@@ -1,0 +1,28 @@
+{
+  "name": "bibliotech-scout-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Aplicación Android de BiblioTech Scout: biblioteca scout offline con contenido actualizable.",
+  "scripts": {
+    "sync:web": "node scripts/sync-web.mjs",
+    "sync": "npm run sync:web && cap sync android",
+    "build:debug": "npm run sync && cd android && gradlew.bat assembleDebug",
+    "assets": "capacitor-assets generate --android"
+  },
+  "dependencies": {
+    "@capacitor-community/file-opener": "^8.0.1",
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/browser": "^8.0.5",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/dialog": "^8.0.1",
+    "@capacitor/filesystem": "^8.1.5",
+    "@capacitor/network": "^8.0.1",
+    "@capacitor/preferences": "^8.0.1",
+    "@capacitor/toast": "^8.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^4.0.0",
+    "@capacitor/cli": "^8.6.0"
+  }
+}

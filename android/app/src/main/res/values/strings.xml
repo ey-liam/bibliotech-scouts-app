@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">BiblioTech Scout</string>
+    <string name="title_activity_main">BiblioTech Scout</string>
+    <string name="package_name">mx.bibliotechscout.app</string>
+    <string name="custom_url_scheme">mx.bibliotechscout.app</string>
+</resources>

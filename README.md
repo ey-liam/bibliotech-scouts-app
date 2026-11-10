@@ -43,8 +43,9 @@ sitio (GitHub Pages)  ->  scripts/sync-web.mjs  ->  www/  ->  Capacitor  ->  APK
 
 La carpeta `assets/` (66 MB de fotos) **no** se empaqueta: sus URLs se reescriben
 a `https://ey-liam.github.io/bibliotech-scouts/assets/...` y se ven cuando hay
-internet. Los archivos originales de `files/` tampoco se empaquetan; se descargan
-desde el panel Offline.
+internet. Las portadas de `covers/` (11 MB) también se enlazan al sitio. Los
+archivos originales de `files/` tampoco se empaquetan; se descargan desde el
+panel Offline.
 
 Después se inyectan `native-early.js`, `native.css` y `native-bridge.js`. La
 primera se carga en `<head>`, antes de `app.js`, para que el catálogo y las

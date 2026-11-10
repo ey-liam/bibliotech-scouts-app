@@ -46,8 +46,10 @@ a `https://ey-liam.github.io/bibliotech-scouts/assets/...` y se ven cuando hay
 internet. Los archivos originales de `files/` tampoco se empaquetan; se descargan
 desde el panel Offline.
 
-Después se inyectan `native.css` y `native-bridge.js`, que son los que añaden la
-interfaz nativa sin modificar `app.js` del sitio.
+Después se inyectan `native-early.js`, `native.css` y `native-bridge.js`. La
+primera se carga en `<head>`, antes de `app.js`, para que el catálogo y las
+preguntas actualizadas se lean de la caché; las otras dos añaden la interfaz
+nativa sin modificar `app.js` del sitio.
 
 ## Desarrollo local
 
@@ -126,6 +128,7 @@ Al abrir la app (como máximo una vez cada 12 horas) se consulta
 | --- | --- |
 | `scripts/sync-web.mjs` | Copia el sitio a `www/` e inyecta la capa nativa |
 | `scripts/make-assets.mjs` | Genera icono y splash desde `img/icon-512.png` |
+| `web-overlay/native-early.js` | Usa la caché de contenido antes de que arranque `app.js` |
 | `web-overlay/native-bridge.js` | Panel offline, descargas, sincronización y updates |
 | `web-overlay/native.css` | Estilos del panel y del botón flotante |
 | `android/` | Proyecto Android generado por Capacitor |

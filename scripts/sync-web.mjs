@@ -86,6 +86,10 @@ async function patchHtml() {
   // y no inflan el APK (66 MB). Las rutas locales pasan a ser absolutas.
   html = html.replace(/(src|href|srcset)="assets\//g, `$1="${siteUrl}/assets/`);
 
+  if (!html.includes("native-early.js")) {
+    html = html.replace("</head>", '  <script src="native-early.js"></script>\n</head>');
+  }
+
   if (!html.includes("native.css")) {
     html = html.replace("</head>", '  <link rel="stylesheet" href="native.css" />\n</head>');
   }
@@ -98,7 +102,7 @@ async function patchHtml() {
 }
 
 async function copyOverlay() {
-  for (const file of ["native.css", "native-bridge.js"]) {
+  for (const file of ["native-early.js", "native.css", "native-bridge.js"]) {
     await cp(path.join(overlayDir, file), path.join(outDir, file));
   }
 }

@@ -42,11 +42,13 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Preparar Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Instalar plataforma Android
-        run: sdkmanager --install "platforms;android-36" "build-tools;36.0.0" "platform-tools"
+        run: |
+          SDK_ROOT="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          SDKMANAGER="$(find "$SDK_ROOT/cmdline-tools" -name sdkmanager -type f | head -n 1)"
+          echo "sdkmanager: $SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses > /dev/null 2>&1 || true
+          "$SDKMANAGER" --install "platforms;android-36" "build-tools;36.0.0" "platform-tools"
 
       - name: Decodificar el keystore de publicación
         if: startsWith(github.ref, 'refs/tags/v')

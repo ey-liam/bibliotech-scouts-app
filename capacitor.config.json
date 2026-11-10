@@ -1,0 +1,12 @@
+{
+  "appId": "mx.bibliotechscout.app",
+  "appName": "BiblioTech Scout",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#0a1024",
+    "allowMixedContent": false
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}

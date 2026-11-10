@@ -73,29 +73,9 @@
   }
 
   // ------------------------------------------------------------------
-  // Caché de datos: permite actualizar catálogo, preguntas y textos
-  // sin publicar un APK nuevo.
+  // Caché de datos: native-early.js la instala en <head>, antes de que
+  // app.js empiece a pedir el catálogo. Aquí solo se escribe y se borra.
   // ------------------------------------------------------------------
-  function installFetchCache() {
-    if (!("caches" in window)) return;
-    const originalFetch = window.fetch.bind(window);
-    window.fetch = function (input, init) {
-      let url = "";
-      try {
-        url = typeof input === "string" ? input : input && input.url ? input.url : "";
-      } catch (_) {
-        return originalFetch(input, init);
-      }
-      if (!url || !/^(\.\/)?(data|app-build\.json)/.test(url)) {
-        return originalFetch(input, init);
-      }
-      return caches
-        .open(CACHE_NAME)
-        .then((cache) => cache.match(new URL(url, location.href).href))
-        .then((hit) => hit || originalFetch(input, init))
-        .catch(() => originalFetch(input, init));
-    };
-  }
 
   async function readPref(key, fallback) {
     try {
@@ -598,7 +578,10 @@
         try {
           const head = await fetch(remoteUrl, { method: "HEAD", cache: "no-store" });
           if (!head.ok) continue;
-          const etag = head.headers.get("etag") || head.headers.get("content-length") || "";
+          const etag =
+            head.headers.get("etag") ||
+            [head.headers.get("last-modified"), head.headers.get("content-length")].filter(Boolean).join("|") ||
+            "";
           if (etag && etags[path] === etag) continue;
           const res = await fetch(remoteUrl, { cache: "no-store" });
           if (!res.ok) continue;
@@ -750,7 +733,10 @@
     try {
       const head = await fetch(`${SITE}/data/catalog.json`, { method: "HEAD", cache: "no-store" });
       if (!head.ok) return;
-      const etag = head.headers.get("etag") || head.headers.get("content-length") || "";
+      const etag =
+        head.headers.get("etag") ||
+        [head.headers.get("last-modified"), head.headers.get("content-length")].filter(Boolean).join("|") ||
+        "";
       const etags = await readPref("content_etags", {});
       const previous = etags["data/catalog.json"];
       if (etag && previous && previous !== etag && navigator.onLine) {
@@ -855,7 +841,6 @@
   // Arranque
   // ------------------------------------------------------------------
   async function start() {
-    installFetchCache();
     await clearOldContentCache();
     await loadOfflineIndex();
     buildUi();

@@ -78,6 +78,22 @@ async function copySite(source) {
   }
 }
 
+async function patchAppJs() {
+  const appPath = path.join(outDir, "app.js");
+  let js = await readFile(appPath, "utf8");
+  const before = js;
+
+  // Las portadas (11 MB) se quedan en el sitio y se ven cuando hay internet.
+  // Sin conexión, app.js muestra su portada de respaldo.
+  js = js.replace(/`covers\//g, `\`${siteUrl}/covers/`);
+
+  if (js === before) {
+    throw new Error("No se encontraron las rutas de covers/ en app.js.");
+  }
+
+  await writeFile(appPath, js, "utf8");
+}
+
 async function patchHtml() {
   const htmlPath = path.join(outDir, "index.html");
   let html = await readFile(htmlPath, "utf8");
@@ -132,6 +148,7 @@ async function dirSize(dir) {
 
 const source = await prepareSource();
 await copySite(source);
+await patchAppJs();
 await patchHtml();
 await copyOverlay();
 const info = await writeBuildInfo(source);

@@ -105,7 +105,8 @@ node scripts/make-native-test.mjs
 
 Abre <http://127.0.0.1:8766/native-test.html>. La página carga
 `native-mock.js` para simular Capacitor, descargas y el lector PDF. No forma
-parte del APK.
+parte del APK. Después de probar, vuelve a ejecutar `npm run sync:web` antes de
+`npx cap sync android` para que las páginas de prueba no entren en la compilación.
 
 ## Compilación y publicación
 

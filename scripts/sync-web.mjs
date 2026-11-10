@@ -13,6 +13,20 @@ const overlayDir = path.join(root, "web-overlay");
 
 const pkg = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 
+// Recursos de interfaz que deben viajar dentro del APK. Son los que usan el
+// menú, las animaciones, los fondos, el autor y las secciones del sitio.
+// Las galerías grandes que no se referencian desde la página se quedan fuera.
+const BASE_ASSETS = [
+  "assets/Liam.png",
+  "assets/Liam.webp",
+  "assets/LiamFondo.jpg",
+  "assets/scouts/logo_biblioteca_centenario.png",
+  "assets/scouts/foto_secciones_nac.png",
+  "assets/scouts/foros_extra_2.jpg",
+  "assets/scouts/foros_evento_3.jpg",
+  "assets/scouts/wosm_photo2.jpg",
+];
+
 const sibling = path.resolve(root, "..", "bibliotech-scouts");
 const localSource = process.env.SITE_SOURCE
   ? path.resolve(process.env.SITE_SOURCE)
@@ -51,7 +65,7 @@ async function prepareSource() {
     repoUrl,
     cloneDir,
   ]);
-  run("git", ["-C", cloneDir, "sparse-checkout", "set", "data", "img"]);
+  run("git", ["-C", cloneDir, "sparse-checkout", "set", "data", "img", "covers", "assets"]);
   return cloneDir;
 }
 
@@ -69,52 +83,62 @@ async function copySite(source) {
     await cp(from, path.join(outDir, file));
   }
 
-  for (const dir of ["data", "img"]) {
+  for (const dir of ["data", "img", "covers"]) {
     const from = path.join(source, dir);
     if (!existsSync(from)) {
       throw new Error(`Falta la carpeta ${dir}/ en el sitio de origen (${source}).`);
     }
     await cp(from, path.join(outDir, dir), { recursive: true });
   }
+
+  // Solo los recursos visuales que la página usa de verdad. Así el APK incluye
+  // menú, animaciones y fondos sin arrastrar las galerías de 66 MB.
+  for (const relative of BASE_ASSETS) {
+    const from = path.join(source, relative);
+    if (!existsSync(from)) {
+      throw new Error(`Falta el recurso base ${relative} en el sitio de origen.`);
+    }
+    const to = path.join(outDir, relative);
+    await mkdir(path.dirname(to), { recursive: true });
+    await cp(from, to);
+  }
 }
 
-async function patchAppJs() {
-  const appPath = path.join(outDir, "app.js");
-  let js = await readFile(appPath, "utf8");
-  const before = js;
+function patchHtml(html) {
+  let out = html;
 
-  // Las portadas (11 MB) se quedan en el sitio y se ven cuando hay internet.
-  // Sin conexión, app.js muestra su portada de respaldo.
-  js = js.replace(/`covers\//g, `\`${siteUrl}/covers/`);
-
-  if (js === before) {
-    throw new Error("No se encontraron las rutas de covers/ en app.js.");
+  // La leyenda del pie se genera desde package.json para que la app y el sitio
+  // muestren siempre la misma versión.
+  if (pkg.versionLabel) {
+    out = out.replace(
+      /(<p class="footer-db-cutoff">\s*Base de datos: )([^<]+)(<\/p>)/i,
+      (match, start, body, end) => {
+        const cutoff = (body.match(/\d{2}\/\d{2}\/\d{4}/) || ["03/11/2026"])[0];
+        return `${start}${cutoff} · ${pkg.versionLabel}${end}`;
+      }
+    );
   }
 
-  await writeFile(appPath, js, "utf8");
+  if (!out.includes("native-early.js")) {
+    out = out.replace("</head>", '  <script src="native-early.js"></script>\n</head>');
+  }
+
+  if (!out.includes("native.css")) {
+    out = out.replace("</head>", '  <link rel="stylesheet" href="native.css" />\n</head>');
+  }
+
+  if (!out.includes("native-bridge.js")) {
+    out = out.replace("</body>", '  <script src="native-bridge.js" defer></script>\n</body>');
+  }
+
+  return out;
 }
 
-async function patchHtml() {
+async function patchHtmlFile() {
   const htmlPath = path.join(outDir, "index.html");
-  let html = await readFile(htmlPath, "utf8");
-
-  // Las imágenes de assets/ se quedan en el servidor: se ven cuando hay internet
-  // y no inflan el APK (66 MB). Las rutas locales pasan a ser absolutas.
-  html = html.replace(/(src|href|srcset)="assets\//g, `$1="${siteUrl}/assets/`);
-
-  if (!html.includes("native-early.js")) {
-    html = html.replace("</head>", '  <script src="native-early.js"></script>\n</head>');
-  }
-
-  if (!html.includes("native.css")) {
-    html = html.replace("</head>", '  <link rel="stylesheet" href="native.css" />\n</head>');
-  }
-
-  if (!html.includes("native-bridge.js")) {
-    html = html.replace("</body>", '  <script src="native-bridge.js" defer></script>\n</body>');
-  }
-
-  await writeFile(htmlPath, html, "utf8");
+  const html = await readFile(htmlPath, "utf8");
+  const patched = patchHtml(html);
+  await writeFile(htmlPath, patched, "utf8");
 }
 
 async function copyOverlay() {
@@ -127,8 +151,11 @@ async function writeBuildInfo(source) {
   const commit = runCapture("git", ["-C", source, "rev-parse", "--short", "HEAD"]) || "desconocido";
   const info = {
     appVersion: pkg.version,
+    versionLabel: pkg.versionLabel || "",
     siteCommit: commit,
     siteUrl,
+    baseAssets: BASE_ASSETS,
+    bundledCovers: true,
     builtAt: new Date().toISOString(),
   };
   await writeFile(path.join(outDir, "app-build.json"), JSON.stringify(info, null, 2) + "\n", "utf8");
@@ -148,13 +175,13 @@ async function dirSize(dir) {
 
 const source = await prepareSource();
 await copySite(source);
-await patchAppJs();
-await patchHtml();
+await patchHtmlFile();
 await copyOverlay();
 const info = await writeBuildInfo(source);
 
 const size = await dirSize(outDir);
 console.log("");
 console.log(`www/ listo — commit del sitio: ${info.siteCommit}`);
+console.log(`Versión visible: ${info.versionLabel}`);
 console.log(`Peso del contenido web: ${(size / 1024 / 1024).toFixed(1)} MB`);
 console.log("Siguiente paso: npx cap sync android");

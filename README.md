@@ -1,30 +1,48 @@
 # BiblioTech Scout — App Android
 
 Aplicación Android (teléfonos y tablets) de **BiblioTech Scout**. Envuelve el sitio
-oficial con Capacitor y añade funciones que el navegador no puede dar: descargas
-selectivas para uso sin conexión y actualización del APK desde GitHub Releases.
+oficial con Capacitor y añade funciones que el navegador no puede dar: biblioteca
+sin conexión, lector de PDF integrado, gestor de archivos descargados y
+actualización del APK desde GitHub Releases.
 
 - Sitio: <https://ey-liam.github.io/bibliotech-scouts/>
 - App: este repositorio
 - Paquete Android: `mx.bibliotechscout.app`
+- Versión actual: `0.1.3` — `BETA V4 - 1.3 Mobile (10/11/2026)`
 - Sitio de referencia: `ey-liam/bibliotech-scouts`
 
 ## Qué incluye
 
-- **Preguntas y texto disponibles desde el primer arranque.** El catálogo, el banco
-  de preguntas, la base de conocimiento y los textos extraídos de los 650
-  documentos viajan dentro del APK (~36 MB).
-- **Modo sin conexión selectivo.** Un panel propio permite elegir qué archivos
-  originales (PDF, DOCX, XLSX, imágenes) descargar, ver su peso, seguir el
-  progreso y borrarlos después.
-- **Lectura de archivos guardados.** Los documentos descargados se abren con el
-  visor del sistema mediante `@capacitor-community/file-opener`.
+- **Todo el contenido de consulta desde el primer arranque.** El catálogo, el
+  banco de preguntas, la base de conocimiento, los fragmentos de búsqueda y los
+  textos extraídos de los documentos viajan dentro del APK.
+- **Preguntas sin conexión desde la primera consulta.** El motor local espera a
+  que terminen de cargar el catálogo, el banco de preguntas y los fragmentos
+  antes de responder, incluso si la pregunta se hace justo al abrir la app.
+- **Mi biblioteca.** Panel con tres pestañas:
+  - **Descargar:** los 301 documentos con archivo original, con búsqueda, filtro
+    por sección, selección múltiple, peso y progreso.
+  - **Mis archivos:** solo lo descargado, con búsqueda, fecha, apertura y borrado.
+  - **App:** versión, contenido del sitio, estado de conexión, actualización de
+    contenido, búsqueda de APK nuevo y verificación de datos sin conexión.
+- **Lector de PDF integrado.** Los PDF descargados se abren dentro de la app con
+  `PdfRenderer`, sin internet ni apps externas. Incluye navegación de páginas,
+  zoom hasta 250 %, deslizamiento horizontal y botón Atrás.
+- **Visor de imágenes integrado** para PNG, JPG, WebP, AVIF y GIF. DOCX, XLSX,
+  PPTX y otros formatos se abren con el visor del sistema mediante
+  `@capacitor-community/file-opener`.
+- **Recursos base incluidos.** El APK lleva los ocho recursos visuales que usa la
+  página (retrato y fondo del autor, logos y fotos de secciones) y las 433
+  portadas del catálogo. La interfaz no depende del sitio para verse completa.
 - **Contenido actualizable sin publicar un APK.** La app comprueba el ETag de los
   JSON del sitio y guarda las versiones nuevas en Cache Storage. Los textos
   nuevos o modificados se sincronizan desde el árbol del repositorio.
 - **Autoactualización del APK.** Consulta la última release del repositorio, avisa
   al usuario y descarga e instala la nueva versión con un plugin nativo propio
   (`NativeUpdater`).
+- **Navegación móvil corregida.** El botón de Mi biblioteca es compacto, está
+  abajo a la izquierda y ya no choca con la barra rápida del sitio ni tapa el
+  contenido. El menú móvil respeta las safe areas y el pie tiene espacio extra.
 - **Enlaces externos en el navegador del sistema** y botón Atrás controlado.
 - **Aviso de sin conexión** y contador de archivos guardados.
 
@@ -38,19 +56,26 @@ sitio (GitHub Pages)  ->  scripts/sync-web.mjs  ->  www/  ->  Capacitor  ->  APK
 --sparse`) y copia a `www/`:
 
 - `index.html`, `styles.css`, `app.js`, `manifest.webmanifest`
-- `data/**` (catálogo, preguntas, textos)
+- `data/**` (catálogo, preguntas, base de conocimiento, chunks y textos)
 - `img/**`
+- `covers/**` (433 portadas, ~11 MB)
+- Los ocho recursos de `assets/` que la página usa de verdad: `Liam.png`,
+  `Liam.webp`, `LiamFondo.jpg` y las imágenes de `assets/scouts/` referenciadas
+  en el HTML.
 
-La carpeta `assets/` (66 MB de fotos) **no** se empaqueta: sus URLs se reescriben
-a `https://ey-liam.github.io/bibliotech-scouts/assets/...` y se ven cuando hay
-internet. Las portadas de `covers/` (11 MB) también se enlazan al sitio. Los
-archivos originales de `files/` tampoco se empaquetan; se descargan desde el
-panel Offline.
+La carpeta `assets/` completa (66 MB de galerías) **no** se empaqueta. Los
+archivos originales de `files/` tampoco: se descargan desde Mi biblioteca. El
+contenido web resultante pesa unos 60.7 MB.
 
-Después se inyectan `native-early.js`, `native.css` y `native-bridge.js`. La
-primera se carga en `<head>`, antes de `app.js`, para que el catálogo y las
-preguntas actualizadas se lean de la caché; las otras dos añaden la interfaz
-nativa sin modificar `app.js` del sitio.
+El sincronizador también:
+
+- Parchea la leyenda del pie con `versionLabel` de `package.json`, para que la
+  web y la app muestren la misma versión.
+- Inyecta `native-early.js` en `<head>`, antes de `app.js`, para que el catálogo
+  y las preguntas actualizadas se lean de la caché.
+- Inyecta `native.css` y `native-bridge.js` sin modificar el `app.js` del sitio.
+- Genera `www/app-build.json` con la versión, el commit del sitio y los recursos
+  incluidos.
 
 ## Desarrollo local
 
@@ -71,14 +96,26 @@ $env:SITE_SOURCE = "C:\Users\liamc\bibliotech-scouts"
 npm run sync:web
 ```
 
+### Probar la capa nativa en el navegador
+
+```powershell
+npx --yes http-server www -p 8766 -a 127.0.0.1 -c-1
+node scripts/make-native-test.mjs
+```
+
+Abre <http://127.0.0.1:8766/native-test.html>. La página carga
+`native-mock.js` para simular Capacitor, descargas y el lector PDF. No forma
+parte del APK. Después de probar, vuelve a ejecutar `npm run sync:web` antes de
+`npx cap sync android` para que las páginas de prueba no entren en la compilación.
+
 ## Compilación y publicación
 
 El workflow `.github/workflows/android.yml` compila en cada push y PR (APK de
 prueba como artefacto). Para publicar una versión:
 
 ```powershell
-git tag v0.1.1
-git push origin v0.1.1
+git tag v0.1.3
+git push origin v0.1.3
 ```
 
 El workflow:
@@ -103,7 +140,7 @@ El workflow:
 
 ### Contenido
 
-El panel **Offline → Actualizar contenido** revisa:
+El panel **Mi biblioteca → App → Actualizar contenido** revisa:
 
 - `data/catalog.json`, `questions_bank.json`, `knowledge_base.json`,
   `chunks.json` y `faq_v3.json` mediante ETag.
@@ -127,21 +164,30 @@ Al abrir la app (como máximo una vez cada 12 horas) se consulta
 
 | Ruta | Qué contiene |
 | --- | --- |
-| `scripts/sync-web.mjs` | Copia el sitio a `www/` e inyecta la capa nativa |
+| `scripts/sync-web.mjs` | Copia el sitio, portadas y recursos base; parchea la versión e inyecta la capa nativa |
 | `scripts/make-assets.mjs` | Genera icono y splash desde `img/icon-512.png` |
+| `scripts/make-native-test.mjs` | Crea la página de prueba con el mock de Capacitor |
 | `web-overlay/native-early.js` | Usa la caché de contenido antes de que arranque `app.js` |
-| `web-overlay/native-bridge.js` | Panel offline, descargas, sincronización y updates |
-| `web-overlay/native.css` | Estilos del panel y del botón flotante |
+| `web-overlay/native-bridge.js` | Mi biblioteca, descargas, lector PDF, imágenes y updates |
+| `web-overlay/native.css` | Estilos del panel, botón flotante y visores |
+| `web-overlay/native-mock.js` | Mock de Capacitor para probar en navegador |
 | `android/` | Proyecto Android generado por Capacitor |
+| `android/app/src/main/java/mx/bibliotechscout/app/MainActivity.java` | Registra `NativeUpdater` y `PdfViewer` |
 | `android/app/src/main/java/mx/bibliotechscout/app/NativeUpdaterPlugin.java` | Descarga e instalación del APK |
+| `android/app/src/main/java/mx/bibliotechscout/app/PdfViewerPlugin.java` | Renderiza páginas de PDF con `PdfRenderer` |
 | `.github/workflows/android.yml` | Compilación y publicación |
 
 ## Limitaciones conocidas
 
 - El APK se distribuye directamente (no Play Store), así que Android muestra el
   aviso de «instalar apps desconocidas».
-- Las imágenes de `assets/` y los archivos de `files/` requieren internet salvo
-  que se descarguen desde el panel.
+- DOCX, XLSX y PPTX necesitan una app compatible instalada; el lector propio solo
+  cubre PDF e imágenes.
+- Las galerías completas de `assets/` requieren internet. Los recursos de la
+  interfaz y las portadas sí están incluidos en el APK.
+- Los cambios de interfaz del sitio (`index.html`, `styles.css`, `app.js`)
+  requieren publicar una versión nueva del APK. El contenido de `data/**` y los
+  textos sí se actualizan desde el panel.
 - La app no sustituye al sitio: el sitio sigue siendo la fuente de contenido y
   metadatos.
 - No se editan a mano los JSON de `data/`; se generan en el repositorio del sitio.

@@ -1,7 +1,7 @@
 # BiblioTech Scout — Documento Maestro de Traspaso y Arquitectura del Sistema
 **Para:** Gemini Argon 4 / Próximos Desarrolladores y Agentes  
 **Fecha de corte:** 11 de Noviembre de 2026  
-**Versión actual del ecosistema:** BETA V7 (Web) · Mobile 2.1.1 (Android)  
+**Versión actual del ecosistema:** BETA V7 (Web) · Mobile 2.2.2 (Android)  
 **Autor y Creador Exclusivo:** Liam Durán — Provincia TLXH (Instagram: [@liaadurg3](https://www.instagram.com/liaadurg3/))  
 **Repositorio Web:** `https://github.com/ey-liam/bibliotech-scouts`  
 **Repositorio App Android:** `https://github.com/ey-liam/bibliotech-scouts-app`  
@@ -44,9 +44,9 @@ El desarrollo actual de BiblioTech Scout es el resultado de un trabajo coordinad
 * **Prototipos de Motor de Respuestas:** Diseñó scripts de evaluación semántica local con stopwords y sinónimos para generar respuestas directas sin depender de APIs de IA de pago.
 
 ### Aportes de Antigravity
-* **Hero V7 (Portada Inclinada Estilo Jamboree 2027):**
+* **Reestructuración de la Interfaz de Inicio (V7):**
   - Diseñó el gran banner dinámico inclinado (`rotate(-2deg)`) con tipografía bold display (`BiblioTech Scout`) en la paleta azul-morada del proyecto, cinta horizontal de fondo (`.hero-band`), iconos scout en esquinas y subtítulo oficial de Liam Durán.
-  - Reestructuró el contenido inicial en dos columnas: descripción del sitio con estadísticas (`5,451 preguntas`, `498 documentos`, `104 temas`) y escenario fotográfico de la Comunidad de Caminantes.
+  - Reestructuró el contenido inicial en dos columnas: descripción del sitio optimizada para consultas rápidas y escenario visual continuo.
 * **Sustitución de «Mochila» por «Guardados» con Cookies y LocalStorage Híbrido:**
   - Retiró el sistema antiguo de mochila que presentaba fallos en PWA/iOS.
   - Implementó persistencia híbrida en `document.cookie` y `localStorage` (`bt_saved_docs` y `bt_note_`), asegurando que los documentos guardados y las notas persistan de forma confiable entre sesiones.
@@ -83,6 +83,7 @@ El desarrollo actual de BiblioTech Scout es el resultado de un trabajo coordinad
   - Control de audio TTS (`speechSynthesis`).
   - Lector interactivo con visor PDF embebido, pestañas de texto extraído y buscador interno con resaltado.
 * **`data/catalog.json`**: Catálogo completo de 650 documentos (498 libros/manuales oficiales descargables), con metadatos de categoría, sección, año, páginas, sinopsis y hash SHA12.
+* **`data/questions_bank.json`, `data/faq_v3.json` y `data/faq_v4.json`**: Banco combinado de **11,254 preguntas y respuestas únicas** (`5,356` base, `101` V3 y `5,797` V4). El banco V4 añade preguntas de convocatorias, formatos/actas/seguro, menciones textuales con página y cita, y extractos por documento.
 * **`data/text/`**: 650 archivos de texto plano indexados por hash SHA12 para lectura rápida y motor de búsqueda sin conexión.
 * **`covers/`**: 433 portadas de libros y manuales oficiales en formato JPG optimizado.
 

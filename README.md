@@ -8,17 +8,16 @@ nuevas versiones con descarga desde GitHub Releases.
 - Sitio: <https://ey-liam.github.io/bibliotech-scouts/>
 - App: este repositorio
 - Paquete Android: `mx.bibliotechscout.app`
-- Versión actual: `2.1.1` — `BETA V7 - 2.1.1 Mobile (10/11/2026)`
+- Versión actual: `2.2.0` — `V2.2.0 Mobile - Web V7 Fusión Cósmica (11/11/2026)`
 - Creador: Liam Durán - Provincia TLXH (Instagram: [@liaadurg3](https://www.instagram.com/liaadurg3/))
 - Sitio de referencia: `ey-liam/bibliotech-scouts`
 
-## Novedades de la Versión 2.1.1 (Edición "Game Feel & UI Unificada")
+## Novedades de la Versión 2.2.0 (Fusión Cósmica & Modo Noche Limpio)
 
-- **Dock Inferior Unificado de Cristal:** La app se integra de forma limpia con la barra inferior flotante de la V7; el acceso a Mi Mochila / Descargas se sincroniza directamente sin tapar la pantalla.
-- **Caché Offline de Portadas:** Al guardar cualquier documento, la portada original a color se guarda en el almacenamiento nativo de `@capacitor/filesystem` para navegar por la biblioteca sin conexión visualmente completa.
-- **Memoria de Última Página y Nivel de Zoom:** El visor PDF recuerda de forma persistente la última página y el nivel de zoom en cada documento.
-- **Modo Campamento / Visión Nocturna:** Compatibilidad nativa completa con el tema nocturno OLED negro puro y ámbar astronómico.
-- **Micro-Pulsos Hápticos:** Respuesta al tacto nativa al descargar, guardar en la mochila y navegar por el catálogo.
+- **Portada Cósmica Dinámica Sincronizada:** Incorpora la nueva portada estilizada con cinta en zigzag en gradiente púrpura/cian, tarjeta central `BIBLIOTECH SCOUT` con firma `By Liam` y doodles vectoriales animados.
+- **Buscador Extendido y Cubos Decorativos:** El fondo cósmico fluye sin cortes hacia el motor de consulta con cubos 3D y botón de recarga de preguntas aleatorias `↻`.
+- **Modo Noche Invertido Limpio:** Sustitución del filtro ámbar por un modo oscuro puro OLED con tipografía en alto contraste blanco/azul neón sin distorsión de color en documentos e imágenes.
+- **Optimización para Teléfonos:** Badge de marca "Scout" visible en todo momento y eliminación de controles duplicados entre el dock nativo y la interfaz web.
 
 ## Descargar la app
 

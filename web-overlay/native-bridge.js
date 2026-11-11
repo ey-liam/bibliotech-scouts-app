@@ -20,11 +20,12 @@
   const Toast = plugin("Toast");
   const Network = plugin("Network");
   const FileOpener = plugin("FileOpener");
-  const NativeUpdater = plugin("NativeUpdater");
   const PdfViewer = plugin("PdfViewer");
 
   const SITE = "https://ey-liam.github.io/bibliotech-scouts";
   const APP_REPO = "ey-liam/bibliotech-scouts-app";
+  const APP_RELEASES = `https://github.com/${APP_REPO}/releases/latest`;
+  const APP_DOWNLOAD = `${APP_RELEASES}/download/bibliotech-scout.apk`;
   const SITE_REPO = "ey-liam/bibliotech-scouts";
   const DATA_DIR = "offline";
   const CACHE_NAME = "bt-content-v1";
@@ -306,11 +307,11 @@
             </div>
             <div class="bt-app-actions">
               <button type="button" class="bt-btn bt-primary" id="bt-update">Actualizar contenido</button>
-              <button type="button" class="bt-btn bt-secondary" id="bt-check-app">Buscar nueva versión</button>
+              <button type="button" class="bt-btn bt-secondary" id="bt-check-app">Buscar actualización</button>
               <button type="button" class="bt-btn bt-secondary" id="bt-verify-offline">Verificar preguntas sin conexión</button>
             </div>
             <p class="bt-app-status" id="bt-app-status" role="status"></p>
-            <p class="bt-note">Los archivos se guardan solo en este dispositivo. Las preguntas y el texto ya vienen incluidos en la app y funcionan sin internet.</p>
+            <p class="bt-note">Los archivos se guardan solo en este dispositivo. Las preguntas y el texto ya vienen incluidos en la app y funcionan sin internet. La app no instala actualizaciones por su cuenta: al pulsar «Buscar actualización» se abre la descarga en el navegador.</p>
           </section>
         </div>
 
@@ -1351,7 +1352,7 @@
   }
 
   // ------------------------------------------------------------------
-  // Actualización del APK
+  // Aviso de actualización del APK (la instalación es manual, desde el navegador)
   // ------------------------------------------------------------------
   function compareVersions(a, b) {
     const pa = String(a).replace(/^v/, "").split(".").map((n) => parseInt(n, 10) || 0);
@@ -1375,7 +1376,10 @@
         cache: "no-store",
       });
       if (!res.ok) {
-        if (!silent) toast("No se pudo consultar la versión más reciente.");
+        if (!silent) {
+          await Browser.open({ url: APP_RELEASES });
+          toast("Abriendo la página de descargas…");
+        }
         return;
       }
       const release = await res.json();
@@ -1389,28 +1393,23 @@
         return;
       }
 
-      const asset = (release.assets || []).find((item) => /\.apk$/i.test(item.name));
-      if (!asset) {
-        if (!silent) toast("La versión nueva aún no tiene APK publicado.");
+      await writePref("last_app_check", Date.now());
+
+      if (silent) {
+        toast(`Nueva versión ${latest} disponible. Ábrela desde Mi biblioteca → App.`, true);
         return;
       }
 
       const accepted = await confirmDialog(
         `Nueva versión ${latest}`,
-        (release.body || "Incluye mejoras y correcciones.").slice(0, 320),
-        "Actualizar",
+        `${(release.body || "Incluye mejoras y correcciones.").slice(0, 280)}\n\nSe abrirá la descarga en el navegador. Instala el APK encima de esta app para conservar tus archivos.`,
+        "Ir a la descarga",
         "Ahora no"
       );
       if (!accepted) return;
 
-      if (!NativeUpdater) {
-        Browser.open({ url: asset.browser_download_url });
-        return;
-      }
-
-      toast("Descargando actualización…", true);
-      await NativeUpdater.install({ url: asset.browser_download_url });
-      toast("Sigue las instrucciones de Android para instalar.", true);
+      await Browser.open({ url: APP_DOWNLOAD });
+      toast("Descarga el APK y ábrelo para instalar la actualización.", true);
     } catch (error) {
       console.warn("No se pudo buscar actualización", error);
       if (!silent) toast("No se pudo buscar la actualización.");

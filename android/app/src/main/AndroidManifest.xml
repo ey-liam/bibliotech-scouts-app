@@ -19,18 +19,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
-        </provider>
     </application>
 
     <!-- Permissions -->
-
+    <!-- La app solo necesita internet. No solicita REQUEST_INSTALL_PACKAGES:
+         las actualizaciones se descargan y se instalan desde el navegador. -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 </manifest>

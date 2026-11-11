@@ -2,14 +2,35 @@
 
 Aplicación Android (teléfonos y tablets) de **BiblioTech Scout**. Envuelve el sitio
 oficial con Capacitor y añade funciones que el navegador no puede dar: biblioteca
-sin conexión, lector de PDF integrado, gestor de archivos descargados y
-actualización del APK desde GitHub Releases.
+sin conexión, lector de PDF integrado, gestor de archivos descargados y aviso de
+nuevas versiones con descarga desde GitHub Releases.
 
 - Sitio: <https://ey-liam.github.io/bibliotech-scouts/>
 - App: este repositorio
 - Paquete Android: `mx.bibliotechscout.app`
-- Versión actual: `0.1.3` — `BETA V4 - 1.3 Mobile (10/11/2026)`
+- Versión actual: `0.1.4` — `BETA V4.1 - 1.4 Mobile (10/11/2026)`
 - Sitio de referencia: `ey-liam/bibliotech-scouts`
+
+## Descargar la app
+
+El enlace siguiente descarga siempre el APK de la última release publicada:
+
+<https://github.com/ey-liam/bibliotech-scouts-app/releases/latest/download/bibliotech-scout.apk>
+
+1. Abre el enlace desde el teléfono y descarga `bibliotech-scout.apk`.
+2. Abre el archivo y permite la instalación desde el navegador si Android lo pide.
+3. Pulsa **Instalar**. Si ya tenías la app, instala encima para conservar tus
+   archivos y descargas.
+
+> **Play Protect:** al instalar fuera de Play Store, Android puede mostrar «Es
+> posible que esta app sea dañina». Es el aviso para apps desconocidas. Verifica
+> que el archivo venga del enlace oficial y pulsa **Más detalles → Instalar de
+> todos modos**. No instales APK de otros sitios. El APK de **Releases** está
+> firmado; el artefacto debug de Actions usa otra firma y no debe instalarse.
+>
+> Desde 1.4 la app ya no solicita `REQUEST_INSTALL_PACKAGES` ni descarga
+> instaladores por su cuenta. Aun así, Google no garantiza que Play Protect deje
+> de advertir en apps distribuidas fuera de su tienda.
 
 ## Qué incluye
 
@@ -24,7 +45,8 @@ actualización del APK desde GitHub Releases.
     por sección, selección múltiple, peso y progreso.
   - **Mis archivos:** solo lo descargado, con búsqueda, fecha, apertura y borrado.
   - **App:** versión, contenido del sitio, estado de conexión, actualización de
-    contenido, búsqueda de APK nuevo y verificación de datos sin conexión.
+    contenido, aviso de nueva versión con descarga en el navegador y
+    verificación de datos sin conexión.
 - **Lector de PDF integrado.** Los PDF descargados se abren dentro de la app con
   `PdfRenderer`, sin internet ni apps externas. Incluye navegación de páginas,
   zoom hasta 250 %, deslizamiento horizontal y botón Atrás.
@@ -37,9 +59,11 @@ actualización del APK desde GitHub Releases.
 - **Contenido actualizable sin publicar un APK.** La app comprueba el ETag de los
   JSON del sitio y guarda las versiones nuevas en Cache Storage. Los textos
   nuevos o modificados se sincronizan desde el árbol del repositorio.
-- **Autoactualización del APK.** Consulta la última release del repositorio, avisa
-  al usuario y descarga e instala la nueva versión con un plugin nativo propio
-  (`NativeUpdater`).
+- **Aviso de nuevas versiones sin instalador interno.** Consulta la última release
+  del repositorio y, si hay una versión mayor, abre la descarga en el navegador.
+  La app no solicita `REQUEST_INSTALL_PACKAGES` ni descarga o abre instaladores
+  por su cuenta. Esto reduce la superficie que Play Protect considera peligrosa
+  en apps distribuidas fuera de la tienda.
 - **Navegación móvil corregida.** El botón de Mi biblioteca es compacto, está
   abajo a la izquierda y ya no choca con la barra rápida del sitio ni tapa el
   contenido. El menú móvil respeta las safe areas y el pie tiene espacio extra.
@@ -114,8 +138,8 @@ El workflow `.github/workflows/android.yml` compila en cada push y PR (APK de
 prueba como artefacto). Para publicar una versión:
 
 ```powershell
-git tag v0.1.3
-git push origin v0.1.3
+git tag v0.1.4
+git push origin v0.1.4
 ```
 
 El workflow:
@@ -152,13 +176,18 @@ para no tapar el contenido nuevo del paquete.
 
 ### APK
 
-Al abrir la app (como máximo una vez cada 12 horas) se consulta
+Al abrir la app (como máximo una vez cada 24 horas) se consulta
 `releases/latest`. Si hay una versión mayor:
 
-1. Se muestra el diálogo con las notas.
-2. Se descarga el APK con `NativeUpdater`.
-3. Android pide permiso para instalar apps desconocidas la primera vez.
-4. Se abre el instalador del sistema.
+1. Se muestra un aviso con las notas de la release.
+2. Al aceptar, se abre en el navegador la descarga directa del APK más reciente.
+3. El usuario descarga el archivo y lo abre desde el navegador o la carpeta de
+   descargas.
+4. Android pide permiso para instalar apps desconocidas la primera vez y abre su
+   instalador. La app no descarga ni ejecuta instaladores por su cuenta.
+
+También se puede entrar a **Mi biblioteca → App → Buscar actualización** o usar
+el enlace de descarga de este README.
 
 ## Estructura
 
@@ -172,15 +201,16 @@ Al abrir la app (como máximo una vez cada 12 horas) se consulta
 | `web-overlay/native.css` | Estilos del panel, botón flotante y visores |
 | `web-overlay/native-mock.js` | Mock de Capacitor para probar en navegador |
 | `android/` | Proyecto Android generado por Capacitor |
-| `android/app/src/main/java/mx/bibliotechscout/app/MainActivity.java` | Registra `NativeUpdater` y `PdfViewer` |
-| `android/app/src/main/java/mx/bibliotechscout/app/NativeUpdaterPlugin.java` | Descarga e instalación del APK |
+| `android/app/src/main/java/mx/bibliotechscout/app/MainActivity.java` | Registra `PdfViewer` |
 | `android/app/src/main/java/mx/bibliotechscout/app/PdfViewerPlugin.java` | Renderiza páginas de PDF con `PdfRenderer` |
 | `.github/workflows/android.yml` | Compilación y publicación |
 
 ## Limitaciones conocidas
 
 - El APK se distribuye directamente (no Play Store), así que Android muestra el
-  aviso de «instalar apps desconocidas».
+  aviso de «instalar apps desconocidas» y Play Protect puede advertir que la app
+  es desconocida o «posiblemente dañina». La app ya no pide instalar otros APK;
+  instala siempre el archivo de **Releases** y nunca el APK debug de Actions.
 - DOCX, XLSX y PPTX necesitan una app compatible instalada; el lector propio solo
   cubre PDF e imágenes.
 - Las galerías completas de `assets/` requieren internet. Los recursos de la

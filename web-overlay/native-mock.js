@@ -83,7 +83,7 @@
         addListener: async () => ({ remove() {} }),
       },
       App: {
-        getInfo: async () => ({ version: "0.1.3", build: "1" }),
+        getInfo: async () => ({ version: "0.1.4", build: "4" }),
         addListener: async () => ({ remove() {} }),
         exitApp: () => {},
       },
@@ -99,9 +99,6 @@
       },
       FileOpener: {
         open: async (options) => window.__openedLog.push(options.filePath),
-      },
-      NativeUpdater: {
-        install: async (options) => console.log("UPDATE:", options.url),
       },
     },
   };

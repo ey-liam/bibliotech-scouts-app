@@ -268,7 +268,7 @@
   function buildUi() {
     if ($("bt-offline-fab")) return;
 
-    injectNavLink();
+    // injectNavLink(); // Retirado: usuario solicitó dejar solo el botón de la esquina inferior izquierda
 
     const fab = document.createElement("button");
     fab.type = "button";
@@ -574,7 +574,7 @@
 
     const setupDockIntegration = () => {
       const dock = document.getElementById("unifiedBottomDock");
-      const dockBtn = document.getElementById("dockBtnMochila");
+      const dockBtn = document.getElementById("dockBtnSaved") || document.getElementById("dockBtnMochila");
       if (dock && dockBtn) {
         document.body.classList.add("has-unified-dock");
         dockBtn.onclick = (e) => {
@@ -653,7 +653,7 @@
       navBadge.hidden = entries.length === 0;
     }
 
-    const dockBadge = $("dockBackpackCount");
+    const dockBadge = $("dockSavedCount") || $("dockBackpackCount");
     if (dockBadge) {
       dockBadge.textContent = String(entries.length);
       dockBadge.classList.toggle("hidden", entries.length === 0);

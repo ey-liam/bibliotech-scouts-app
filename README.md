@@ -8,13 +8,13 @@ nuevas versiones con descarga desde GitHub Releases.
 - Sitio: <https://ey-liam.github.io/bibliotech-scouts/>
 - App: este repositorio
 - Paquete Android: `mx.bibliotechscout.app`
-- Versión actual: `2.1.0` — `BETA V6 - 2.1.0 Mobile (10/11/2026)`
+- Versión actual: `2.1.1` — `BETA V7 - 2.1.1 Mobile (10/11/2026)`
 - Creador: Liam Durán - Provincia TLXH (Instagram: [@liaadurg3](https://www.instagram.com/liaadurg3/))
 - Sitio de referencia: `ey-liam/bibliotech-scouts`
 
-## Novedades de la Versión 2.1.0 (Edición "Game Feel & UI Unificada")
+## Novedades de la Versión 2.1.1 (Edición "Game Feel & UI Unificada")
 
-- **Dock Inferior Unificado de Cristal:** La app se integra de forma limpia con la barra inferior flotante de la V6; el acceso a Mi Mochila / Descargas se sincroniza directamente sin tapar la pantalla.
+- **Dock Inferior Unificado de Cristal:** La app se integra de forma limpia con la barra inferior flotante de la V7; el acceso a Mi Mochila / Descargas se sincroniza directamente sin tapar la pantalla.
 - **Caché Offline de Portadas:** Al guardar cualquier documento, la portada original a color se guarda en el almacenamiento nativo de `@capacitor/filesystem` para navegar por la biblioteca sin conexión visualmente completa.
 - **Memoria de Última Página y Nivel de Zoom:** El visor PDF recuerda de forma persistente la última página y el nivel de zoom en cada documento.
 - **Modo Campamento / Visión Nocturna:** Compatibilidad nativa completa con el tema nocturno OLED negro puro y ámbar astronómico.

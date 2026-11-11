@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
 
-def appVersionName = System.getenv("APP_VERSION_NAME") ?: "2.1.0"
+def appVersionName = System.getenv("APP_VERSION_NAME") ?: "2.1.1"
 if (appVersionName.startsWith("v")) {
     appVersionName = appVersionName.substring(1)
 }

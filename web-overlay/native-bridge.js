@@ -2336,3 +2336,160 @@
     start();
   }
 })();
+
+/* ============================================================================
+ * DOCUMENTO MAESTRO UNIFICADO DE ARQUITECTURA, PROTOCOLO Y TRASPASO INTERNO
+ * (Consolidación íntegra de AGENTS.md, GEMINI.md, TRASPASO.md,
+ *  TRASPASO_GEMINI_ARGON.md y copilot-instructions.md)
+ * ============================================================================
+ *
+ * Fecha de corte: 11 de Noviembre de 2026
+ * Versión actual del ecosistema: BETA V7 (Web) · Mobile 2.2.2 (Android)
+ * Autor y Creador Exclusivo: Liam Durán — Provincia TLXH (Instagram: @liaadurg3)
+ * Repositorio Web: https://github.com/ey-liam/bibliotech-scouts
+ * Repositorio App Android: https://github.com/ey-liam/bibliotech-scouts-app
+ * Sitio Web Público: https://ey-liam.github.io/bibliotech-scouts/
+ * APK Oficial Release: https://github.com/ey-liam/bibliotech-scouts-app/releases/latest/download/bibliotech-scout.apk
+ *
+ * ----------------------------------------------------------------------------
+ * 1. REGLAS FUNDAMENTALES DEL PROYECTO (LECTURA OBLIGATORIA)
+ * ----------------------------------------------------------------------------
+ * 1. Autoría y Colaboradores Exclusivos:
+ *    - En todos los commits, PRs, README.md, licencias, créditos de interfaz y
+ *      metadatos de GitHub, el único autor y creador reconocido es Liam Durán
+ *      (ey-liam, correo verificado: rdc.tlxh@gmail.com / liamchuchundra1@gmail.com).
+ *    - Bajo ninguna circunstancia se debe listar a agentes de IA (OpenCode,
+ *      Antigravity, Gemini, Claude o Copilot) como autores o colaboradores en
+ *      GitHub ni en la web.
+ *    - Las ramas de trabajo agent/<agente>/<tema> o human/<tema> son convenios
+ *      técnicos temporales; siempre deben fusionarse a main utilizando --squash
+ *      y eliminando la rama para mantener el historial limpio y con un solo
+ *      contribuidor.
+ * 2. Cero Emojis en Código y Menús:
+ *    - No se deben utilizar emojis gráficos en ninguna parte del código fuente,
+ *      menús, textos, títulos de botones, commits ni etiquetas. Únicamente se
+ *      permiten iconos SVG vectoriales limpios y accesibles con atributos ARIA.
+ * 3. Privacidad y Documentos Sensibles:
+ *    - El acervo documental de BiblioTech Scout está compuesto únicamente por
+ *      publicaciones, manuales, reglamentos, carnets y documentos de dominio
+ *      público e institucional de la Asociación de Scouts de México, A.C.
+ *      (ASMAC) y World Scouting (WOSM).
+ *    - Jamás se deben indexar ni subir documentos personales, consentimientos
+ *      médicos, formatos con datos privados ni fotografías familiares de
+ *      carpetas locales como SCOUTS DOCUMENTOS, ni tokens, contraseñas, .env
+ *      o service.json.
+ * 4. Sincronización Simultánea:
+ *    - Cualquier cambio realizado en la lógica web, estilos o base de datos de
+ *      bibliotech-scouts debe replicarse o sincronizarse de inmediato en
+ *      bibliotech-scouts-app ejecutando npm run sync:web y npx cap sync android.
+ * 5. Idioma y Tono:
+ *    - Todo el contenido de cara al usuario está redactado en español
+ *      latinoamericano, con un tono cercano, scout y fraterno.
+ * 6. Prohibición de Edición Manual de JSON Generados:
+ *    - No editar a mano data/catalog.json, data/knowledge_base.json,
+ *      data/questions_bank.json, data/faq_v3.json, data/faq_v4.json ni
+ *      data/chunks.json. Todos provienen de scripts generadores y de los
+ *      documentos oficiales sin inventar información.
+ * 7. Precaución con Scripts de Copia Masiva:
+ *    - En C:\Users\liamc\.gemini\antigravity\scratch\bibliotech-scouts\ existen
+ *      public/ y dist_web/. No ejecutar prepare_public_site.py,
+ *      actualizar_bibliotech.bat ni PUBLICAR_WEB.bat sin antes sincronizar
+ *      main hacia public/, para no sobrescribir mejoras del repositorio.
+ *
+ * ----------------------------------------------------------------------------
+ * 2. MAPA DE ARCHIVOS Y ARQUITECTURA DEL REPOSITORIO WEB (bibliotech-scouts)
+ * ----------------------------------------------------------------------------
+ * - index.html: Estructura principal accesible y semántica con SVGs embebidos.
+ *   Contiene Hero V7, buscador, catálogo por sección, biblioteca de 498
+ *   documentos, acerca del autor, Agentes de Cambio.MX, lector interactivo
+ *   modal (#docModal), panel de guardados (#savedPanel) y dock inferior
+ *   (#unifiedBottomDock).
+ * - styles.css: Hoja de estilos responsiva con variables temáticas scout,
+ *   glassmorphism, transformaciones 3D, modo campamento / noche OLED
+ *   (html[data-camp-mode="true"]), dock claro y animaciones de resorte.
+ * - app.js: Motor principal de la aplicación web:
+ *   1. Carga en paralelo y diferida de catalog.json, questions_bank.json,
+ *      faq_v3.json, faq_v4.json, knowledge_base.json y chunks.json.
+ *   2. Normalización de consultas (normalizeQuestionKey) y búsqueda por capas:
+ *      - Capa 1: Coincidencia exacta / normalizada en el banco de preguntas.
+ *      - Capa 2: Coincidencia difusa, similitud de n-gramas, stopwords y
+ *        palabras clave en el banco de preguntas y base de conocimiento.
+ *      - Capa 3: Búsqueda en fragmentos de documentos (chunks.json) y textos
+ *        extraídos citando página y documento oficial.
+ *   3. Respuesta transparente cuando un dato no consta en documentos oficiales.
+ *   4. Gestor de guardados híbrido en document.cookie y localStorage
+ *      (bt_saved_docs y bt_note_) con panel #savedPanel.
+ *   5. Control de audio TTS (speechSynthesis), lector interactivo con visor PDF
+ *      embebido (Google Docs Viewer hacia assets de GitHub Releases v1.0),
+ *      controles de zoom (Zoom - / Zoom +), lectura a 2 columnas en horizontal
+ *      y buscador interno con resaltado.
+ * - data/catalog.json: Catálogo completo de 650 documentos (498 libros/manuales
+ *   oficiales descargables), con categoría, sección, año, páginas, sinopsis y
+ *   hash SHA12.
+ * - data/questions_bank.json, data/faq_v3.json y data/faq_v4.json: Banco
+ *   combinado de 11,254 preguntas y respuestas únicas (5,356 base, 101 V3 y
+ *   5,797 V4). El banco V4 se regenera con scripts/generate_faq_v4.js e incluye
+ *   convocatorias (sede, fechas, cuotas, requisitos, contacto y modalidad),
+ *   formatos/actas/seguro (asunto, datos solicitados, autorizaciones y orden
+ *   del día), artículos reglamentarios, menciones textuales con página y cita,
+ *   guías paso a paso y proyectos SMART.
+ * - data/text/: 650 archivos de texto plano indexados por hash SHA12.
+ * - covers/: 433 portadas de libros y manuales oficiales en formato JPG.
+ * - img/ y assets/: Recursos visuales e insignias de los 4 Ejes de Agentes de
+ *   Cambio (Salud y Bienestar, Habilidades para la Vida, Medio Ambiente y
+ *   Sustentabilidad, Paz y Participación Comunitaria).
+ *
+ * ----------------------------------------------------------------------------
+ * 3. ARQUITECTURA DE LA APLICACIÓN ANDROID (bibliotech-scouts-app)
+ * ----------------------------------------------------------------------------
+ * Envuelve el sitio web con Capacitor 8 e inyecta una capa nativa offline:
+ * - package.json: Versión de la app (2.2.2) y versionLabel (BETA V7 - 2.2.2 Mobile).
+ * - scripts/sync-web.mjs: Copia el sitio hermano a www/, incluye BASE_ASSETS,
+ *   portadas, data/, inyecta native-early.js, native.css y native-bridge.js,
+ *   parchea la leyenda del pie de página y escribe app-build.json.
+ * - web-overlay/native-early.js: Intercepta fetch al inicio del <head> para
+ *   servir caché local y actualizaciones OTA sin conexión.
+ * - web-overlay/native-bridge.js: Orquestador del panel Mi biblioteca,
+ *   descargas offline en @capacitor/filesystem, visor PDF nativo con zoom
+ *   (40% a 250%) y modo pliego de 2 páginas en tablets, actualización OTA de
+ *   interfaz/datos y verificación de nueva versión APK desde GitHub Releases.
+ * - android/app/src/main/java/mx/bibliotechscout/app/PdfViewerPlugin.java:
+ *   Plugin Capacitor nativo basado en android.graphics.pdf.PdfRenderer.
+ * - android/app/src/main/java/mx/bibliotechscout/app/OtaUpdaterPlugin.java:
+ *   Plugin nativo de actualización OTA con promoción atómica y rollback seguro.
+ * - Seguridad y Play Protect: AndroidManifest.xml utiliza únicamente el permiso
+ *   android.permission.INTERNET (sin REQUEST_INSTALL_PACKAGES ni autoinstalador
+ *   interno); las nuevas versiones de APK se descargan desde el navegador para
+ *   evitar alertas heurísticas de Google Play Protect.
+ * - .github/workflows/android.yml: Compila, firma con el Release Keystore de
+ *   GitHub Secrets y publica bibliotech-scout.apk al subir un tag vX.Y.Z.
+ *
+ * ----------------------------------------------------------------------------
+ * 4. PROTOCOLO DE TRABAJO, VALIDACIÓN Y DESPLIEGUE
+ * ----------------------------------------------------------------------------
+ * 1. Flujo en bibliotech-scouts (Web):
+ *    - Actualizar desde origin/main y crear rama temporal agent/<agente>/<tema>.
+ *    - Realizar cambios cuidando accesibilidad (WCAG 2.2, textos alt, ARIA,
+ *      contraste, navegación por teclado), SEO, escapeHtml en contenido
+ *      dinámico y loading="lazy" / decoding="async" en imágenes fuera de la
+ *      primera pantalla.
+ *    - Validar sintaxis con: node --check app.js
+ *    - Probar en servidor local: python -m http.server 8765 --bind 127.0.0.1
+ *      verificando 0 errores de consola, buscador, biblioteca, catálogo, lector
+ *      y vista móvil (390 px).
+ *    - Crear PR, revisar, fusionar con squash (--squash --delete-branch) y
+ *      verificar el despliegue en GitHub Pages.
+ * 2. Flujo en bibliotech-scouts-app (Android):
+ *    - Crear rama temporal, ejecutar npm run sync:web y npx cap sync android.
+ *    - Si corresponde nueva versión de APK, incrementar version y versionLabel
+ *      en package.json, versionCode y versionName en android/app/build.gradle,
+ *      y las leyendas en index.html.
+ *    - Hacer commit, PR y merge con squash a main.
+ *    - Para publicar nuevo APK firmado: crear tag anotado vX.Y.Z y hacer
+ *      git push origin vX.Y.Z para disparar el workflow Build Android APK.
+ * 3. Líneas de Evolución Continua:
+ *    - Refinamiento continuo del ranking semántico local en app.js para
+ *      consultas coloquiales.
+ *    - Descarga de estantes completos en lote y caché persistente en la app.
+ * ============================================================================ */
+

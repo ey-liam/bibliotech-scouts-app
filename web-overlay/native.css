@@ -27,50 +27,101 @@ html.bt-modal-open .bt-net-banner {
 }
 
 /* ------------------------------------------------------------
-   Botón flotante compacto (abajo a la izquierda)
+   Botón en el encabezado principal (Header Scout)
+   ------------------------------------------------------------ */
+.bt-header-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: 38px;
+  padding: 0 0.85rem;
+  border: 1.5px solid rgba(124, 58, 237, 0.4);
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.14), rgba(14, 165, 233, 0.12));
+  color: #4c1d95;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  flex-shrink: 0;
+}
+
+.bt-header-btn:hover,
+.bt-header-btn:focus-visible {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.24), rgba(14, 165, 233, 0.2));
+  border-color: #7c3aed;
+  outline: 2px solid #7c3aed;
+  outline-offset: 2px;
+}
+
+.bt-header-btn:active {
+  transform: scale(0.94);
+}
+
+.bt-header-icon {
+  display: grid;
+  place-items: center;
+  color: #7c3aed;
+}
+
+.bt-header-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.32rem;
+  border-radius: 999px;
+  background: #ffb703;
+  color: #020617;
+  font-size: 0.68rem;
+  font-weight: 900;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Enlace en el menú desplegable móvil */
+.bt-nav-link {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  color: #7c3aed !important;
+  font-weight: 800 !important;
+}
+
+.bt-nav-badge {
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: #ffb703;
+  color: #020617;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+/* ------------------------------------------------------------
+   Botón flotante Aurora Scout (abajo a la izquierda)
    ------------------------------------------------------------ */
 .bt-fab {
   position: fixed;
-  left: calc(14px + env(safe-area-inset-left, 0px));
-  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
-  z-index: 900;
-  width: 56px;
-  height: 56px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 50%;
-  background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 58%, #0ea5e9 100%);
+  left: calc(16px + env(safe-area-inset-left, 0px));
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  z-index: 890;
+  height: 46px;
+  padding: 0 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 55%, #0284c7 100%);
   color: #ffffff;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
   cursor: pointer;
-  box-shadow: 0 14px 34px rgba(2, 6, 23, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-}
-
-.bt-fab::before {
-  content: "";
-  position: absolute;
-  inset: -5px;
-  border-radius: 50%;
-  border: 1px solid rgba(124, 58, 237, 0.38);
-  animation: btFabPulse 3s ease-out infinite;
-  pointer-events: none;
-}
-
-@keyframes btFabPulse {
-  0% {
-    opacity: 0.7;
-    transform: scale(0.94);
-  }
-  70% {
-    opacity: 0;
-    transform: scale(1.18);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.18);
-  }
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
 }
 
 .bt-fab:active {
@@ -82,21 +133,24 @@ html.bt-modal-open .bt-net-banner {
   outline-offset: 3px;
 }
 
-.bt-fab b {
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  min-width: 1.35rem;
-  height: 1.35rem;
+.bt-fab-icon {
   display: grid;
   place-items: center;
-  padding: 0 0.28rem;
-  border: 2px solid #0a1024;
+}
+
+.bt-fab b {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  padding: 0 0.32rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
   border-radius: 999px;
-  background: #22c55e;
-  color: #052e16;
-  font-size: 0.68rem;
+  background: #ffb703;
+  color: #020617;
+  font-size: 0.72rem;
   font-weight: 900;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 /* ------------------------------------------------------------
@@ -533,55 +587,107 @@ html.bt-modal-open .bt-net-banner {
   text-align: center;
 }
 
-/* Mis archivos */
-.bt-saved-row {
+/* ------------------------------------------------------------
+   Mis descargas (Tarjetas Scout Aurora y Estado vacío)
+   ------------------------------------------------------------ */
+.bt-empty-state {
+  margin: 1.5rem 0;
+  padding: 1.8rem 1rem;
   display: flex;
-  align-items: stretch;
-  gap: 0.35rem;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(167, 139, 250, 0.3);
+  border-radius: 20px;
 }
 
-.bt-saved-row:last-child {
-  border-bottom: 0;
+.bt-empty-icon-wrap {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.25), rgba(14, 165, 233, 0.15));
+  border: 1.5px solid rgba(167, 139, 250, 0.4);
+  color: #ffb703;
+  margin-bottom: 0.25rem;
 }
 
-.bt-saved-open {
-  flex: 1 1 auto;
-  min-width: 0;
+.bt-empty-title {
+  margin: 0;
+  color: #ffffff;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.bt-empty-desc {
+  margin: 0;
+  max-width: 42ch;
+  color: #94a3b8;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.bt-empty-cta {
+  margin-top: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.6rem 1.4rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 55%, #0284c7 100%);
+  color: #ffffff;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: 0.86rem;
+  font-weight: 800;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 10px 24px rgba(124, 58, 237, 0.45);
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.bt-empty-cta:active {
+  transform: scale(0.96);
+}
+
+.bt-saved-card {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
-  padding: 0.6rem 0.2rem;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
+  gap: 0.75rem;
+  padding: 0.75rem 0.85rem;
+  margin-bottom: 0.65rem;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(15, 23, 42, 0.65);
+  box-shadow: 0 4px 16px rgba(2, 6, 23, 0.35);
+  transition: border-color 0.18s ease, background 0.18s ease;
 }
 
-.bt-saved-open:active {
-  opacity: 0.75;
+.bt-saved-card:hover,
+.bt-saved-card:focus-within {
+  border-color: rgba(124, 58, 237, 0.45);
+  background: rgba(26, 32, 58, 0.75);
 }
 
-.bt-saved-open:focus-visible {
-  outline: 2px solid rgba(34, 197, 94, 0.75);
-  outline-offset: -2px;
-  border-radius: 10px;
-}
-
-.bt-file-icon {
+.bt-saved-icon {
   flex: 0 0 auto;
-  width: 2.6rem;
-  height: 2.6rem;
+  width: 2.75rem;
+  height: 2.75rem;
   display: grid;
   place-items: center;
   border-radius: 12px;
   background: #64748b;
   color: #ffffff;
-  font-size: 0.58rem;
+  font-size: 0.62rem;
   font-weight: 900;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .bt-ext-pdf {
@@ -613,64 +719,103 @@ html.bt-modal-open .bt-net-banner {
   background: linear-gradient(135deg, #a855f7, #6d28d9);
 }
 
-.bt-saved-main {
+.bt-saved-info {
   flex: 1 1 auto;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.12rem;
-}
-
-.bt-saved-main strong {
-  color: #eef4ff;
-  font-size: 0.83rem;
-  line-height: 1.25;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
-.bt-saved-main small {
-  color: #8fa0c2;
-  font-size: 0.69rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.bt-chevron {
-  flex: 0 0 auto;
-  color: #64748b;
-  font-size: 1.25rem;
-  line-height: 1;
-}
-
-.bt-icon-btn {
-  flex: 0 0 auto;
-  width: 2.7rem;
-  min-height: 2.7rem;
-  display: grid;
-  place-items: center;
-  margin: 0.35rem 0;
-  border: 1px solid rgba(248, 113, 113, 0.28);
-  border-radius: 11px;
-  background: rgba(248, 113, 113, 0.08);
-  color: #fca5a5;
+  gap: 0.22rem;
   cursor: pointer;
 }
 
-.bt-icon-btn:active {
+.bt-saved-title {
+  margin: 0;
+  color: #f8fafc;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.bt-saved-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.bt-pill-section {
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(124, 58, 237, 0.22);
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  color: #c4b5fd;
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
+.bt-pill-size,
+.bt-pill-date {
+  color: #94a3b8;
+  font-size: 0.68rem;
+}
+
+.bt-saved-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.bt-btn-open {
+  min-height: 2.35rem;
+  padding: 0.4rem 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 10px;
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  color: #ffffff;
+  font-size: 0.76rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(22, 163, 74, 0.35);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.bt-btn-open:active {
   transform: scale(0.95);
 }
 
-.bt-icon-btn:focus-visible {
-  outline: 2px solid rgba(248, 113, 113, 0.8);
-  outline-offset: 2px;
+.bt-btn-delete {
+  width: 2.35rem;
+  height: 2.35rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-radius: 10px;
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  background: rgba(248, 113, 113, 0.12);
+  color: #fca5a5;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.bt-btn-delete:active {
+  transform: scale(0.94);
+  background: rgba(248, 113, 113, 0.22);
 }
 
 .bt-danger-link {
   color: #fca5a5 !important;
+  font-size: 0.76rem;
+  text-align: center;
+  margin-top: 0.5rem;
 }
 
 /* Pie y botones */

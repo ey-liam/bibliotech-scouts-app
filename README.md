@@ -8,7 +8,7 @@ nuevas versiones con descarga desde GitHub Releases.
 - Sitio: <https://ey-liam.github.io/bibliotech-scouts/>
 - App: este repositorio
 - Paquete Android: `mx.bibliotechscout.app`
-- Versión actual: `0.1.4` — `BETA V4.1 - 1.4 Mobile (10/11/2026)`
+- Versión actual: `0.1.5` — `BETA V4.2 - 1.5 Mobile (10/11/2026)`
 - Sitio de referencia: `ey-liam/bibliotech-scouts`
 
 ## Descargar la app
@@ -40,13 +40,10 @@ El enlace siguiente descarga siempre el APK de la última release publicada:
 - **Preguntas sin conexión desde la primera consulta.** El motor local espera a
   que terminen de cargar el catálogo, el banco de preguntas y los fragmentos
   antes de responder, incluso si la pregunta se hace justo al abrir la app.
-- **Mi biblioteca.** Panel con tres pestañas:
-  - **Descargar:** los 301 documentos con archivo original, con búsqueda, filtro
-    por sección, selección múltiple, peso y progreso.
-  - **Mis archivos:** solo lo descargado, con búsqueda, fecha, apertura y borrado.
-  - **App:** versión, contenido del sitio, estado de conexión, actualización de
-    contenido, aviso de nueva versión con descarga en el navegador y
-    verificación de datos sin conexión.
+- **Mi biblioteca y descargas.** Panel integrado con la interfaz y accesible desde el encabezado principal, el menú lateral y el botón flotante:
+  - **Mis descargas:** tus documentos guardados en tarjetas claras con formato, sección, peso y botones directos de «Abrir» y «Borrar».
+  - **Explorar catálogo:** los 650 documentos oficiales disponibles para descargar, con búsqueda rápida, filtro por sección y descarga por lotes.
+  - **App y estado:** versión, contenido del sitio, estado de conexión, actualización de contenido y verificación de datos sin conexión.
 - **Lector de PDF integrado.** Los PDF descargados se abren dentro de la app con
   `PdfRenderer`, sin internet ni apps externas. Incluye navegación de páginas,
   zoom hasta 250 %, deslizamiento horizontal y botón Atrás.

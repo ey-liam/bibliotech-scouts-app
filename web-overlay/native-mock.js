@@ -47,6 +47,7 @@
       return { type: "file", size: 900000, uri: `file:///mock/${path}` };
     },
     readFile: async () => ({ data: tinyPng }),
+    mkdir: async () => {},
     deleteFile: async ({ path }) => {
       window.__deletedLog.push(path);
       fileSet.delete(path);
@@ -83,7 +84,7 @@
         addListener: async () => ({ remove() {} }),
       },
       App: {
-        getInfo: async () => ({ version: "0.1.4", build: "4" }),
+        getInfo: async () => ({ version: "0.1.5", build: "5" }),
         addListener: async () => ({ remove() {} }),
         exitApp: () => {},
       },

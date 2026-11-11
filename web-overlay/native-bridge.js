@@ -27,6 +27,7 @@
   const APP_RELEASES = `https://github.com/${APP_REPO}/releases/latest`;
   const APP_DOWNLOAD = `${APP_RELEASES}/download/bibliotech-scout.apk`;
   const SITE_REPO = "ey-liam/bibliotech-scouts";
+  const GITHUB_RELEASE_BASE = `https://github.com/${SITE_REPO}/releases/download/v1.0/`;
   const DATA_DIR = "offline";
   const CACHE_NAME = "bt-content-v1";
   const DATA_JSON = [
@@ -60,7 +61,7 @@
     selected: new Set(),
     query: "",
     section: "all",
-    activeTab: "download",
+    activeTab: "files",
     savedQuery: "",
     busy: false,
     modalOpen: false,
@@ -81,18 +82,37 @@
     }
   }
 
-  async function confirmDialog(title, message, okButtonTitle, cancelButtonTitle) {
-    if (!Dialog || !Dialog.confirm) return true;
+  async function ensureDataDirectory() {
+    if (!Filesystem) return;
     try {
-      const result = await Dialog.confirm({
-        title,
-        message,
-        okButtonTitle: okButtonTitle || "Aceptar",
-        cancelButtonTitle: cancelButtonTitle || "Cancelar",
+      await Filesystem.mkdir({
+        path: DATA_DIR,
+        directory: "DATA",
+        recursive: true,
       });
-      return Boolean(result && result.value);
+    } catch (_) {}
+  }
+
+  async function confirmDialog(title, message, okButtonTitle, cancelButtonTitle) {
+    if (Dialog && Dialog.confirm) {
+      try {
+        const result = await Dialog.confirm({
+          title,
+          message,
+          okButtonTitle: okButtonTitle || "Aceptar",
+          cancelButtonTitle: cancelButtonTitle || "Cancelar",
+        });
+        if (result && typeof result.value === "boolean") {
+          return result.value;
+        }
+      } catch (e) {
+        console.warn("Dialog.confirm no disponible, usando confirm web", e);
+      }
+    }
+    try {
+      return window.confirm(`${title}\n\n${message}`);
     } catch (_) {
-      return false;
+      return true;
     }
   }
 
@@ -153,7 +173,7 @@
     const json = await res.json();
     state.catalog = json;
     state.docs = (json.documents || [])
-      .filter((d) => d && d.sha12 && d.has_web_file)
+      .filter((d) => d && d.sha12 && String(d.ext || "").toLowerCase() !== "html")
       .map((d) => ({
         sha12: d.sha12,
         title: d.title || d.filename || "Documento",
@@ -161,21 +181,28 @@
         section: d.section_label || d.section || "General",
         year: d.year || "",
         size: d.size_bytes || 0,
+        has_web_file: Boolean(d.has_web_file),
       }))
       .sort((a, b) => a.title.localeCompare(b.title, "es"));
     return json;
   }
 
   function docFileName(doc) {
-    return `${doc.sha12}.${doc.ext}`;
+    return `${doc.sha12}.${String(doc.ext || "pdf").toLowerCase()}`;
   }
 
   function docUrl(doc) {
-    return `${SITE}/files/${docFileName(doc)}`;
+    const fileName = docFileName(doc);
+    if (doc.has_web_file) {
+      return `${SITE}/files/${fileName}`;
+    }
+    return `${GITHUB_RELEASE_BASE}${fileName}`;
   }
 
   function isDownloadLink(url) {
-    return /\/files\/[a-f0-9]{12}\.[a-z0-9]+$/i.test(url.pathname);
+    if (/\/files\/[a-f0-9]{12}\.[a-z0-9]+$/i.test(url.pathname)) return true;
+    if (url.hostname === "github.com" && /\/releases\/download\/[^/]+\/([a-f0-9]{12})\.([a-z0-9]+)$/i.test(url.pathname)) return true;
+    return false;
   }
 
   function isExternal(url) {
@@ -183,18 +210,23 @@
   }
 
   function findDocByUrl(url) {
-    const match = url.pathname.match(/\/files\/([a-f0-9]{12})\.([a-z0-9]+)$/i);
+    let match = url.pathname.match(/\/files\/([a-f0-9]{12})\.([a-z0-9]+)$/i);
+    if (!match && url.hostname === "github.com") {
+      match = url.pathname.match(/\/releases\/download\/[^/]+\/([a-f0-9]{12})\.([a-z0-9]+)$/i);
+    }
     if (!match) return null;
     const sha12 = match[1].toLowerCase();
+    const ext = match[2].toLowerCase();
     const found = state.docs.find((d) => d.sha12 === sha12);
     if (found) return found;
     return {
       sha12,
       title: match[1],
-      ext: match[2].toLowerCase(),
+      ext,
       section: "General",
       year: "",
       size: 0,
+      has_web_file: false,
     };
   }
 
@@ -206,21 +238,78 @@
     return offlineEntries().reduce((sum, item) => sum + (item.size || 0), 0);
   }
 
+  function injectHeaderButton() {
+    if ($("bt-header-btn")) return;
+    const headerInner = document.querySelector(".header-inner");
+    if (!headerInner) return;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.id = "bt-header-btn";
+    btn.className = "bt-header-btn";
+    btn.setAttribute("aria-haspopup", "dialog");
+    btn.setAttribute("aria-label", "Abrir descargas sin conexión");
+    btn.innerHTML =
+      '<span class="bt-header-icon" aria-hidden="true">' +
+      '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>' +
+      '</span>' +
+      '<span class="bt-header-label">Descargas</span>' +
+      '<span class="bt-header-count" id="bt-header-count" hidden>0</span>';
+    btn.addEventListener("click", () => openModal("files"));
+
+    const navToggle = headerInner.querySelector("#navToggle");
+    if (navToggle) {
+      headerInner.insertBefore(btn, navToggle);
+    } else {
+      headerInner.appendChild(btn);
+    }
+  }
+
+  function injectNavLink() {
+    if ($("bt-nav-downloads")) return;
+    const mainNav = document.querySelector("#navegacion-principal");
+    if (!mainNav) return;
+    const link = document.createElement("a");
+    link.href = "#descargas-offline";
+    link.id = "bt-nav-downloads";
+    link.className = "nav-link bt-nav-link";
+    link.innerHTML = '<span>📥 Descargas</span><span class="bt-nav-badge" id="bt-nav-badge" hidden>0</span>';
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const header = document.querySelector(".main-header");
+      const navToggle = $("navToggle");
+      const navBackdrop = $("navBackdrop");
+      if (header && header.classList.contains("nav-open")) {
+        header.classList.remove("nav-open");
+        if (navToggle) navToggle.setAttribute("aria-expanded", "false");
+        if (navBackdrop) navBackdrop.hidden = true;
+      }
+      openModal("files");
+    });
+    mainNav.appendChild(link);
+  }
+
   // ------------------------------------------------------------------
   // Construcción de la interfaz
   // ------------------------------------------------------------------
   function buildUi() {
     if ($("bt-offline-fab")) return;
 
+    injectHeaderButton();
+    injectNavLink();
+
     const fab = document.createElement("button");
     fab.type = "button";
     fab.id = "bt-offline-fab";
     fab.className = "bt-fab";
     fab.setAttribute("aria-haspopup", "dialog");
-    fab.setAttribute("aria-label", "Abrir mi biblioteca sin conexión");
+    fab.setAttribute("aria-label", "Abrir descargas sin conexión");
     fab.innerHTML =
-      '<svg viewBox="0 0 24 24" aria-hidden="true" width="26" height="26"><path fill="currentColor" d="M6.5 2A4.5 4.5 0 0 0 2 6.5v12A3.5 3.5 0 0 0 5.5 22H20a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1H6.5a2.5 2.5 0 0 1 0-5H20a1 1 0 1 0 0-2H6.5Zm0 4H19v14H5.5a1.5 1.5 0 0 1-1.5-1.5v-12c0 .24.06.48.17.7.27.5.8.8 1.33.8Z"/></svg><b id="bt-fab-count" hidden></b>';
-    fab.addEventListener("click", openModal);
+      '<span class="bt-fab-icon" aria-hidden="true">' +
+      '<svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>' +
+      '</span>' +
+      '<span class="bt-fab-label">Descargas</span>' +
+      '<b id="bt-fab-count" hidden>0</b>';
+    fab.addEventListener("click", () => openModal("files"));
     document.body.appendChild(fab);
 
     const banner = document.createElement("div");
@@ -244,22 +333,22 @@
         <div class="bt-sheet-grip" aria-hidden="true"></div>
         <header class="bt-modal-head">
           <div class="bt-head-copy">
-            <span class="bt-eyebrow">BiblioTech Scout</span>
+            <span class="bt-eyebrow">BiblioTech Scout · Modo sin conexión</span>
             <h2 id="bt-offline-title">Mi biblioteca</h2>
-            <p class="bt-sub">Preguntas, texto y archivos disponibles aunque no tengas internet.</p>
+            <p class="bt-sub">Documentos y lecturas oficiales disponibles en tu dispositivo sin necesidad de internet.</p>
           </div>
           <button type="button" class="bt-close" id="bt-close-btn" data-bt-close="1" aria-label="Cerrar">×</button>
         </header>
 
         <nav class="bt-tabs" role="tablist" aria-label="Secciones de Mi biblioteca">
-          <button type="button" class="bt-tab is-active" id="bt-tab-download" role="tab" aria-selected="true" aria-controls="bt-panel-download">
-            <span>Descargar</span><span class="bt-tab-badge" id="bt-tab-download-count">0</span>
+          <button type="button" class="bt-tab is-active" id="bt-tab-files" role="tab" aria-selected="true" aria-controls="bt-panel-files">
+            <span>Mis descargas</span><span class="bt-tab-badge" id="bt-tab-files-count">0</span>
           </button>
-          <button type="button" class="bt-tab" id="bt-tab-files" role="tab" aria-selected="false" aria-controls="bt-panel-files" tabindex="-1">
-            <span>Mis archivos</span><span class="bt-tab-badge" id="bt-tab-files-count">0</span>
+          <button type="button" class="bt-tab" id="bt-tab-download" role="tab" aria-selected="false" aria-controls="bt-panel-download" tabindex="-1">
+            <span>Explorar catálogo</span><span class="bt-tab-badge" id="bt-tab-download-count">0</span>
           </button>
           <button type="button" class="bt-tab" id="bt-tab-app" role="tab" aria-selected="false" aria-controls="bt-panel-app" tabindex="-1">
-            <span>App</span>
+            <span>App y estado</span>
           </button>
         </nav>
 
@@ -269,11 +358,21 @@
         </div>
 
         <div class="bt-panels">
-          <section class="bt-panel" id="bt-panel-download" role="tabpanel" aria-labelledby="bt-tab-download">
+          <section class="bt-panel" id="bt-panel-files" role="tabpanel" aria-labelledby="bt-tab-files">
+            <div class="bt-storage" id="bt-saved-storage"></div>
+            <label class="bt-search bt-search-saved">
+              <span class="bt-sr">Buscar en mis archivos descargados</span>
+              <input id="bt-saved-search" type="search" placeholder="Buscar en mis descargas…" autocomplete="off" />
+            </label>
+            <div class="bt-list" id="bt-saved-list" role="list"></div>
+            <button type="button" class="bt-link bt-danger-link" id="bt-delete-all">Borrar todos los archivos guardados</button>
+          </section>
+
+          <section class="bt-panel" id="bt-panel-download" role="tabpanel" aria-labelledby="bt-tab-download" hidden>
             <div class="bt-storage" id="bt-storage"></div>
             <div class="bt-tools">
               <label class="bt-search">
-                <span class="bt-sr">Buscar documento</span>
+                <span class="bt-sr">Buscar documento en catálogo</span>
                 <input id="bt-search" type="search" placeholder="Buscar por título, año o sección…" autocomplete="off" />
               </label>
               <label class="bt-select">
@@ -286,16 +385,6 @@
               <button type="button" class="bt-link" id="bt-select-visible">Seleccionar visibles</button>
             </div>
             <div class="bt-list" id="bt-list" role="list"></div>
-          </section>
-
-          <section class="bt-panel" id="bt-panel-files" role="tabpanel" aria-labelledby="bt-tab-files" hidden>
-            <div class="bt-storage" id="bt-saved-storage"></div>
-            <label class="bt-search bt-search-saved">
-              <span class="bt-sr">Buscar en mis archivos</span>
-              <input id="bt-saved-search" type="search" placeholder="Buscar en mis archivos…" autocomplete="off" />
-            </label>
-            <div class="bt-list" id="bt-saved-list" role="list"></div>
-            <button type="button" class="bt-link bt-danger-link" id="bt-delete-all">Borrar todos los archivos guardados</button>
           </section>
 
           <section class="bt-panel" id="bt-panel-app" role="tabpanel" aria-labelledby="bt-tab-app" hidden>
@@ -311,11 +400,11 @@
               <button type="button" class="bt-btn bt-secondary" id="bt-verify-offline">Verificar preguntas sin conexión</button>
             </div>
             <p class="bt-app-status" id="bt-app-status" role="status"></p>
-            <p class="bt-note">Los archivos se guardan solo en este dispositivo. Las preguntas y el texto ya vienen incluidos en la app y funcionan sin internet. La app no instala actualizaciones por su cuenta: al pulsar «Buscar actualización» se abre la descarga en el navegador.</p>
+            <p class="bt-note">Los archivos descargados se guardan localmente en tu teléfono. El banco de preguntas, conocimientos y textos ya están integrados en la app y funcionan sin internet. Al pulsar «Buscar actualización» se abre la descarga del APK en el navegador.</p>
           </section>
         </div>
 
-        <footer class="bt-modal-foot" id="bt-download-foot">
+        <footer class="bt-modal-foot" id="bt-download-foot" hidden>
           <span id="bt-selection">0 seleccionados</span>
           <div class="bt-actions">
             <button type="button" class="bt-btn bt-secondary" id="bt-delete" disabled>Borrar</button>
@@ -486,7 +575,7 @@
   }
 
   function setTab(tab, focusTab) {
-    if (!["download", "files", "app"].includes(tab)) tab = "download";
+    if (!["download", "files", "app"].includes(tab)) tab = "files";
     state.activeTab = tab;
     writePref("library_tab", tab);
     for (const name of ["download", "files", "app"]) {
@@ -533,16 +622,29 @@
       strong.textContent = summary;
       const span = document.createElement("span");
       span.textContent = entries.length
-        ? "Toca un archivo para abrirlo aquí mismo, sin conexión."
-        : "Descarga archivos desde la pestaña Descargar.";
+        ? "Toca «Abrir» para ver un documento aquí mismo, sin conexión."
+        : "Descarga manuales e insignias desde «Explorar catálogo».";
       savedStorage.append(strong, span);
     }
 
-    const count = $("bt-fab-count");
-    if (count) {
-      count.textContent = String(entries.length);
-      count.hidden = entries.length === 0;
+    const fabCount = $("bt-fab-count");
+    if (fabCount) {
+      fabCount.textContent = String(entries.length);
+      fabCount.hidden = entries.length === 0;
     }
+
+    const headerCount = $("bt-header-count");
+    if (headerCount) {
+      headerCount.textContent = String(entries.length);
+      headerCount.hidden = entries.length === 0;
+    }
+
+    const navBadge = $("bt-nav-badge");
+    if (navBadge) {
+      navBadge.textContent = String(entries.length);
+      navBadge.hidden = entries.length === 0;
+    }
+
     const tabCount = $("bt-tab-files-count");
     if (tabCount) tabCount.textContent = String(entries.length);
     const downloadCount = $("bt-tab-download-count");
@@ -683,57 +785,109 @@
 
     list.innerHTML = "";
     if (!entries.length) {
-      const empty = document.createElement("p");
-      empty.className = "bt-empty";
-      empty.textContent = query
-        ? "No hay archivos guardados que coincidan con esa búsqueda."
-        : "Todavía no has descargado archivos. Ve a la pestaña Descargar para elegir documentos.";
+      const empty = document.createElement("div");
+      empty.className = "bt-empty-state";
+      if (query) {
+        empty.innerHTML = `
+          <p class="bt-empty-desc">No hay archivos descargados que coincidan con «${query}».</p>
+        `;
+      } else {
+        empty.innerHTML = `
+          <div class="bt-empty-icon-wrap" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="38" height="38"><path fill="currentColor" d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+          </div>
+          <h3 class="bt-empty-title">Tu biblioteca sin conexión está vacía</h3>
+          <p class="bt-empty-desc">Guarda manuales oficiales, reglamentos o insignias en tu dispositivo para poder consultarlos en cualquier campamento sin señal ni internet.</p>
+          <button type="button" class="bt-btn bt-primary bt-empty-cta" id="bt-empty-to-catalog">
+            <span>📥 Explorar catálogo y descargar</span>
+          </button>
+        `;
+        const cta = empty.querySelector("#bt-empty-to-catalog");
+        if (cta) {
+          cta.addEventListener("click", () => setTab("download", true));
+        }
+      }
       list.appendChild(empty);
       return;
     }
 
     const fragment = document.createDocumentFragment();
     for (const item of entries) {
-      const row = document.createElement("div");
-      row.className = "bt-saved-row";
-      row.setAttribute("role", "listitem");
+      const card = document.createElement("div");
+      card.className = "bt-saved-card";
+      card.setAttribute("role", "listitem");
 
-      const open = document.createElement("button");
-      open.type = "button";
-      open.className = "bt-saved-open";
-      open.setAttribute("aria-label", `Abrir ${item.title || "documento"}`);
-
-      const icon = document.createElement("span");
-      icon.className = `bt-file-icon bt-ext-${String(item.ext || "bin").toLowerCase()}`;
+      const icon = document.createElement("div");
+      icon.className = `bt-saved-icon bt-ext-${String(item.ext || "bin").toLowerCase()}`;
       icon.textContent = String(item.ext || "?").toUpperCase().slice(0, 4);
 
-      const main = document.createElement("span");
-      main.className = "bt-saved-main";
-      const title = document.createElement("strong");
+      const info = document.createElement("div");
+      info.className = "bt-saved-info";
+      info.setAttribute("tabindex", "0");
+      info.setAttribute("role", "button");
+      info.setAttribute("aria-label", `Abrir ${item.title || "documento"}`);
+
+      const title = document.createElement("h4");
+      title.className = "bt-saved-title";
       title.textContent = item.title || "Documento";
-      const meta = document.createElement("small");
-      meta.textContent = [item.section, item.size ? fmtMB(item.size) : "", item.savedAt ? formatDate(item.savedAt) : ""]
-        .filter(Boolean)
-        .join(" · ");
-      main.append(title, meta);
 
-      const chevron = document.createElement("span");
-      chevron.className = "bt-chevron";
-      chevron.textContent = "›";
-      chevron.setAttribute("aria-hidden", "true");
+      const meta = document.createElement("div");
+      meta.className = "bt-saved-meta";
 
-      open.append(icon, main, chevron);
-      open.addEventListener("click", () => openSaved(item));
+      if (item.section) {
+        const sec = document.createElement("span");
+        sec.className = "bt-pill-section";
+        sec.textContent = item.section;
+        meta.appendChild(sec);
+      }
+      if (item.size) {
+        const sz = document.createElement("span");
+        sz.className = "bt-pill-size";
+        sz.textContent = fmtMB(item.size);
+        meta.appendChild(sz);
+      }
+      if (item.savedAt) {
+        const dt = document.createElement("span");
+        dt.className = "bt-pill-date";
+        dt.textContent = formatDate(item.savedAt);
+        meta.appendChild(dt);
+      }
+      info.append(title, meta);
+      info.addEventListener("click", () => openSaved(item));
+      info.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openSaved(item);
+        }
+      });
 
-      const remove = document.createElement("button");
-      remove.type = "button";
-      remove.className = "bt-icon-btn";
-      remove.setAttribute("aria-label", `Borrar ${item.title || "documento"}`);
-      remove.innerHTML = TRASH_SVG;
-      remove.addEventListener("click", () => deleteSaved(item.sha12));
+      const actions = document.createElement("div");
+      actions.className = "bt-saved-actions";
 
-      row.append(open, remove);
-      fragment.appendChild(row);
+      const openBtn = document.createElement("button");
+      openBtn.type = "button";
+      openBtn.className = "bt-btn bt-btn-open";
+      openBtn.setAttribute("aria-label", `Abrir ${item.title || "documento"}`);
+      openBtn.innerHTML =
+        '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg><span>Abrir</span>';
+      openBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openSaved(item);
+      });
+
+      const delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "bt-btn bt-btn-delete";
+      delBtn.setAttribute("aria-label", `Eliminar ${item.title || "documento"}`);
+      delBtn.innerHTML = TRASH_SVG;
+      delBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        deleteSaved(item.sha12);
+      });
+
+      actions.append(openBtn, delBtn);
+      card.append(icon, info, actions);
+      fragment.appendChild(card);
     }
     list.appendChild(fragment);
   }
@@ -754,6 +908,7 @@
 
   async function downloadDoc(doc, index, total) {
     if (!Filesystem) throw new Error("Filesystem no disponible");
+    await ensureDataDirectory();
     const fileName = docFileName(doc);
     $("bt-progress-text").textContent = `Descargando ${index + 1} de ${total}: ${doc.title}`;
     $("bt-bar-fill").style.width = "0%";
@@ -766,7 +921,7 @@
     });
     state.offline[doc.sha12] = {
       title: doc.title,
-      ext: doc.ext,
+      ext: String(doc.ext || "pdf").toLowerCase(),
       section: doc.section || "General",
       size: doc.size || 0,
       savedAt: new Date().toISOString(),
@@ -785,8 +940,9 @@
     const totalBytes = docs.reduce((sum, doc) => sum + (doc.size || 0), 0);
     const accepted = await confirmDialog(
       "Descargar archivos",
-      `Se guardarán ${docs.length} archivo${docs.length === 1 ? "" : "s"} (${fmtMB(totalBytes)}). Puedes borrarlos después desde Mis archivos.`,
-      "Descargar"
+      `Se guardarán ${docs.length} archivo${docs.length === 1 ? "" : "s"} (${fmtMB(totalBytes)}). Puedes abrirlos o borrarlos después desde Mis descargas.`,
+      "Descargar",
+      "Cancelar"
     );
     if (!accepted) return;
 
@@ -810,7 +966,8 @@
         : `Listo: ${docs.length} archivo${docs.length === 1 ? "" : "s"} disponible${docs.length === 1 ? "" : "s"} sin conexión.`;
       if (!errors) {
         state.selected.clear();
-        toast("Descarga completada");
+        toast(`¡Descarga completada! (${docs.length} archivo${docs.length === 1 ? "" : "s"})`);
+        setTab("files", false);
       }
       renderStorage();
       renderList();
@@ -825,12 +982,18 @@
   }
 
   async function deleteFileEntry(sha12, entry) {
-    try {
-      await Filesystem.deleteFile({
-        path: `${DATA_DIR}/${sha12}.${entry.ext}`,
-        directory: "DATA",
-      });
-    } catch (_) {}
+    if (Filesystem) {
+      const extList = [entry && entry.ext, "pdf", "PDF", "png", "jpg", "docx", "xlsx"];
+      const uniqueExts = Array.from(new Set(extList.filter(Boolean)));
+      for (const ext of uniqueExts) {
+        try {
+          await Filesystem.deleteFile({
+            path: `${DATA_DIR}/${sha12}.${ext}`,
+            directory: "DATA",
+          });
+        } catch (_) {}
+      }
+    }
     delete state.offline[sha12];
     state.selected.delete(sha12);
     await persistOfflineIndex();
@@ -844,9 +1007,10 @@
       return;
     }
     const accepted = await confirmDialog(
-      "Borrar archivos",
-      `Se eliminarán ${docs.length} archivo${docs.length === 1 ? "" : "s"} de este dispositivo. Las preguntas y el texto seguirán disponibles.`,
-      "Borrar"
+      "Eliminar archivos",
+      `Se eliminarán ${docs.length} archivo${docs.length === 1 ? "" : "s"} de este dispositivo. Las preguntas y el texto seguirán disponibles sin conexión.`,
+      "Eliminar",
+      "Cancelar"
     );
     if (!accepted) return;
 
@@ -860,46 +1024,58 @@
     renderStorage();
     renderList();
     renderSavedList();
-    toast("Archivos borrados");
+    toast("Archivos eliminados");
   }
 
   async function deleteSaved(sha12) {
     const entry = state.offline[sha12];
     if (!entry) return;
     const accepted = await confirmDialog(
-      "Borrar archivo",
-      `Se eliminará «${entry.title || "documento"}» de este dispositivo.`,
-      "Borrar"
+      "Eliminar archivo",
+      `¿Deseas eliminar «${entry.title || "este documento"}» del dispositivo?\n\nPodrás volver a descargarlo cuando tengas conexión a internet.`,
+      "Eliminar",
+      "Cancelar"
     );
     if (!accepted) return;
     state.busy = true;
-    await deleteFileEntry(sha12, entry);
-    state.busy = false;
-    renderStorage();
-    renderList();
-    renderSavedList();
-    toast("Archivo borrado");
+    try {
+      await deleteFileEntry(sha12, entry);
+      toast("Archivo eliminado del dispositivo");
+    } catch (err) {
+      console.warn("Error borrando archivo:", err);
+      delete state.offline[sha12];
+      await persistOfflineIndex();
+    } finally {
+      state.busy = false;
+      renderStorage();
+      renderList();
+      renderSavedList();
+    }
   }
 
   async function deleteAllSaved() {
     const entries = offlineEntries();
     if (!entries.length || state.busy) return;
     const accepted = await confirmDialog(
-      "Borrar todos los archivos",
-      `Se eliminarán ${entries.length} archivo${entries.length === 1 ? "" : "s"} de este dispositivo. El contenido y las preguntas seguirán disponibles.`,
-      "Borrar todos"
+      "Eliminar todos los archivos",
+      `Se eliminarán los ${entries.length} archivos descargados de este dispositivo.\n\nLas preguntas, textos y el contenido integrado seguirán funcionando sin conexión.`,
+      "Eliminar todos",
+      "Cancelar"
     );
     if (!accepted) return;
     state.busy = true;
-    for (const entry of entries) {
-      await deleteFileEntry(entry.sha12, entry);
+    try {
+      for (const entry of entries) {
+        await deleteFileEntry(entry.sha12, entry);
+      }
+      toast("Todos los archivos fueron eliminados");
+    } finally {
+      state.busy = false;
+      state.selected.clear();
+      renderStorage();
+      renderList();
+      renderSavedList();
     }
-    state.busy = false;
-    state.selected.clear();
-    renderStorage();
-    renderList();
-    renderSavedList();
-    toast("Archivos borrados");
   }
 
   // ------------------------------------------------------------------
@@ -1534,7 +1710,8 @@
       renderStorage();
       renderList();
       renderSavedList();
-      toast("Descargado");
+      toast("Archivo descargado correctamente");
+      setTab("files", false);
       await openDoc(doc);
     } catch (error) {
       toast("No se pudo descargar. Revisa tu conexión.");
@@ -1546,7 +1723,7 @@
     }
   }
 
-  function openModal() {
+  function openModal(targetTab) {
     if (state.modalOpen) return;
     state.modalOpen = true;
     state.lastFocused = document.activeElement;
@@ -1554,8 +1731,7 @@
     modal.hidden = false;
     document.documentElement.classList.add("bt-modal-open");
 
-    let tab = state.activeTab;
-    if (tab === "files" && !offlineEntries().length) tab = "download";
+    const tab = targetTab || state.activeTab || "files";
     setTab(tab, false);
     renderStorage();
     renderList();
@@ -1625,6 +1801,7 @@
   // ------------------------------------------------------------------
   async function start() {
     document.documentElement.classList.add("bt-native");
+    await ensureDataDirectory();
     await clearOldContentCache();
     await loadOfflineIndex();
     buildUi();
@@ -1633,6 +1810,14 @@
 
     const savedTab = await readPref("library_tab", "");
     if (["download", "files", "app"].includes(savedTab)) state.activeTab = savedTab;
+    else state.activeTab = "files";
+
+    // Verificamos que el botón en el header y el menú estén listos tras el primer render
+    setTimeout(() => {
+      injectHeaderButton();
+      injectNavLink();
+      renderStorage();
+    }, 350);
 
     if (Network) {
       try {

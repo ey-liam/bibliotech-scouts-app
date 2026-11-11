@@ -8,7 +8,8 @@ nuevas versiones con descarga desde GitHub Releases.
 - Sitio: <https://ey-liam.github.io/bibliotech-scouts/>
 - App: este repositorio
 - Paquete Android: `mx.bibliotechscout.app`
-- Versión actual: `0.1.5` — `BETA V4.2 - 1.5 Mobile (10/11/2026)`
+- Versión actual: `2.0.0` — `BETA V5 - 2.0 Mobile (10/11/2026)`
+- Creador: Liam Durán - Provincia TLXH (Instagram: [@liaadurg3](https://www.instagram.com/liaadurg3/))
 - Sitio de referencia: `ey-liam/bibliotech-scouts`
 
 ## Descargar la app

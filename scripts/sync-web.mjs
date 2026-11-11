@@ -25,6 +25,13 @@ const BASE_ASSETS = [
   "assets/scouts/foros_extra_2.jpg",
   "assets/scouts/foros_evento_3.jpg",
   "assets/scouts/wosm_photo2.jpg",
+  "assets/scouts/agentes_cambio/AgentesDeCambioLogo.png",
+  "assets/scouts/agentes_cambio/Salud.png",
+  "assets/scouts/agentes_cambio/Habilidades.png",
+  "assets/scouts/agentes_cambio/Sustentabilidad.png",
+  "assets/scouts/agentes_cambio/Paz.png",
+  "assets/scouts/agentes_cambio/LetreroCNRC.png",
+  "assets/scouts/agentes_cambio/Logos.png",
 ];
 
 const sibling = path.resolve(root, "..", "bibliotech-scouts");

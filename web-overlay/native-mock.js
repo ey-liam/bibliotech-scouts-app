@@ -46,7 +46,12 @@
       if (!fileSet.has(path)) throw new Error(`No existe ${path}`);
       return { type: "file", size: 900000, uri: `file:///mock/${path}` };
     },
-    readFile: async () => ({ data: tinyPng }),
+    readFile: async (opts) => {
+      if (opts && opts.encoding === "utf8") {
+        return { data: "<!DOCTYPE html><html lang='es-MX'><body><main style='padding:20px;font-family:sans-serif'><h1>Guía HTML Offline de Prueba</h1><p>Contenido autónomo cargado correctamente sin conexión.</p></main></body></html>" };
+      }
+      return { data: tinyPng };
+    },
     writeFile: async ({ path }) => {
       fileSet.add(path);
       saveFiles();
@@ -89,7 +94,7 @@
         addListener: async () => ({ remove() {} }),
       },
       App: {
-        getInfo: async () => ({ version: "2.2.2", build: "11" }),
+        getInfo: async () => ({ version: "2.2.3", build: "12" }),
         addListener: async () => ({ remove() {} }),
         exitApp: () => {},
       },

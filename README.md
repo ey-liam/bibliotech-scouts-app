@@ -8,7 +8,7 @@ nuevas versiones con descarga desde GitHub Releases.
 - Sitio: <https://ey-liam.github.io/bibliotech-scouts/>
 - App: este repositorio
 - Paquete Android: `mx.bibliotechscout.app`
-- Versión actual: `2.2.2` — `V2.2.2 Mobile - Web V7 (11/11/2026)`
+- Versión actual: `2.2.3` — `V2.2.3 Mobile - Web V7.1 (11/11/2026)`
 - Creador: Liam Durán - Provincia TLXH (Instagram: [@liaadurg3](https://www.instagram.com/liaadurg3/))
 - Sitio de referencia: `ey-liam/bibliotech-scouts`
 
@@ -16,24 +16,23 @@ nuevas versiones con descarga desde GitHub Releases.
 
 | Inicio en la App con Dock Inferior | Consulta Offline (Ejes y Metodologías) | Panel Nativo y Verificación de Datos |
 | :---: | :---: | :---: |
-| ![Inicio móvil de BiblioTech Scout App](docs/screenshots/app-inicio-movil.png) | ![Consulta de Ejes Temáticos en la app](docs/screenshots/app-consulta-movil.png) | ![Estado offline verificado con 5 fuentes en v2.2.2](docs/screenshots/app-estado-offline.png) |
+| ![Inicio móvil de BiblioTech Scout App](docs/screenshots/app-inicio-movil.png) | ![Consulta de Ejes Temáticos en la app](docs/screenshots/app-consulta-movil.png) | ![Estado offline verificado en v2.2.3](docs/screenshots/app-estado-offline.png) |
 
 **Cómo usar la app:**
 1. En la parte inferior dispones del dock flotante con acceso rápido a **Inicio**, **Consultar**, **Biblioteca**, **Agentes**, **Guardados** y **Noche** (modo oscuro).
-2. Puedes buscar entre **11,254 preguntas y respuestas oficiales sin conexión** (incluidos proyectos SMART, ciclo PER, Ejes Temáticos, SISAS, ExplorApp, CarpetApp, convocatorias, formatos y actas, Reglamento 2023 y Manual del Uniforme junio 2026).
+2. Puedes buscar entre **12,264 preguntas y respuestas oficiales sin conexión** (incluidos proyectos SMART, PPV del Clan de Rovers, ciclo PER, Ejes Temáticos, las 18 Especialidades FES de Comunidad, 46 plantillas RECME/CNAMS, Help Desk SISAS/CONECTA, Reglamento 2023 y Manual del Uniforme junio 2026).
 3. El botón flotante **Descargas** (en la esquina inferior izquierda) y el acceso del menú abren **Mi biblioteca**, donde puedes:
-   - Consultar los PDFs e imágenes ya guardados sin internet con el lector nativo.
-   - Explorar los 650 documentos del catálogo y descargar los que necesites.
+   - Consultar los PDFs, guías HTML autónomas e imágenes ya guardados sin internet con los lectores integrados.
+   - Explorar los **599 documentos oficiales accesibles** (de **751** totales en catálogo) filtrando por sección, **11 categorías y sus subcategorías**, o descargar los que necesites.
    - Entrar a **App y estado** para comprobar tus 5 bancos de preguntas sin conexión o buscar actualizaciones automáticas al instante.
 
-## Novedades de la Versión 2.2.2 (11,254 Preguntas Offline, Optimización y Estabilidad)
+## Novedades de la Versión 2.2.3 (Acervo RECME/FES/Help Desk, Subcategorías y Lector HTML Offline)
 
-- **Banco Ampliado Sin Conexión (`data/faq_v4.json` — 11,254 preguntas):** Incorpora **5,797 preguntas nuevas** (`5,356` en `questions_bank.json` + `101` en `faq_v3.json` + `5,797` en `faq_v4.json`), sumando campos estructurados de convocatorias, formatos/actas/seguro y menciones textuales con página y cita, verificables desde **Mi biblioteca → App y estado**.
-- **Reestructuración de la Interfaz de Inicio:** Escenario superior renovado con paleta azul-morada institucional, animaciones ligeras y continuidad visual hacia el buscador principal con recarga de preguntas aleatorias.
-- **Auto-actualización Web y de Contenido (OTA sin re-instalar APK):** Incorpora `OtaUpdaterPlugin` y un `OtaWebViewClient` seguro en Java que actualiza en segundo plano tanto la base de datos (`data/*.json` y textos) como la interfaz web (`index.html`, `styles.css`, `app.js`), con verificación de integridad y reversión automática ante fallos.
-- **Integración Offline Completa y Mayor Estabilidad:** Al pulsar «Leer» en el catálogo o buscador de la web embebida, si el PDF o imagen ya está descargado localmente, se abre directamente con el lector nativo (`PdfViewerPlugin`), incluso sin internet. Acceso directo a Marcadores y Notas web desde Mi biblioteca y soporte completo del botón flotante en tablets.
-- **Compatibilidad Total de Modo Oscuro:** Modo oscuro limpio sin tonos amarillentos, con badges de extensión, cabecera, dock y paneles nativos en alto contraste.
-- **Mejoras de Optimización en Móviles:** Visualización completa del distintivo de marca y eliminación de colisiones o controles duplicados entre el dock inferior y la capa nativa.
+- **Acervo RECME, Especialidades FES y Help Desk Sin Conexión (12,264 Preguntas):** Incorpora **65 nuevos PDFs canónicos** (18 FES Comunidad, 46 plantillas P1–P10 de Diagnóstico/Evaluación/Mapas/FAES/Insignia Final Obsidiana y Jade/CNAMS y Formato de Proyecto v1.1), **32 guías HTML autónomas** (25 guías Help Desk SISAS/CONECTA con capturas embebidas, directorio de 11 departamentos, instructivos Genially *Masterchefsito* y *Primer Respondiente Junior*, y catálogos RECME) y **4 emblemas oficiales**, sumando **6,807 preguntas en `faq_v4.json`** (10 a 30 por cada PDF nuevo).
+- **Lector HTML Integrado Offline:** Los documentos HTML autónomos descargados en **Mi biblioteca** se abren directamente dentro de la app (`#bt-html-viewer`) sin depender de apps externas ni conexión.
+- **Filtro por 11 Categorías y Subcategorías en Mi Biblioteca:** Nuevo selector dinámico de **Categoría** y **Subcategoría** en *Explorar catálogo* replicando la estructura completa de la web.
+- **Auto-actualización Web y de Contenido (OTA sin re-instalar APK):** Incorpora `OtaUpdaterPlugin` y `OtaWebViewClient` en Java para actualizar base de datos e interfaz web en segundo plano con verificación de integridad y reversión automática.
+- **Compatibilidad Total de Modo Oscuro y Estabilidad:** Modo oscuro limpio de alto contraste con sincronización completa de versiones y recursos empaquetados (504 portadas).
 
 ## Descargar la app
 

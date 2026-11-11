@@ -52,6 +52,8 @@
     webp: "image/webp",
     avif: "image/avif",
     gif: "image/gif",
+    html: "text/html",
+    htm: "text/html",
   };
   const IMAGE_EXTS = new Set(["png", "jpg", "jpeg", "webp", "avif", "gif"]);
   const TRASH_SVG =
@@ -66,6 +68,8 @@
     selected: new Set(),
     query: "",
     section: "all",
+    category: "all",
+    subcategory: "all",
     activeTab: "files",
     savedQuery: "",
     busy: false,
@@ -73,6 +77,7 @@
     lastFocused: null,
     pdf: null,
     image: null,
+    html: null,
     appInfo: null,
     siteInfo: null,
     resizeTimer: null,
@@ -180,7 +185,7 @@
     state.catalog = json;
     const byId = {};
     state.docs = (json.documents || [])
-      .filter((d) => d && d.sha12 && String(d.ext || "").toLowerCase() !== "html")
+      .filter((d) => d && d.sha12 && (String(d.ext || "").toLowerCase() !== "html" || d.is_readable_html === true))
       .map((d) => {
         const entry = {
           id: d.id || "",
@@ -188,6 +193,8 @@
           title: d.title || d.filename || "Documento",
           ext: String(d.ext || "pdf").toLowerCase(),
           section: d.section_label || d.section || "General",
+          category: d.category || "General",
+          subcategory: d.subcategory || "",
           year: d.year || "",
           size: d.size_bytes || 0,
           has_web_file: Boolean(d.has_web_file),
@@ -370,7 +377,15 @@
             <div class="bt-tools">
               <label class="bt-search">
                 <span class="bt-sr">Buscar documento en catálogo</span>
-                <input id="bt-search" type="search" placeholder="Buscar por título, año o sección…" autocomplete="off" />
+                <input id="bt-search" type="search" placeholder="Buscar por título, categoría, subcategoría o año…" autocomplete="off" />
+              </label>
+              <label class="bt-select">
+                <span class="bt-sr">Filtrar por categoría</span>
+                <select id="bt-category"><option value="all">Todas las categorías</option></select>
+              </label>
+              <label class="bt-select">
+                <span class="bt-sr">Filtrar por subcategoría</span>
+                <select id="bt-subcategory"><option value="all">Todas las subcategorías</option></select>
               </label>
               <label class="bt-select">
                 <span class="bt-sr">Filtrar por sección</span>
@@ -477,12 +492,43 @@
       </div>`;
     document.body.appendChild(imageViewer);
 
+    const htmlViewer = document.createElement("div");
+    htmlViewer.id = "bt-html-viewer";
+    htmlViewer.className = "bt-viewer";
+    htmlViewer.hidden = true;
+    htmlViewer.setAttribute("role", "dialog");
+    htmlViewer.setAttribute("aria-modal", "true");
+    htmlViewer.setAttribute("aria-labelledby", "bt-html-title");
+    htmlViewer.innerHTML = `
+      <header class="bt-viewer-head">
+        <button type="button" class="bt-viewer-icon" id="bt-html-close" aria-label="Cerrar guía">←</button>
+        <div class="bt-viewer-title">
+          <strong id="bt-html-title">Guía HTML</strong>
+          <span id="bt-html-meta"></span>
+        </div>
+        <button type="button" class="bt-viewer-icon" id="bt-html-external" aria-label="Abrir con otra app" title="Abrir con otra app">↗</button>
+      </header>
+      <div class="bt-viewer-stage bt-html-stage">
+        <iframe id="bt-html-frame" class="bt-html-frame" sandbox="allow-same-origin" title="Contenido de la guía"></iframe>
+      </div>`;
+    document.body.appendChild(htmlViewer);
+
     $("bt-tab-download").addEventListener("click", () => setTab("download", true));
     $("bt-tab-files").addEventListener("click", () => setTab("files", true));
     $("bt-tab-app").addEventListener("click", () => setTab("app", true));
 
     $("bt-search").addEventListener("input", (event) => {
       state.query = event.target.value.trim().toLowerCase();
+      renderList();
+    });
+    $("bt-category").addEventListener("change", (event) => {
+      state.category = event.target.value;
+      state.subcategory = "all";
+      renderSubcategories();
+      renderList();
+    });
+    $("bt-subcategory").addEventListener("change", (event) => {
+      state.subcategory = event.target.value;
       renderList();
     });
     $("bt-section").addEventListener("change", (event) => {
@@ -550,6 +596,11 @@
       if (!state.image) return;
       openWithSystem(state.image.doc, state.image.entry);
     });
+    $("bt-html-close").addEventListener("click", closeHtmlViewer);
+    $("bt-html-external").addEventListener("click", () => {
+      if (!state.html) return;
+      openWithSystem(state.html.doc, state.html.entry);
+    });
 
     let touchStart = null;
     const stage = $("bt-pdf-stage");
@@ -603,6 +654,13 @@
         if (event.key === "Escape") {
           event.preventDefault();
           closeImageViewer();
+        }
+        return;
+      }
+      if (state.html) {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          closeHtmlViewer();
         }
         return;
       }
@@ -729,6 +787,41 @@
     if (appStorage) appStorage.textContent = entries.length ? `${entries.length} · ${fmtMB(bytes)}` : "Sin archivos";
   }
 
+  function renderCategories() {
+    const select = $("bt-category");
+    if (!select) return;
+    const cats = Array.from(new Set(state.docs.map((doc) => doc.category).filter(Boolean))).sort((a, b) =>
+      a.localeCompare(b, "es")
+    );
+    select.innerHTML = '<option value="all">Todas las categorías</option>';
+    for (const cat of cats) {
+      const option = document.createElement("option");
+      option.value = cat;
+      option.textContent = cat;
+      select.appendChild(option);
+    }
+    select.value = state.category;
+  }
+
+  function renderSubcategories() {
+    const select = $("bt-subcategory");
+    if (!select) return;
+    const pool =
+      state.category === "all" ? state.docs : state.docs.filter((doc) => doc.category === state.category);
+    const subs = Array.from(new Set(pool.map((doc) => doc.subcategory).filter(Boolean))).sort((a, b) =>
+      a.localeCompare(b, "es")
+    );
+    select.innerHTML = '<option value="all">Todas las subcategorías</option>';
+    for (const sub of subs) {
+      const option = document.createElement("option");
+      option.value = sub;
+      option.textContent = sub;
+      select.appendChild(option);
+    }
+    select.value = subs.includes(state.subcategory) ? state.subcategory : "all";
+    state.subcategory = select.value;
+  }
+
   function renderSections() {
     const select = $("bt-section");
     if (!select) return;
@@ -741,13 +834,17 @@
       select.appendChild(option);
     }
     select.value = state.section;
+    renderCategories();
+    renderSubcategories();
   }
 
   function visibleDocs() {
     return state.docs.filter((doc) => {
       if (state.section !== "all" && doc.section !== state.section) return false;
+      if (state.category !== "all" && doc.category !== state.category) return false;
+      if (state.subcategory !== "all" && doc.subcategory !== state.subcategory) return false;
       if (!state.query) return true;
-      const haystack = `${doc.title} ${doc.section} ${doc.year}`.toLowerCase();
+      const haystack = `${doc.title} ${doc.section} ${doc.category} ${doc.subcategory} ${doc.year}`.toLowerCase();
       return haystack.includes(state.query);
     });
   }
@@ -1214,6 +1311,7 @@
     }
     if (ext === "pdf") return openPdfReader(normalized, entry);
     if (IMAGE_EXTS.has(ext)) return openImageViewer(normalized, entry);
+    if (ext === "html" || ext === "htm") return openHtmlViewer(normalized, entry);
     return openWithSystem(normalized, entry);
   }
 
@@ -1284,6 +1382,7 @@
       return openWithSystem(doc, entry);
     }
     closeImageViewer();
+    closeHtmlViewer();
     const path = `${DATA_DIR}/${doc.sha12}.${doc.ext}`;
     const isLandscape = window.innerWidth > window.innerHeight;
     const isWide = window.innerWidth >= 680;
@@ -1610,6 +1709,7 @@
 
   async function openImageViewer(doc, entry) {
     closePdfReader();
+    closeHtmlViewer();
     const path = `${DATA_DIR}/${doc.sha12}.${doc.ext}`;
     let src = "";
     try {
@@ -1638,6 +1738,43 @@
     };
     if (src) image.src = src;
     else image.onerror();
+    return true;
+  }
+
+  function closeHtmlViewer() {
+    if (!state.html) return;
+    state.html = null;
+    const viewer = $("bt-html-viewer");
+    if (viewer) viewer.hidden = true;
+    const frame = $("bt-html-frame");
+    if (frame) frame.removeAttribute("srcdoc");
+    document.documentElement.classList.remove("bt-viewer-open");
+  }
+
+  async function openHtmlViewer(doc, entry) {
+    closePdfReader();
+    closeImageViewer();
+    const path = `${DATA_DIR}/${doc.sha12}.${doc.ext}`;
+    state.html = { doc, entry, path };
+    const viewer = $("bt-html-viewer");
+    viewer.hidden = false;
+    document.documentElement.classList.add("bt-viewer-open");
+    $("bt-html-title").textContent = doc.title || "Guía HTML";
+    $("bt-html-meta").textContent = `${doc.category || "Guía Web"}${entry.size ? ` · ${fmtMB(entry.size)}` : ""}`;
+    const frame = $("bt-html-frame");
+    try {
+      const { data } = await Filesystem.readFile({ path, directory: "DATA", encoding: "utf8" });
+      let htmlText = String(data || "");
+      if (!htmlText.trim().startsWith("<") && /^[A-Za-z0-9+/=\s]+$/.test(htmlText.slice(0, 64))) {
+        const bin = atob(htmlText.replace(/\s+/g, ""));
+        const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        htmlText = new TextDecoder("utf-8").decode(bytes);
+      }
+      frame.srcdoc = htmlText;
+    } catch (_) {
+      frame.srcdoc = "<p style='padding:24px;font-family:sans-serif;'>No se pudo abrir esta guía HTML offline.</p>";
+    }
     return true;
   }
 
@@ -1744,7 +1881,7 @@
       out = out.replace(
         /(<p class="footer-db-cutoff">\s*Base de datos:\s*)([^<]+)(<\/p>)/i,
         (match, start, body, end) => {
-          const cutoff = (body.match(/\d{2}\/\d{2}\/\d{4}/) || ["03/11/2026"])[0];
+          const cutoff = (body.match(/\d{2}\/\d{2}\/\d{4}/) || ["11/11/2026"])[0];
           return `${start}${cutoff} · ${label}${end}`;
         }
       );
@@ -2255,6 +2392,8 @@
         closePdfReader();
       } else if (state.image) {
         closeImageViewer();
+      } else if (state.html) {
+        closeHtmlViewer();
       } else if (state.modalOpen) {
         closeModal();
       } else if (canGoBack) {
@@ -2345,7 +2484,7 @@
  *
  * Para: Próximos desarrolladores y agentes de IA
  * Fecha de corte: 11 de Noviembre de 2026
- * Versión actual del ecosistema: BETA V7 (Web) - V2.2.2 Mobile (Android)
+ * Versión actual del ecosistema: BETA V7.1 (Web) - V2.2.3 Mobile (Android)
  * Autor y Creador Exclusivo: Liam Durán - Provincia TLXH (Instagram: @liaadurg3)
  * Sitio Web Público: https://ey-liam.github.io/bibliotech-scouts/
  * Repositorio Web: https://github.com/ey-liam/bibliotech-scouts (rama main)
@@ -2479,7 +2618,7 @@
  *
  * B) Repositorio App Android (ey-liam/bibliotech-scouts-app):
  * Envuelve el sitio web utilizando Capacitor 8 e inyecta una capa nativa:
- * - package.json: Versión 2.2.2 y versionLabel "V2.2.2 Mobile - Web V7 (11/11/2026)".
+ * - package.json: Versión 2.2.3 y versionLabel "V2.2.3 Mobile - Web V7.1 (11/11/2026)".
  * - scripts/sync-web.mjs: Clona o toma ../bibliotech-scouts como fuente hacia
  *   www/, copia index.html, styles.css, app.js, manifest.webmanifest, data/,
  *   img/, covers/ y BASE_ASSETS; parchea la leyenda del pie desde package.json;
@@ -2508,7 +2647,7 @@
  * - web-overlay/native.css: Estilos del botón flotante inferior izquierdo,
  *   modal de descargas, banner OTA y visores nativos.
  * - android/app/build.gradle: Configuración Android (applicationId
- *   mx.bibliotechscout.app, versionName 2.2.2, versionCode 11 y compilación
+ *   mx.bibliotechscout.app, versionName 2.2.3, versionCode 12 y compilación
  *   sobreescrita en tag vía APP_VERSION_NAME / APP_VERSION_CODE).
  * - android/app/src/main/AndroidManifest.xml: Permiso único
  *   android.permission.INTERNET (sin REQUEST_INSTALL_PACKAGES).

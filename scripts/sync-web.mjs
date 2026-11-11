@@ -120,7 +120,7 @@ function patchHtml(html) {
     out = out.replace(
       /(<p class="footer-db-cutoff">\s*Base de datos: )([^<]+)(<\/p>)/i,
       (match, start, body, end) => {
-        const cutoff = (body.match(/\d{2}\/\d{2}\/\d{4}/) || ["03/11/2026"])[0];
+        const cutoff = (body.match(/\d{2}\/\d{2}\/\d{4}/) || ["11/11/2026"])[0];
         return `${start}${cutoff} · ${pkg.versionLabel}${end}`;
       }
     );

@@ -1,12 +1,12 @@
-# Traspaso para Antigravity / Gemini — Mobile 1.5
+# Traspaso para Antigravity / Gemini — Mobile 2.0 (V5)
 
 > Documento de trabajo para que otro agente pueda continuar sin reconstruir el
 > contexto. Se actualiza al final de cada bloque de cambios.
 >
 > Última actualización: 2026-11-10
-> Rama de trabajo: `agent/gemini/mobile-1.5`
-> Versión: `0.1.5` — `BETA V4.2 - 1.5 Mobile (10/11/2026)`
-> Última release publicada: `v0.1.4` (próxima: `v0.1.5`)
+> Rama de trabajo: `agent/gemini/mobile-2.0`
+> Versión: `2.0.0` — `BETA V5 - 2.0 Mobile (10/11/2026)`
+> Última release publicada: `v0.1.5` (próxima: `v2.0.0`)
 
 ## 1. Qué es este repositorio
 
@@ -17,7 +17,7 @@ sitio estático que vive en `ey-liam/bibliotech-scouts`.
 - Sitio: <https://github.com/ey-liam/bibliotech-scouts>
 - Sitio publicado: <https://ey-liam.github.io/bibliotech-scouts/>
 - Paquete Android: `mx.bibliotechscout.app`
-- APK actual: `v0.1.4` (45.6 MB)
+- APK actual: `v0.1.5` (45.6 MB)
 - Descarga directa:
   <https://github.com/ey-liam/bibliotech-scouts-app/releases/latest/download/bibliotech-scout.apk>
 

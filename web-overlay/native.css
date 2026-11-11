@@ -1146,3 +1146,11 @@ html.bt-modal-open .bt-net-banner {
     transition: none !important;
   }
 }
+
+/* Ocultar sección de descarga de la app y su enlace en el menú dentro del APK */
+#app,
+.app-download-section,
+a.nav-link[href="#app"] {
+  display: none !important;
+}
+

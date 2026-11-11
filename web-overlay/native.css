@@ -1356,23 +1356,132 @@ a.nav-link[href="#app"] {
 }
 
 
-/* Cuando el Dock Unificado esta presente en movil, ocultar el FAB flotante aislado */
-body.has-unified-dock #bt-offline-fab {
-  display: none !important;
+/* Cuando el Dock Unificado es visible en teléfono (<= 900px), ocultar el FAB flotante aislado.
+   En tablets (> 900px) donde el Dock se oculta, el FAB permanece visible para acceder a Mi biblioteca y descargas. */
+@media (max-width: 900px) {
+  body.has-unified-dock #bt-offline-fab {
+    display: none !important;
+  }
 }
 
-/* Integracion del panel Mi Biblioteca con el tema unificado y modo campamento */
-html[data-camp-mode="true"] .bt-modal-panel,
-html[data-camp-mode="true"] .bt-pdf-bar,
-html[data-camp-mode="true"] .bt-image-bar {
-  background: rgba(12, 5, 0, 0.96) !important;
-  border-color: rgba(255, 120, 0, 0.3) !important;
-  color: #ffb366 !important;
+/* Boton acceso rapido a Marcadores y Notas web desde Mi biblioteca */
+.bt-notes-shortcut-wrap {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-end;
 }
 
-html[data-camp-mode="true"] .bt-row,
-html[data-camp-mode="true"] .bt-card {
-  background: rgba(20, 10, 0, 0.8) !important;
-  border-color: rgba(255, 120, 0, 0.2) !important;
-  color: #ffb366 !important;
+.bt-notes-shortcut {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.42rem 0.78rem;
+  border: 1px solid rgba(139, 92, 246, 0.42);
+  border-radius: 999px;
+  background: rgba(139, 92, 246, 0.16);
+  color: #ddd6fe;
+  font-family: inherit;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease;
+}
+
+.bt-notes-shortcut:hover,
+.bt-notes-shortcut:active {
+  background: rgba(139, 92, 246, 0.32);
+  border-color: #38bdf8;
+  color: #ffffff;
+}
+
+/* Banner discreto cuando hay actualizacion OTA lista para aplicar */
+.bt-ota-banner {
+  position: fixed;
+  left: 50%;
+  top: calc(74px + env(safe-area-inset-top, 0px));
+  z-index: 980;
+  transform: translateX(-50%);
+  width: min(94vw, 440px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border: 1.5px solid rgba(56, 189, 248, 0.45);
+  border-radius: 16px;
+  background: rgba(12, 8, 30, 0.96);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  color: #e2e8f0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 0.78rem;
+  box-shadow: 0 14px 36px rgba(2, 6, 23, 0.65);
+}
+
+.bt-ota-banner[hidden] {
+  display: none;
+}
+
+.bt-ota-banner-apply {
+  flex: 0 0 auto;
+  padding: 0.4rem 0.78rem;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #7928ca, #0284c7);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.74rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.bt-ota-banner-dismiss {
+  flex: 0 0 auto;
+  padding: 0.25rem 0.45rem;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* Integracion del panel Mi Biblioteca y lectores con el modo oscuro limpio (cero tono naranja) */
+html[data-camp-mode="true"] .bt-modal-panel {
+  background: radial-gradient(ellipse at 50% 15%, #160c36 0%, #0d0822 65%, #070514 100%) !important;
+  border-color: rgba(139, 92, 246, 0.38) !important;
+  color: #ffffff !important;
+}
+
+html[data-camp-mode="true"] .bt-viewer,
+html[data-camp-mode="true"] .bt-viewer-head,
+html[data-camp-mode="true"] .bt-viewer-foot {
+  background: rgba(10, 6, 24, 0.96) !important;
+  border-color: rgba(139, 92, 246, 0.32) !important;
+  color: #ffffff !important;
+}
+
+html[data-camp-mode="true"] .bt-viewer-stage {
+  background: #070514 !important;
+}
+
+html[data-camp-mode="true"] .bt-app-card,
+html[data-camp-mode="true"] .bt-saved-card,
+html[data-camp-mode="true"] .bt-row {
+  background: rgba(20, 12, 42, 0.85) !important;
+  border-color: rgba(139, 92, 246, 0.3) !important;
+  color: #e2e8f0 !important;
+}
+
+html[data-camp-mode="true"] .bt-row-main strong,
+html[data-camp-mode="true"] .bt-saved-title,
+html[data-camp-mode="true"] .bt-app-row strong {
+  color: #ffffff !important;
+}
+
+html[data-camp-mode="true"] .bt-row-main small,
+html[data-camp-mode="true"] .bt-app-row span,
+html[data-camp-mode="true"] .bt-pill-size,
+html[data-camp-mode="true"] .bt-pill-date {
+  color: #cbd5e1 !important;
 }

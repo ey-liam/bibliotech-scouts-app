@@ -21,6 +21,7 @@
   const Network = plugin("Network");
   const FileOpener = plugin("FileOpener");
   const PdfViewer = plugin("PdfViewer");
+  const OtaUpdater = plugin("OtaUpdater");
 
   const SITE = "https://ey-liam.github.io/bibliotech-scouts";
   const APP_REPO = "ey-liam/bibliotech-scouts-app";
@@ -29,7 +30,9 @@
   const SITE_REPO = "ey-liam/bibliotech-scouts";
   const GITHUB_RELEASE_BASE = `https://github.com/${SITE_REPO}/releases/download/v1.0/`;
   const DATA_DIR = "offline";
+  const OTA_STAGING_DIR = "ota_staging";
   const CACHE_NAME = "bt-content-v1";
+  const SHELL_FILES = ["index.html", "styles.css", "app.js"];
   const DATA_JSON = [
     "data/catalog.json",
     "data/questions_bank.json",
@@ -57,6 +60,7 @@
     online: navigator.onLine !== false,
     catalog: null,
     docs: [],
+    docsById: {},
     offline: {}, // sha12 -> { title, ext, section, size, savedAt }
     selected: new Set(),
     query: "",
@@ -158,6 +162,7 @@
         if ("caches" in window) await caches.delete(CACHE_NAME);
         await writePref("app_version", info.version);
         await writePref("content_etags", {});
+        await writePref("shell_etags", {});
         await writePref("text_shas", {});
       }
     } catch (_) {}
@@ -172,18 +177,25 @@
     if (!res.ok) throw new Error("No se pudo leer el catálogo");
     const json = await res.json();
     state.catalog = json;
+    const byId = {};
     state.docs = (json.documents || [])
       .filter((d) => d && d.sha12 && String(d.ext || "").toLowerCase() !== "html")
-      .map((d) => ({
-        sha12: d.sha12,
-        title: d.title || d.filename || "Documento",
-        ext: String(d.ext || "pdf").toLowerCase(),
-        section: d.section_label || d.section || "General",
-        year: d.year || "",
-        size: d.size_bytes || 0,
-        has_web_file: Boolean(d.has_web_file),
-      }))
+      .map((d) => {
+        const entry = {
+          id: d.id || "",
+          sha12: d.sha12,
+          title: d.title || d.filename || "Documento",
+          ext: String(d.ext || "pdf").toLowerCase(),
+          section: d.section_label || d.section || "General",
+          year: d.year || "",
+          size: d.size_bytes || 0,
+          has_web_file: Boolean(d.has_web_file),
+        };
+        if (entry.id) byId[entry.id] = entry;
+        return entry;
+      })
       .sort((a, b) => a.title.localeCompare(b.title, "es"));
+    state.docsById = byId;
     return json;
   }
 
@@ -338,6 +350,12 @@
         <div class="bt-panels">
           <section class="bt-panel" id="bt-panel-files" role="tabpanel" aria-labelledby="bt-tab-files">
             <div class="bt-storage" id="bt-saved-storage"></div>
+            <div class="bt-notes-shortcut-wrap">
+              <button type="button" class="bt-notes-shortcut" id="bt-open-saved-notes">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+                <span>Marcadores y notas</span>
+              </button>
+            </div>
             <label class="bt-search bt-search-saved">
               <span class="bt-sr">Buscar en mis archivos descargados</span>
               <input id="bt-saved-search" type="search" placeholder="Buscar en mis descargas…" autocomplete="off" />
@@ -369,16 +387,17 @@
             <div class="bt-app-card">
               <div class="bt-app-row"><span>Versión de la app</span><strong id="bt-app-version">—</strong></div>
               <div class="bt-app-row"><span>Contenido del sitio</span><strong id="bt-app-site">—</strong></div>
+              <div class="bt-app-row"><span>Auto-actualización</span><strong id="bt-app-ota">Activa (web y datos)</strong></div>
               <div class="bt-app-row"><span>Conexión</span><strong id="bt-app-network">—</strong></div>
               <div class="bt-app-row"><span>Archivos guardados</span><strong id="bt-app-storage">—</strong></div>
             </div>
             <div class="bt-app-actions">
-              <button type="button" class="bt-btn bt-primary" id="bt-update">Actualizar contenido</button>
-              <button type="button" class="bt-btn bt-secondary" id="bt-check-app">Buscar actualización</button>
+              <button type="button" class="bt-btn bt-primary" id="bt-update">Actualizar web y contenido ahora</button>
+              <button type="button" class="bt-btn bt-secondary" id="bt-check-app">Buscar actualización de APK</button>
               <button type="button" class="bt-btn bt-secondary" id="bt-verify-offline">Verificar preguntas sin conexión</button>
             </div>
             <p class="bt-app-status" id="bt-app-status" role="status"></p>
-            <p class="bt-note">Los archivos descargados se guardan localmente en tu teléfono. El banco de preguntas, conocimientos y textos ya están integrados en la app y funcionan sin internet. Al pulsar «Buscar actualización» se abre la descarga del APK en el navegador.</p>
+            <p class="bt-note">La app actualiza automáticamente el contenido y la interfaz web cuando tienes internet, conservando todos tus documentos descargados. Al pulsar «Buscar actualización de APK» se verifica si existe una nueva versión nativa para instalar desde el navegador.</p>
           </section>
         </div>
 
@@ -477,9 +496,40 @@
     $("bt-delete").addEventListener("click", deleteSelected);
     $("bt-select-visible").addEventListener("click", toggleVisibleSelection);
     $("bt-delete-all").addEventListener("click", deleteAllSaved);
-    $("bt-update").addEventListener("click", () => updateContent(true));
+    $("bt-open-saved-notes").addEventListener("click", () => {
+      closeModal();
+      setTimeout(() => {
+        if (typeof window.openSavedPanel === "function") {
+          window.openSavedPanel();
+        }
+      }, 120);
+    });
+    $("bt-update").addEventListener("click", () => updateContent(true, false));
     $("bt-check-app").addEventListener("click", () => checkAppUpdate(false));
     $("bt-verify-offline").addEventListener("click", () => verifyOfflineData(true));
+
+    const otaBanner = document.createElement("div");
+    otaBanner.id = "bt-ota-banner";
+    otaBanner.className = "bt-ota-banner";
+    otaBanner.hidden = true;
+    otaBanner.setAttribute("role", "status");
+    otaBanner.innerHTML =
+      '<span>Nueva versión web lista en la app.</span>' +
+      '<button type="button" class="bt-ota-banner-apply" id="bt-ota-banner-apply">Aplicar</button>' +
+      '<button type="button" class="bt-ota-banner-dismiss" id="bt-ota-banner-dismiss" aria-label="Cerrar aviso">&times;</button>';
+    document.body.appendChild(otaBanner);
+
+    $("bt-ota-banner-apply").addEventListener("click", async () => {
+      otaBanner.hidden = true;
+      if (OtaUpdater && OtaUpdater.reloadApp) {
+        await OtaUpdater.reloadApp().catch(() => location.reload());
+      } else {
+        location.reload();
+      }
+    });
+    $("bt-ota-banner-dismiss").addEventListener("click", () => {
+      otaBanner.hidden = true;
+    });
 
     modal.querySelectorAll("[data-bt-close]").forEach((el) => el.addEventListener("click", closeModal));
 
@@ -577,11 +627,18 @@
       const dockBtn = document.getElementById("dockBtnSaved") || document.getElementById("dockBtnMochila");
       if (dock && dockBtn) {
         document.body.classList.add("has-unified-dock");
-        dockBtn.onclick = (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          openModal("files");
-        };
+        if (!dockBtn.__btBound) {
+          dockBtn.__btBound = true;
+          dockBtn.addEventListener(
+            "click",
+            (e) => {
+              e.preventDefault();
+              e.stopImmediatePropagation();
+              openModal("files");
+            },
+            true
+          );
+        }
       }
     };
     setupDockIntegration();
@@ -1607,6 +1664,22 @@
         ? `${state.siteInfo.siteCommit || "—"}${state.siteInfo.versionLabel ? ` · ${state.siteInfo.versionLabel}` : ""}`
         : "—";
     }
+    const otaEl = $("bt-app-ota");
+    if (otaEl) {
+      let otaLabel = "Activa (web y datos)";
+      if (OtaUpdater && OtaUpdater.getOtaStatus) {
+        try {
+          const ota = await OtaUpdater.getOtaStatus();
+          if (ota && ota.active) {
+            const stamp = ota.updatedAt ? formatDate(ota.updatedAt) : "al día";
+            otaLabel = `Web actualizada (${stamp || "al día"})`;
+          } else {
+            otaLabel = "Al día (base del APK)";
+          }
+        } catch (_) {}
+      }
+      otaEl.textContent = otaLabel;
+    }
     const networkEl = $("bt-app-network");
     if (networkEl) networkEl.textContent = state.online ? "Con conexión" : "Sin conexión";
     renderStorage();
@@ -1651,30 +1724,168 @@
   }
 
   // ------------------------------------------------------------------
-  // Actualización de contenido (sin publicar APK)
+  // Actualización automática de web y contenido (sin publicar APK)
   // ------------------------------------------------------------------
-  async function updateContent(manual) {
-    if (state.busy) return;
+  function isBundledFileStillCurrent(headRes, builtAtMs) {
+    if (!builtAtMs) return false;
+    const lastMod = headRes.headers.get("last-modified");
+    if (!lastMod) return false;
+    const lmMs = Date.parse(lastMod);
+    if (!Number.isFinite(lmMs)) return false;
+    return lmMs <= builtAtMs + 15 * 60 * 1000;
+  }
+
+  function patchRemoteHtml(rawHtml) {
+    let out = String(rawHtml || "");
+    const label = (state.siteInfo && state.siteInfo.versionLabel) || "";
+    if (label) {
+      out = out.replace(
+        /(<p class="footer-db-cutoff">\s*Base de datos:\s*)([^<]+)(<\/p>)/i,
+        (match, start, body, end) => {
+          const cutoff = (body.match(/\d{2}\/\d{2}\/\d{4}/) || ["03/11/2026"])[0];
+          return `${start}${cutoff} · ${label}${end}`;
+        }
+      );
+    }
+    if (!out.includes("native-early.js")) {
+      out = out.replace("</head>", '  <script src="native-early.js"></script>\n</head>');
+    }
+    if (!out.includes("native.css")) {
+      out = out.replace("</head>", '  <link rel="stylesheet" href="native.css" />\n</head>');
+    }
+    if (!out.includes("native-bridge.js")) {
+      out = out.replace("</body>", '  <script src="native-bridge.js" defer></script>\n</body>');
+    }
+    return out;
+  }
+
+  async function stageTextFile(relPath, content) {
+    if (!Filesystem) return;
+    await Filesystem.writeFile({
+      path: `${OTA_STAGING_DIR}/${relPath}`,
+      data: content,
+      directory: "DATA",
+      encoding: "utf8",
+      recursive: true,
+    });
+  }
+
+  let autoSyncInFlight = false;
+
+  async function updateContent(manual, silent) {
+    if (state.busy || autoSyncInFlight) return;
     if (!state.online) {
-      toast("Sin conexión. Conéctate para buscar actualizaciones.");
+      if (manual) toast("Sin conexión. Conéctate para buscar actualizaciones.");
       return;
     }
-    state.busy = true;
-    $("bt-progress").hidden = false;
-    $("bt-progress-text").textContent = "Buscando actualizaciones del contenido…";
-    $("bt-bar-fill").style.width = "10%";
+
+    if (manual) {
+      state.busy = true;
+      $("bt-progress").hidden = false;
+      $("bt-progress-text").textContent = "Buscando actualizaciones web y de contenido…";
+      $("bt-bar-fill").style.width = "8%";
+    } else {
+      autoSyncInFlight = true;
+    }
 
     try {
+      if (!state.siteInfo) {
+        try {
+          const infoRes = await fetch("app-build.json", { cache: "no-store" });
+          if (infoRes.ok) state.siteInfo = await infoRes.json();
+        } catch (_) {}
+      }
+      const builtAtMs = state.siteInfo && state.siteInfo.builtAt ? Date.parse(state.siteInfo.builtAt) : 0;
+
       const cache = await caches.open(CACHE_NAME);
       const etags = await readPref("content_etags", {});
+      const shellEtags = await readPref("shell_etags", {});
       let updated = 0;
+      let shellUpdated = false;
 
+      // 1. Verificar capa web (index.html, styles.css, app.js) para actualización OTA sin APK
+      if (Filesystem && OtaUpdater) {
+        try {
+          let needsShellBundle = false;
+          const pendingEtags = { ...shellEtags };
+
+          for (const file of SHELL_FILES) {
+            const head = await fetch(`${SITE}/${file}`, { method: "HEAD", cache: "no-store" }).catch(() => null);
+            if (!head || !head.ok) continue;
+            const etag =
+              head.headers.get("etag") ||
+              [head.headers.get("last-modified"), head.headers.get("content-length")].filter(Boolean).join("|") ||
+              "";
+            if (!etag) continue;
+            if (!pendingEtags[file]) {
+              if (isBundledFileStillCurrent(head, builtAtMs)) {
+                pendingEtags[file] = etag;
+                continue;
+              }
+            }
+            if (pendingEtags[file] !== etag) {
+              needsShellBundle = true;
+              pendingEtags[file] = etag;
+            }
+          }
+
+          if (needsShellBundle) {
+            if (manual) {
+              $("bt-bar-fill").style.width = "20%";
+              $("bt-progress-text").textContent = "Descargando interfaz web actualizada…";
+            }
+
+            const [htmlRes, cssRes, jsRes] = await Promise.all([
+              fetch(`${SITE}/index.html`, { cache: "no-store" }),
+              fetch(`${SITE}/styles.css`, { cache: "no-store" }),
+              fetch(`${SITE}/app.js`, { cache: "no-store" }),
+            ]);
+
+            if (htmlRes.ok && cssRes.ok && jsRes.ok) {
+              const [rawHtml, rawCss, rawJs] = await Promise.all([
+                htmlRes.text(),
+                cssRes.text(),
+                jsRes.text(),
+              ]);
+              const patchedHtml = patchRemoteHtml(rawHtml);
+
+              if (
+                patchedHtml.length >= 10240 &&
+                patchedHtml.includes("contenido-principal") &&
+                patchedHtml.includes("native-bridge.js") &&
+                patchedHtml.includes("app.js") &&
+                rawCss.length >= 10240 &&
+                rawJs.length >= 10240
+              ) {
+                await stageTextFile("index.html", patchedHtml);
+                await stageTextFile("styles.css", rawCss);
+                await stageTextFile("app.js", rawJs);
+                await OtaUpdater.promoteStaging({
+                  siteCommit: "ota-web",
+                  updatedAt: new Date().toISOString(),
+                });
+                await writePref("shell_etags", pendingEtags);
+                shellUpdated = true;
+                updated += 3;
+              }
+            }
+          } else {
+            await writePref("shell_etags", pendingEtags);
+          }
+        } catch (shellError) {
+          console.warn("No se pudo actualizar la interfaz web", shellError);
+        }
+      }
+
+      // 2. Verificar bases de datos JSON del catálogo, preguntas y fragmentos
       for (let i = 0; i < DATA_JSON.length; i += 1) {
         const path = DATA_JSON[i];
         const remoteUrl = `${SITE}/${path}`;
         const absUrl = new URL(path, location.href).href;
-        $("bt-bar-fill").style.width = `${10 + Math.round((i / DATA_JSON.length) * 50)}%`;
-        $("bt-progress-text").textContent = `Revisando ${path.split("/").pop()}…`;
+        if (manual) {
+          $("bt-bar-fill").style.width = `${25 + Math.round((i / DATA_JSON.length) * 40)}%`;
+          $("bt-progress-text").textContent = `Revisando ${path.split("/").pop()}…`;
+        }
         try {
           const head = await fetch(remoteUrl, { method: "HEAD", cache: "no-store" });
           if (!head.ok) continue;
@@ -1682,10 +1893,22 @@
             head.headers.get("etag") ||
             [head.headers.get("last-modified"), head.headers.get("content-length")].filter(Boolean).join("|") ||
             "";
+          if (etag && !etags[path] && isBundledFileStillCurrent(head, builtAtMs)) {
+            etags[path] = etag;
+            continue;
+          }
           if (etag && etags[path] === etag) continue;
           const res = await fetch(remoteUrl, { cache: "no-store" });
           if (!res.ok) continue;
-          await cache.put(absUrl, res.clone());
+          const rawJson = await res.text();
+          JSON.parse(rawJson);
+          await cache.put(
+            absUrl,
+            new Response(rawJson, {
+              status: 200,
+              headers: { "Content-Type": "application/json; charset=utf-8" },
+            })
+          );
           etags[path] = etag;
           updated += 1;
         } catch (error) {
@@ -1694,9 +1917,11 @@
       }
       await writePref("content_etags", etags);
 
-      // Textos extraídos: una sola consulta al árbol del repositorio.
-      $("bt-progress-text").textContent = "Revisando el texto de los documentos…";
-      $("bt-bar-fill").style.width = "65%";
+      // 3. Textos extraídos: actualización incremental desde árbol del repositorio
+      if (manual) {
+        $("bt-progress-text").textContent = "Revisando el texto de los documentos…";
+        $("bt-bar-fill").style.width = "70%";
+      }
       try {
         const treeRes = await fetch(`https://api.github.com/repos/${SITE_REPO}/git/trees/main?recursive=1`, {
           headers: { Accept: "application/vnd.github+json" },
@@ -1710,14 +1935,16 @@
           });
           const localShas = await readPref("text_shas", {});
           const changed = Object.keys(remoteShas).filter((path) => remoteShas[path] !== localShas[path]);
-          const limit = manual ? 120 : 40;
+          const limit = manual ? 120 : 25;
           const batch = changed.slice(0, limit);
 
           for (let i = 0; i < batch.length; i += 1) {
             const path = batch[i];
             const absUrl = new URL(path, location.href).href;
-            $("bt-bar-fill").style.width = `${65 + Math.round((i / Math.max(1, batch.length)) * 30)}%`;
-            $("bt-progress-text").textContent = `Actualizando textos… ${i + 1} de ${batch.length}`;
+            if (manual) {
+              $("bt-bar-fill").style.width = `${70 + Math.round((i / Math.max(1, batch.length)) * 25)}%`;
+              $("bt-progress-text").textContent = `Actualizando textos… ${i + 1} de ${batch.length}`;
+            }
             try {
               const res = await fetch(`${SITE}/${path}`, { cache: "no-store" });
               if (!res.ok) continue;
@@ -1732,23 +1959,42 @@
         console.warn("No se pudo revisar el texto", error);
       }
 
-      $("bt-bar-fill").style.width = "100%";
-      if (updated) {
-        $("bt-progress-text").textContent = `Contenido actualizado (${updated} archivo${updated === 1 ? "" : "s"}). Recargando…`;
+      if (manual) {
+        $("bt-bar-fill").style.width = "100%";
+        if (updated || shellUpdated) {
+          $("bt-progress-text").textContent = `Actualización completada (${updated} archivo${updated === 1 ? "" : "s"}). Recargando…`;
+          await writePref("last_content_update", new Date().toISOString());
+          setTimeout(async () => {
+            if (OtaUpdater && OtaUpdater.reloadApp) {
+              await OtaUpdater.reloadApp().catch(() => location.reload());
+            } else {
+              location.reload();
+            }
+          }, 850);
+        } else {
+          $("bt-progress-text").textContent = "Ya tienes la última versión web y de contenido.";
+          toast("Todo está actualizado");
+          setTimeout(() => {
+            if (!state.busy) $("bt-progress").hidden = true;
+          }, 2500);
+        }
+      } else if (shellUpdated || updated > 0) {
         await writePref("last_content_update", new Date().toISOString());
-        setTimeout(() => location.reload(), 900);
-      } else {
-        $("bt-progress-text").textContent = "Ya tienes la última versión del contenido.";
-        if (manual) toast("El contenido ya está actualizado");
-        setTimeout(() => {
-          if (!state.busy) $("bt-progress").hidden = true;
-        }, 2500);
+        if (shellUpdated) {
+          const otaBanner = $("bt-ota-banner");
+          if (otaBanner) otaBanner.hidden = false;
+        } else if (updated > 0) {
+          toast("Contenido actualizado automáticamente en segundo plano.", false);
+        }
       }
     } catch (error) {
-      $("bt-progress-text").textContent = "No se pudo actualizar el contenido. Inténtalo más tarde.";
+      if (manual) {
+        $("bt-progress-text").textContent = "No se pudo completar la actualización. Inténtalo más tarde.";
+      }
       console.warn(error);
     } finally {
-      state.busy = false;
+      if (manual) state.busy = false;
+      autoSyncInFlight = false;
     }
   }
 
@@ -1824,23 +2070,16 @@
     setTimeout(() => checkAppUpdate(true), 3500);
   }
 
-  async function maybeNotifyContentUpdate() {
-    const last = (await readPref("last_content_check", 0)) || 0;
-    if (Date.now() - last < 24 * 60 * 60 * 1000) return;
-    await writePref("last_content_check", Date.now());
-    try {
-      const head = await fetch(`${SITE}/data/catalog.json`, { method: "HEAD", cache: "no-store" });
-      if (!head.ok) return;
-      const etag =
-        head.headers.get("etag") ||
-        [head.headers.get("last-modified"), head.headers.get("content-length")].filter(Boolean).join("|") ||
-        "";
-      const etags = await readPref("content_etags", {});
-      const previous = etags["data/catalog.json"];
-      if (etag && previous && previous !== etag && navigator.onLine) {
-        toast("Hay contenido nuevo. Actualízalo desde Mi biblioteca → App.", true);
+  async function maybeAutoUpdateContent() {
+    if (!state.online) return;
+    const last = (await readPref("last_auto_sync", 0)) || 0;
+    if (Date.now() - last < 2 * 60 * 60 * 1000) return;
+    await writePref("last_auto_sync", Date.now());
+    setTimeout(() => {
+      if (state.online && !state.busy) {
+        updateContent(false, true);
       }
-    } catch (_) {}
+    }, 4500);
   }
 
   // ------------------------------------------------------------------
@@ -1863,6 +2102,22 @@
     document.addEventListener(
       "click",
       (event) => {
+        const openBtn = event.target.closest && event.target.closest("[data-open-doc]");
+        if (openBtn) {
+          const docId = openBtn.getAttribute("data-open-doc");
+          const doc = docId && state.docsById ? state.docsById[docId] : null;
+          if (doc && state.offline[doc.sha12]) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            const savedPanel = document.getElementById("savedPanel");
+            if (savedPanel && !savedPanel.classList.contains("hidden") && typeof window.closeSavedPanel === "function") {
+              window.closeSavedPanel();
+            }
+            openDoc(doc);
+            return;
+          }
+        }
+
         const anchor = event.target.closest && event.target.closest("a[href]");
         if (!anchor) return;
         const href = anchor.getAttribute("href");
@@ -2026,12 +2281,16 @@
   // ------------------------------------------------------------------
   async function start() {
     document.documentElement.classList.add("bt-native");
+    if (OtaUpdater && OtaUpdater.confirmBoot) {
+      OtaUpdater.confirmBoot().catch(() => {});
+    }
     await ensureDataDirectory();
     await clearOldContentCache();
     await loadOfflineIndex();
     buildUi();
     installLinkHandler();
     installBackButton();
+    loadCatalog().catch(() => {});
 
     const savedTab = await readPref("library_tab", "");
     if (["download", "files", "app"].includes(savedTab)) state.activeTab = savedTab;
@@ -2059,12 +2318,13 @@
         if (isActive) {
           setOnline(navigator.onLine);
           maybeAutoCheckUpdate();
+          maybeAutoUpdateContent();
         }
       });
     }
 
     maybeAutoCheckUpdate();
-    maybeNotifyContentUpdate();
+    maybeAutoUpdateContent();
     maybeVerifyOfflineData();
   }
 

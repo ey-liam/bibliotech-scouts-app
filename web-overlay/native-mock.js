@@ -47,6 +47,11 @@
       return { type: "file", size: 900000, uri: `file:///mock/${path}` };
     },
     readFile: async () => ({ data: tinyPng }),
+    writeFile: async ({ path }) => {
+      fileSet.add(path);
+      saveFiles();
+      return { uri: `file:///mock/${path}` };
+    },
     mkdir: async () => {},
     deleteFile: async ({ path }) => {
       window.__deletedLog.push(path);
@@ -84,9 +89,16 @@
         addListener: async () => ({ remove() {} }),
       },
       App: {
-        getInfo: async () => ({ version: "0.1.5", build: "5" }),
+        getInfo: async () => ({ version: "2.2.0", build: "9" }),
         addListener: async () => ({ remove() {} }),
         exitApp: () => {},
+      },
+      OtaUpdater: {
+        confirmBoot: async () => ({ active: false, siteCommit: "", updatedAt: "" }),
+        getOtaStatus: async () => ({ active: false, siteCommit: "", updatedAt: "" }),
+        promoteStaging: async () => ({ active: true, promotedFiles: 3 }),
+        clearOta: async () => ({ active: false }),
+        reloadApp: async () => {},
       },
       Dialog: {
         confirm: async () => ({ value: true }),

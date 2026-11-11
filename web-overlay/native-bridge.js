@@ -310,7 +310,12 @@
             <h2 id="bt-offline-title">Mi biblioteca</h2>
             <p class="bt-sub">Documentos y lecturas oficiales disponibles en tu dispositivo sin necesidad de internet.</p>
           </div>
-          <button type="button" class="bt-close" id="bt-close-btn" data-bt-close="1" aria-label="Cerrar">×</button>
+          <button type="button" class="bt-close" id="bt-close-btn" data-bt-close="1" aria-label="Cerrar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </header>
 
         <nav class="bt-tabs" role="tablist" aria-label="Secciones de Mi biblioteca">
@@ -566,6 +571,21 @@
         renderPdfPage(state.pdf.page);
       }, 200);
     });
+
+    const setupDockIntegration = () => {
+      const dock = document.getElementById("unifiedBottomDock");
+      const dockBtn = document.getElementById("dockBtnMochila");
+      if (dock && dockBtn) {
+        document.body.classList.add("has-unified-dock");
+        dockBtn.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          openModal("files");
+        };
+      }
+    };
+    setupDockIntegration();
+    setTimeout(setupDockIntegration, 600);
   }
 
   function setTab(tab, focusTab) {
@@ -631,6 +651,12 @@
     if (navBadge) {
       navBadge.textContent = String(entries.length);
       navBadge.hidden = entries.length === 0;
+    }
+
+    const dockBadge = $("dockBackpackCount");
+    if (dockBadge) {
+      dockBadge.textContent = String(entries.length);
+      dockBadge.classList.toggle("hidden", entries.length === 0);
     }
 
     const tabCount = $("bt-tab-files-count");
@@ -894,6 +920,21 @@
     });
   }
 
+  async function cacheDocCover(sha12) {
+    if (!sha12 || !Filesystem) return;
+    try {
+      const coverPath = `covers/${sha12}.jpg`;
+      const stat = await Filesystem.stat({ path: coverPath, directory: "DATA" }).catch(() => null);
+      if (stat) return;
+      await Filesystem.downloadFile({
+        url: `${SITE}/covers/${sha12}.jpg`,
+        path: coverPath,
+        directory: "DATA",
+        recursive: true
+      }).catch(() => {});
+    } catch (_) {}
+  }
+
   async function downloadDoc(doc, index, total) {
     if (!Filesystem) throw new Error("Filesystem no disponible");
     await ensureDataDirectory();
@@ -907,6 +948,9 @@
       recursive: true,
       progress: true,
     });
+    if (doc.sha12) {
+      cacheDocCover(doc.sha12).catch(() => {});
+    }
     state.offline[doc.sha12] = {
       title: doc.title,
       ext: String(doc.ext || "pdf").toLowerCase(),
@@ -1222,7 +1266,29 @@
       if (!state.pdf) return false;
       state.pdf.pages = Number(info && info.pages) || 0;
       if (!state.pdf.pages) throw new Error("El PDF no tiene páginas.");
-      await renderPdfPage(0);
+
+      let initialPage = 0;
+      let initialZoom = 1;
+      try {
+        const raw = localStorage.getItem(`bt_reader_state_${doc.sha12}`);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (typeof parsed.page === "number" && parsed.page >= 0 && parsed.page < state.pdf.pages) {
+            initialPage = parsed.page;
+          }
+          if (typeof parsed.zoom === "number" && parsed.zoom >= 0.45 && parsed.zoom <= 2.45) {
+            initialZoom = parsed.zoom;
+          }
+        }
+      } catch (_) {}
+
+      if (initialZoom !== 1) {
+        setPdfZoom(initialZoom, true);
+      }
+      await renderPdfPage(initialPage);
+      if (initialPage > 0) {
+        toast(`Continuando en la página ${initialPage + 1}`);
+      }
       return true;
     } catch (error) {
       console.warn("No se pudo abrir el PDF", error);
@@ -1230,6 +1296,20 @@
       toast("No se pudo abrir el PDF. Probando con el visor del sistema…");
       return openWithSystem(doc, entry);
     }
+  }
+
+  function savePdfReaderState() {
+    const pdf = state.pdf;
+    if (!pdf || !pdf.doc || !pdf.doc.sha12) return;
+    try {
+      localStorage.setItem(
+        `bt_reader_state_${pdf.doc.sha12}`,
+        JSON.stringify({
+          page: pdf.page,
+          zoom: pdf.zoom,
+        })
+      );
+    } catch (_) {}
   }
 
   function applyPdfZoom() {
@@ -1289,6 +1369,7 @@
     const zoom = Math.max(minZoom, Math.min(maxZoom, reset ? 1 : Math.round(value * 100) / 100));
     state.pdf.zoom = zoom;
     applyPdfZoom();
+    savePdfReaderState();
   }
 
   function stepPdfZoom(delta) {
@@ -1353,6 +1434,7 @@
       target -= 1;
     }
     pdf.page = target;
+    savePdfReaderState();
 
     const target2 = (pdf.twoPage && target + 1 < pdf.pages) ? target + 1 : null;
     const width = (window.innerWidth >= 720 && !pdf.twoPage) ? 1800 : 1200;

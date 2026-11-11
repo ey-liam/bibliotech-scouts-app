@@ -1355,3 +1355,24 @@ a.nav-link[href="#app"] {
   display: none !important;
 }
 
+
+/* Cuando el Dock Unificado esta presente en movil, ocultar el FAB flotante aislado */
+body.has-unified-dock #bt-offline-fab {
+  display: none !important;
+}
+
+/* Integracion del panel Mi Biblioteca con el tema unificado y modo campamento */
+html[data-camp-mode="true"] .bt-modal-panel,
+html[data-camp-mode="true"] .bt-pdf-bar,
+html[data-camp-mode="true"] .bt-image-bar {
+  background: rgba(12, 5, 0, 0.96) !important;
+  border-color: rgba(255, 120, 0, 0.3) !important;
+  color: #ffb366 !important;
+}
+
+html[data-camp-mode="true"] .bt-row,
+html[data-camp-mode="true"] .bt-card {
+  background: rgba(20, 10, 0, 0.8) !important;
+  border-color: rgba(255, 120, 0, 0.2) !important;
+  color: #ffb366 !important;
+}

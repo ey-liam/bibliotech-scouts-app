@@ -1,7 +1,7 @@
 # BiblioTech Scout — Documento Maestro de Traspaso y Arquitectura del Sistema
 **Para:** Gemini Argon 4 / Próximos Desarrolladores y Agentes  
 **Fecha de corte:** 10 de Noviembre de 2026  
-**Versión actual del ecosistema:** BETA V5 (Web) · Mobile 2.0.0 (Android)  
+**Versión actual del ecosistema:** BETA V6 (Web) · Mobile 2.1.0 (Android)  
 **Autor y Creador Exclusivo:** Liam Durán — Provincia TLXH (Instagram: [@liaadurg3](https://www.instagram.com/liaadurg3/))  
 **Repositorio Web:** `https://github.com/ey-liam/bibliotech-scouts`  
 **Repositorio App Android:** `https://github.com/ey-liam/bibliotech-scouts-app`  

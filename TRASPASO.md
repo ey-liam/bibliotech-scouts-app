@@ -277,15 +277,9 @@ nuevas no podrán instalarse encima de las anteriores.
    publicar en Play Store (o usar Play App Signing); no basta con cambiar el
    código.
 
-## 12. Instrucciones para el siguiente agente
+## 13. Ajustes de lector PDF y botón único de descargas
 
-1. Lee `AGENTS.md` y este archivo.
-2. Trabaja en una rama `agent/<agente>/<tema>`.
-3. No edites a mano los JSON de `data/`; se generan en el repo del sitio.
-4. No subas keystores ni contraseñas.
-5. Mantén la capa nativa en `web-overlay/` y no modifiques `app.js` del sitio
-   salvo que sea imprescindible; si lo haces, documenta el cambio aquí.
-6. Prueba en navegador con el mock antes de pedir compilación.
-7. No vuelvas a introducir `REQUEST_INSTALL_PACKAGES` ni un instalador interno:
-   es justo lo que se retiró para reducir el aviso de Play Protect.
-8. Actualiza este documento al terminar cada bloque.
+- **Botón único de descargas:** Se eliminó el botón duplicado del encabezado principal (`#bt-header-btn`). La apertura de descargas queda centralizada en el botón flotante inferior izquierdo (`#bt-offline-fab`) y en el menú lateral (`#bt-nav-downloads`).
+- **Zoom libre en visor PDF:** Se corrigió la restricción `Math.max(1, ...)` permitiendo alejar documentos por debajo del 100 % (hasta 40 %) y acercar hasta 250 %, evitando que las páginas se sobredimensionen en tablets y pantallas grandes.
+- **Modo 2 páginas (horizontal / tablets):** Soporte para visualización de dos páginas en pliego lado a lado cuando el dispositivo se orienta en horizontal o en tablets anchas, con botón selector directo entre 1 y 2 páginas y avance coordinado de pliego.
+- **Sin emojis:** Toda la interfaz mantiene iconos SVG limpios y textos legibles.

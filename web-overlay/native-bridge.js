@@ -272,7 +272,7 @@
     link.href = "#descargas-offline";
     link.id = "bt-nav-downloads";
     link.className = "nav-link bt-nav-link";
-    link.innerHTML = '<span>📥 Descargas</span><span class="bt-nav-badge" id="bt-nav-badge" hidden>0</span>';
+    link.innerHTML = '<span>Descargas</span><span class="bt-nav-badge" id="bt-nav-badge" hidden>0</span>';
     link.addEventListener("click", (e) => {
       e.preventDefault();
       const header = document.querySelector(".main-header");
@@ -799,7 +799,7 @@
           <h3 class="bt-empty-title">Tu biblioteca sin conexión está vacía</h3>
           <p class="bt-empty-desc">Guarda manuales oficiales, reglamentos o insignias en tu dispositivo para poder consultarlos en cualquier campamento sin señal ni internet.</p>
           <button type="button" class="bt-btn bt-primary bt-empty-cta" id="bt-empty-to-catalog">
-            <span>📥 Explorar catálogo y descargar</span>
+            <span>Explorar catálogo y descargar</span>
           </button>
         `;
         const cta = empty.querySelector("#bt-empty-to-catalog");

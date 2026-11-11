@@ -8,14 +8,29 @@ nuevas versiones con descarga desde GitHub Releases.
 - Sitio: <https://ey-liam.github.io/bibliotech-scouts/>
 - App: este repositorio
 - Paquete Android: `mx.bibliotechscout.app`
-- Versión actual: `2.2.0` — `V2.2.0 Mobile - Web V7 Fusión Cósmica (11/11/2026)`
+- Versión actual: `2.2.1` — `V2.2.1 Mobile - Web V7 (11/11/2026)`
 - Creador: Liam Durán - Provincia TLXH (Instagram: [@liaadurg3](https://www.instagram.com/liaadurg3/))
 - Sitio de referencia: `ey-liam/bibliotech-scouts`
 
-## Novedades de la Versión 2.2.0 (Fusión Cósmica, Modo Noche Limpio y Auto-actualización OTA)
+## Capturas de pantalla y uso en teléfono
 
-- **Portada Cósmica Dinámica Sincronizada:** Incorpora la nueva portada estilizada con cinta en zigzag en gradiente púrpura/cian, tarjeta central `BIBLIOTECH SCOUT` con firma `By Liam` y doodles vectoriales animados.
-- **Buscador Extendido y Cubos Decorativos:** El fondo cósmico fluye sin cortes hacia el motor de consulta con cubos 3D y botón de recarga de preguntas aleatorias `↻`.
+| Inicio en la App con Dock Inferior | Consulta Offline (Ejes y Metodologías) | Panel Nativo y Verificación de Datos |
+| :---: | :---: | :---: |
+| ![Inicio móvil de BiblioTech Scout App](docs/screenshots/app-inicio-movil.png) | ![Consulta de Ejes Temáticos en la app](docs/screenshots/app-consulta-movil.png) | ![Estado offline verificado con 5 fuentes en v2.2.1](docs/screenshots/app-estado-offline.png) |
+
+**Cómo usar la app:**
+1. En la parte inferior dispones del dock flotante con acceso rápido a **Inicio**, **Consultar**, **Biblioteca**, **Agentes**, **Guardados** y **Noche** (modo oscuro).
+2. Puedes buscar entre **11,060 preguntas y respuestas oficiales sin conexión** (incluidos proyectos SMART, ciclo PER, Ejes Temáticos, SISAS, ExplorApp, CarpetApp, Reglamento 2023 y Manual del Uniforme junio 2026).
+3. El botón flotante **Descargas** (en la esquina inferior izquierda) y el acceso del menú abren **Mi biblioteca**, donde puedes:
+   - Consultar los PDFs e imágenes ya guardados sin internet con el lector nativo.
+   - Explorar los 650 documentos del catálogo y descargar los que necesites.
+   - Entrar a **App y estado** para comprobar tus 5 bancos de preguntas sin conexión o buscar actualizaciones automáticas al instante.
+
+## Novedades de la Versión 2.2.1 (Banco Duplicado a 11,060 Preguntas Offline + Fusión Cósmica)
+
+- **Banco de Preguntas Duplicado Sin Conexión (`data/faq_v4.json`):** Incorpora **5,603 nuevas preguntas y respuestas oficiales**, alcanzando un total de **11,060 preguntas disponibles offline** (`questions_bank.json` 5,356 + `faq_v3.json` 101 + `faq_v4.json` 5,603), verificables desde **Mi biblioteca → App y estado**.
+- **Portada Cósmica Dinámica Sincronizada:** Incorpora la portada estilizada con cinta en zigzag en gradiente púrpura/cian, tarjeta central `BIBLIOTECH SCOUT` con firma `By Liam` y doodles vectoriales animados.
+- **Buscador Extendido y Cubos Decorativos:** El fondo cósmico fluye sin cortes hacia el motor de consulta con cubos 3D y botón de recarga de preguntas aleatorias.
 - **Auto-actualización Web y de Contenido (OTA sin re-instalar APK):** Incorpora `OtaUpdaterPlugin` y un `OtaWebViewClient` seguro en Java que actualiza en segundo plano tanto la base de datos (`data/*.json` y textos) como la interfaz web (`index.html`, `styles.css`, `app.js`), con verificación de integridad y reversión automática ante fallos.
 - **Integración Offline Completa:** Al pulsar «Leer» en el catálogo o buscador de la web embebida, si el PDF o imagen ya está descargado localmente, se abre directamente con el lector nativo (`PdfViewerPlugin`), incluso sin internet. Acceso directo a Marcadores y Notas web desde Mi biblioteca y soporte completo del botón flotante en tablets.
 - **Modo Noche Cósmico Armonioso:** Modo oscuro puro sin tonos naranja, con badges de extensión, cabecera, dock y paneles nativos en alto contraste.
@@ -97,7 +112,7 @@ sitio (GitHub Pages)  ->  scripts/sync-web.mjs  ->  www/  ->  Capacitor  ->  APK
 
 La carpeta `assets/` completa (66 MB de galerías) **no** se empaqueta. Los
 archivos originales de `files/` tampoco: se descargan desde Mi biblioteca. El
-contenido web resultante pesa unos 60.7 MB.
+contenido web resultante pesa unos 68.7 MB.
 
 El sincronizador también:
 
@@ -175,7 +190,7 @@ El workflow:
 La app revisa automáticamente cada 2 horas (cuando hay conexión) o al pulsar **Mi biblioteca → App → Actualizar web y contenido ahora**:
 
 - **Capa web (`index.html`, `styles.css`, `app.js`):** Si detecta cambios mediante ETag, descarga el paquete nuevo a `ota_staging/`, parchea el HTML conservando la capa nativa, verifica su integridad y lo aplica atómicamente en `ota_active/` mediante `OtaUpdaterPlugin` y `OtaWebViewClient` (incluye reversión automática de seguridad ante fallos y limpieza automática si se instala un APK nuevo).
-- **Datos y textos (`data/*.json` y `data/text/**`):** Actualiza `catalog.json`, `questions_bank.json`, `knowledge_base.json`, `chunks.json` y `faq_v3.json` mediante ETag en Cache Storage, más los textos modificados desde GitHub.
+- **Datos y textos (`data/*.json` y `data/text/**`):** Actualiza `catalog.json`, `questions_bank.json`, `knowledge_base.json`, `chunks.json`, `faq_v3.json` y `faq_v4.json` mediante ETag en Cache Storage, más los textos modificados desde GitHub.
 
 ### Actualización nativa del APK
 

@@ -39,6 +39,7 @@
     "data/knowledge_base.json",
     "data/chunks.json",
     "data/faq_v3.json",
+    "data/faq_v4.json",
   ];
   const MIME = {
     pdf: "application/pdf",
@@ -1693,7 +1694,8 @@
   async function verifyOfflineData(manual) {
     const checks = [
       ["Banco de preguntas", "data/questions_bank.json", (json) => (json.questions || []).length],
-      ["FAQ", "data/faq_v3.json", (json) => (json.questions || []).length],
+      ["FAQ V3", "data/faq_v3.json", (json) => (json.questions || []).length],
+      ["FAQ ampliado V4", "data/faq_v4.json", (json) => (json.questions || []).length],
       ["Base de conocimiento", "data/knowledge_base.json", (json) => (json.topics || []).length],
       ["Fragmentos", "data/chunks.json", (json) => (Array.isArray(json) ? json.length : 0)],
     ];

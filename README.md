@@ -40,13 +40,14 @@ El enlace siguiente descarga siempre el APK de la última release publicada:
 - **Preguntas sin conexión desde la primera consulta.** El motor local espera a
   que terminen de cargar el catálogo, el banco de preguntas y los fragmentos
   antes de responder, incluso si la pregunta se hace justo al abrir la app.
-- **Mi biblioteca y descargas.** Panel integrado con la interfaz y accesible desde el encabezado principal, el menú lateral y el botón flotante:
+- **Mi biblioteca y descargas.** Panel integrado con la interfaz y accesible desde el botón flotante en la esquina inferior izquierda y desde el menú lateral:
   - **Mis descargas:** tus documentos guardados en tarjetas claras con formato, sección, peso y botones directos de «Abrir» y «Borrar».
   - **Explorar catálogo:** los 650 documentos oficiales disponibles para descargar, con búsqueda rápida, filtro por sección y descarga por lotes.
   - **App y estado:** versión, contenido del sitio, estado de conexión, actualización de contenido y verificación de datos sin conexión.
 - **Lector de PDF integrado.** Los PDF descargados se abren dentro de la app con
   `PdfRenderer`, sin internet ni apps externas. Incluye navegación de páginas,
-  zoom hasta 250 %, deslizamiento horizontal y botón Atrás.
+  modo de 2 páginas (pliego tipo libro) en horizontal y tablets con ajuste
+  perfecto a pantalla, zoom desde 40 % hasta 250 %, deslizamiento táctil y botón Atrás.
 - **Visor de imágenes integrado** para PNG, JPG, WebP, AVIF y GIF. DOCX, XLSX,
   PPTX y otros formatos se abren con el visor del sistema mediante
   `@capacitor-community/file-opener`.

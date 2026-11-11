@@ -238,32 +238,6 @@
     return offlineEntries().reduce((sum, item) => sum + (item.size || 0), 0);
   }
 
-  function injectHeaderButton() {
-    if ($("bt-header-btn")) return;
-    const headerInner = document.querySelector(".header-inner");
-    if (!headerInner) return;
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.id = "bt-header-btn";
-    btn.className = "bt-header-btn";
-    btn.setAttribute("aria-haspopup", "dialog");
-    btn.setAttribute("aria-label", "Abrir descargas sin conexión");
-    btn.innerHTML =
-      '<span class="bt-header-icon" aria-hidden="true">' +
-      '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>' +
-      '</span>' +
-      '<span class="bt-header-label">Descargas</span>' +
-      '<span class="bt-header-count" id="bt-header-count" hidden>0</span>';
-    btn.addEventListener("click", () => openModal("files"));
-
-    const navToggle = headerInner.querySelector("#navToggle");
-    if (navToggle) {
-      headerInner.insertBefore(btn, navToggle);
-    } else {
-      headerInner.appendChild(btn);
-    }
-  }
-
   function injectNavLink() {
     if ($("bt-nav-downloads")) return;
     const mainNav = document.querySelector("#navegacion-principal");
@@ -294,7 +268,6 @@
   function buildUi() {
     if ($("bt-offline-fab")) return;
 
-    injectHeaderButton();
     injectNavLink();
 
     const fab = document.createElement("button");
@@ -432,15 +405,28 @@
       </header>
       <div class="bt-viewer-stage" id="bt-pdf-stage">
         <div class="bt-viewer-loading" id="bt-pdf-loading">Cargando página…</div>
-        <img id="bt-pdf-image" class="bt-pdf-image" alt="" draggable="false" hidden />
+        <div class="bt-pdf-pages-wrap" id="bt-pdf-pages-wrap">
+          <div class="bt-pdf-page-slot" id="bt-pdf-slot-1">
+            <img id="bt-pdf-image" class="bt-pdf-image" alt="" draggable="false" hidden />
+          </div>
+          <div class="bt-pdf-page-slot" id="bt-pdf-slot-2" hidden>
+            <img id="bt-pdf-image-2" class="bt-pdf-image" alt="" draggable="false" hidden />
+          </div>
+        </div>
       </div>
       <footer class="bt-viewer-foot">
         <button type="button" class="bt-viewer-nav" id="bt-pdf-prev" aria-label="Página anterior" disabled>‹</button>
         <div class="bt-zoom" role="group" aria-label="Zoom">
           <button type="button" id="bt-pdf-zoom-out" aria-label="Alejar">−</button>
-          <span id="bt-pdf-zoom">100%</span>
+          <span id="bt-pdf-zoom" title="Restablecer al 100%">100%</span>
           <button type="button" id="bt-pdf-zoom-in" aria-label="Acercar">+</button>
         </div>
+        <button type="button" class="bt-layout-toggle" id="bt-pdf-layout-btn" aria-label="Cambiar vista de páginas" title="Ver 2 páginas en horizontal">
+          <span class="bt-layout-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 16H5V5h6v14zm8 0h-6V5h6v14z"/></svg>
+          </span>
+          <span id="bt-pdf-layout-label">2 págs</span>
+        </button>
         <button type="button" class="bt-viewer-nav" id="bt-pdf-next" aria-label="Página siguiente" disabled>›</button>
       </footer>`;
     document.body.appendChild(pdfViewer);
@@ -497,6 +483,8 @@
     $("bt-pdf-next").addEventListener("click", () => goPdfPage(1));
     $("bt-pdf-zoom-out").addEventListener("click", () => stepPdfZoom(-0.25));
     $("bt-pdf-zoom-in").addEventListener("click", () => stepPdfZoom(0.25));
+    $("bt-pdf-zoom").addEventListener("click", () => setPdfZoom(1, true));
+    $("bt-pdf-layout-btn").addEventListener("click", togglePdfLayout);
     $("bt-pdf-external").addEventListener("click", () => {
       if (!state.pdf) return;
       openWithSystem(state.pdf.doc, state.pdf.entry);
@@ -569,8 +557,14 @@
       if (!state.pdf) return;
       clearTimeout(state.resizeTimer);
       state.resizeTimer = setTimeout(() => {
-        if (state.pdf) renderPdfPage(state.pdf.page);
-      }, 220);
+        if (!state.pdf) return;
+        if (!state.pdf.userLayoutChoice) {
+          const isLandscape = window.innerWidth > window.innerHeight;
+          const isWide = window.innerWidth >= 680;
+          state.pdf.twoPage = Boolean(isLandscape && isWide);
+        }
+        renderPdfPage(state.pdf.page);
+      }, 200);
     });
   }
 
@@ -631,12 +625,6 @@
     if (fabCount) {
       fabCount.textContent = String(entries.length);
       fabCount.hidden = entries.length === 0;
-    }
-
-    const headerCount = $("bt-header-count");
-    if (headerCount) {
-      headerCount.textContent = String(entries.length);
-      headerCount.hidden = entries.length === 0;
     }
 
     const navBadge = $("bt-nav-badge");
@@ -1159,10 +1147,30 @@
     state.pdf = null;
     const viewer = $("bt-pdf-viewer");
     if (viewer) viewer.hidden = true;
-    const image = $("bt-pdf-image");
-    if (image) {
-      image.removeAttribute("src");
-      image.hidden = true;
+    const image1 = $("bt-pdf-image");
+    if (image1) {
+      image1.removeAttribute("src");
+      image1.hidden = true;
+      image1.style.maxHeight = "";
+      image1.style.maxWidth = "";
+      image1.style.width = "";
+      image1.style.height = "";
+    }
+    const image2 = $("bt-pdf-image-2");
+    if (image2) {
+      image2.removeAttribute("src");
+      image2.hidden = true;
+      image2.style.maxHeight = "";
+      image2.style.maxWidth = "";
+      image2.style.width = "";
+      image2.style.height = "";
+    }
+    const slot2 = $("bt-pdf-slot-2");
+    if (slot2) slot2.hidden = true;
+    const wrap = $("bt-pdf-pages-wrap");
+    if (wrap) {
+      wrap.classList.remove("bt-pdf-spread");
+      wrap.classList.remove("is-zoomed");
     }
     document.documentElement.classList.remove("bt-viewer-open");
     if (PdfViewer && PdfViewer.close) PdfViewer.close().catch(() => {});
@@ -1175,6 +1183,8 @@
     }
     closeImageViewer();
     const path = `${DATA_DIR}/${doc.sha12}.${doc.ext}`;
+    const isLandscape = window.innerWidth > window.innerHeight;
+    const isWide = window.innerWidth >= 680;
     state.pdf = {
       doc,
       entry,
@@ -1182,6 +1192,8 @@
       pages: 0,
       page: 0,
       zoom: 1,
+      twoPage: Boolean(isLandscape && isWide),
+      userLayoutChoice: false,
       cache: new Map(),
       token: 0,
     };
@@ -1192,6 +1204,13 @@
     $("bt-pdf-page").textContent = "Abriendo…";
     $("bt-pdf-image").hidden = true;
     $("bt-pdf-image").removeAttribute("src");
+    const img2 = $("bt-pdf-image-2");
+    if (img2) {
+      img2.hidden = true;
+      img2.removeAttribute("src");
+    }
+    const slot2 = $("bt-pdf-slot-2");
+    if (slot2) slot2.hidden = !state.pdf.twoPage;
     $("bt-pdf-loading").hidden = false;
     $("bt-pdf-loading").textContent = "Preparando el documento…";
     $("bt-pdf-prev").disabled = true;
@@ -1213,17 +1232,63 @@
     }
   }
 
-  function setPdfZoom(value, reset) {
-    if (!state.pdf) return;
-    const zoom = Math.max(1, Math.min(2.5, reset ? 1 : value));
-    state.pdf.zoom = zoom;
-    const image = $("bt-pdf-image");
-    if (image) {
-      image.style.width = `${zoom * 100}%`;
-      image.classList.toggle("is-zoomed", zoom > 1);
-    }
+  function applyPdfZoom() {
+    const pdf = state.pdf;
+    if (!pdf) return;
+    const zoom = pdf.zoom;
+    const stage = $("bt-pdf-stage");
+    const wrap = $("bt-pdf-pages-wrap");
+    const img1 = $("bt-pdf-image");
+    const img2 = $("bt-pdf-image-2");
+
     const label = $("bt-pdf-zoom");
     if (label) label.textContent = `${Math.round(zoom * 100)}%`;
+
+    const zoomOutBtn = $("bt-pdf-zoom-out");
+    const zoomInBtn = $("bt-pdf-zoom-in");
+    if (zoomOutBtn) zoomOutBtn.disabled = zoom <= 0.45;
+    if (zoomInBtn) zoomInBtn.disabled = zoom >= 2.45;
+
+    if (Math.abs(zoom - 1) < 0.01) {
+      if (img1) {
+        img1.style.maxHeight = "";
+        img1.style.maxWidth = "";
+        img1.style.width = "";
+        img1.style.height = "";
+      }
+      if (img2) {
+        img2.style.maxHeight = "";
+        img2.style.maxWidth = "";
+        img2.style.width = "";
+        img2.style.height = "";
+      }
+      if (wrap) wrap.classList.remove("is-zoomed");
+    } else {
+      const baseHeight = Math.max(300, (stage ? stage.clientHeight : window.innerHeight) - 120);
+      const targetHeight = Math.round(baseHeight * zoom);
+      if (img1) {
+        img1.style.maxHeight = `${targetHeight}px`;
+        img1.style.maxWidth = zoom > 1 ? "none" : "";
+        img1.style.width = "auto";
+        img1.style.height = `${targetHeight}px`;
+      }
+      if (img2) {
+        img2.style.maxHeight = `${targetHeight}px`;
+        img2.style.maxWidth = zoom > 1 ? "none" : "";
+        img2.style.width = "auto";
+        img2.style.height = `${targetHeight}px`;
+      }
+      if (wrap) wrap.classList.toggle("is-zoomed", zoom > 1);
+    }
+  }
+
+  function setPdfZoom(value, reset) {
+    if (!state.pdf) return;
+    const minZoom = 0.4;
+    const maxZoom = 2.5;
+    const zoom = Math.max(minZoom, Math.min(maxZoom, reset ? 1 : Math.round(value * 100) / 100));
+    state.pdf.zoom = zoom;
+    applyPdfZoom();
   }
 
   function stepPdfZoom(delta) {
@@ -1231,84 +1296,162 @@
     setPdfZoom(state.pdf.zoom + delta, false);
   }
 
-  function updatePdfNav(page) {
+  function togglePdfLayout() {
+    const pdf = state.pdf;
+    if (!pdf) return;
+    pdf.userLayoutChoice = true;
+    pdf.twoPage = !pdf.twoPage;
+    if (pdf.twoPage && pdf.page % 2 !== 0 && pdf.page > 0) {
+      pdf.page -= 1;
+    }
+    renderPdfPage(pdf.page);
+  }
+
+  function updatePdfNav() {
     const pdf = state.pdf;
     if (!pdf) return;
     const label = $("bt-pdf-page");
-    if (label) label.textContent = `Página ${page + 1} de ${pdf.pages}`;
+    const target2 = (pdf.twoPage && pdf.page + 1 < pdf.pages) ? pdf.page + 1 : null;
+    if (label) {
+      if (target2 !== null) {
+        label.textContent = `Páginas ${pdf.page + 1} - ${target2 + 1} de ${pdf.pages}`;
+      } else {
+        label.textContent = `Página ${pdf.page + 1} de ${pdf.pages}`;
+      }
+    }
     const prev = $("bt-pdf-prev");
     const next = $("bt-pdf-next");
-    if (prev) prev.disabled = page <= 0;
-    if (next) next.disabled = page >= pdf.pages - 1;
+    if (prev) prev.disabled = pdf.page <= 0;
+    if (next) {
+      const lastRendered = target2 !== null ? target2 : pdf.page;
+      next.disabled = lastRendered >= pdf.pages - 1;
+    }
+    const layoutLabel = $("bt-pdf-layout-label");
+    const layoutBtn = $("bt-pdf-layout-btn");
+    if (layoutLabel) {
+      layoutLabel.textContent = pdf.twoPage ? "1 pág" : "2 págs";
+    }
+    if (layoutBtn) {
+      layoutBtn.setAttribute("aria-label", pdf.twoPage ? "Cambiar a 1 página" : "Cambiar a 2 páginas");
+      layoutBtn.title = pdf.twoPage ? "Ver 1 página" : "Ver 2 páginas en horizontal";
+    }
+  }
+
+  function applyPdfSlot(img, dataUrl, pageIndex, totalPages) {
+    if (!img) return;
+    img.src = dataUrl;
+    img.alt = `Página ${pageIndex + 1} de ${totalPages}`;
+    img.hidden = false;
   }
 
   async function renderPdfPage(page) {
     const pdf = state.pdf;
     if (!pdf || !pdf.pages) return;
-    const target = Math.max(0, Math.min(pdf.pages - 1, page));
-    const width = window.innerWidth >= 720 ? 1800 : 1400;
-    const key = `${target}@${width}`;
+
+    let target = Math.max(0, Math.min(pdf.pages - 1, page));
+    if (pdf.twoPage && target % 2 !== 0 && target > 0) {
+      target -= 1;
+    }
     pdf.page = target;
-    updatePdfNav(target);
+
+    const target2 = (pdf.twoPage && target + 1 < pdf.pages) ? target + 1 : null;
+    const width = (window.innerWidth >= 720 && !pdf.twoPage) ? 1800 : 1200;
+
+    updatePdfNav();
+
     const stage = $("bt-pdf-stage");
     if (stage) {
       stage.scrollTop = 0;
       stage.scrollLeft = 0;
     }
 
-    const cached = pdf.cache.get(key);
-    if (cached) {
-      applyPdfImage(cached, target, pdf);
-      return;
+    const wrap = $("bt-pdf-pages-wrap");
+    if (wrap) {
+      wrap.classList.toggle("bt-pdf-spread", Boolean(pdf.twoPage && target2 !== null));
+    }
+
+    const slot2 = $("bt-pdf-slot-2");
+    if (slot2) {
+      slot2.hidden = !pdf.twoPage || target2 === null;
     }
 
     const token = ++pdf.token;
     const loading = $("bt-pdf-loading");
-    const image = $("bt-pdf-image");
+    const img1 = $("bt-pdf-image");
+    const img2 = $("bt-pdf-image-2");
+
+    const key1 = `${target}@${width}`;
+    const cached1 = pdf.cache.get(key1);
+    const key2 = target2 !== null ? `${target2}@${width}` : null;
+    const cached2 = key2 ? pdf.cache.get(key2) : null;
+
+    if (cached1 && (!key2 || cached2)) {
+      applyPdfSlot(img1, cached1, target, pdf.pages);
+      if (key2 && cached2) {
+        applyPdfSlot(img2, cached2, target2, pdf.pages);
+      } else if (img2) {
+        img2.hidden = true;
+      }
+      if (loading) loading.hidden = true;
+      applyPdfZoom();
+      return;
+    }
+
     if (loading) {
       loading.hidden = false;
-      loading.textContent = `Cargando página ${target + 1}…`;
+      loading.textContent = target2 !== null
+        ? `Cargando páginas ${target + 1} y ${target2 + 1}…`
+        : `Cargando página ${target + 1}…`;
     }
-    if (image) image.hidden = true;
 
     try {
-      const result = await PdfViewer.renderPage({ page: target, width });
-      if (!state.pdf || state.pdf !== pdf || token !== pdf.token) return;
-      pdf.cache.set(key, result.dataUrl);
-      if (pdf.cache.size > 8) {
+      let data1 = cached1;
+      if (!data1) {
+        const res1 = await PdfViewer.renderPage({ page: target, width });
+        if (!state.pdf || state.pdf !== pdf || token !== pdf.token) return;
+        data1 = res1.dataUrl;
+        pdf.cache.set(key1, data1);
+      }
+      applyPdfSlot(img1, data1, target, pdf.pages);
+
+      if (target2 !== null) {
+        let data2 = cached2;
+        if (!data2) {
+          const res2 = await PdfViewer.renderPage({ page: target2, width });
+          if (!state.pdf || state.pdf !== pdf || token !== pdf.token) return;
+          data2 = res2.dataUrl;
+          pdf.cache.set(key2, data2);
+        }
+        applyPdfSlot(img2, data2, target2, pdf.pages);
+      } else if (img2) {
+        img2.hidden = true;
+      }
+
+      if (pdf.cache.size > 20) {
         const oldest = pdf.cache.keys().next().value;
         pdf.cache.delete(oldest);
       }
-      applyPdfImage(result.dataUrl, target, pdf);
+
+      if (loading) loading.hidden = true;
+      applyPdfZoom();
     } catch (error) {
       if (!state.pdf || state.pdf !== pdf) return;
       console.warn("No se pudo renderizar la página", error);
       if (loading) {
         loading.hidden = false;
-        loading.textContent = "No se pudo mostrar esta página. Prueba con la página anterior o abre el archivo con otra app.";
+        loading.textContent = "No se pudo mostrar esta página. Puedes abrir el archivo con otra app.";
       }
     }
-  }
-
-  function applyPdfImage(dataUrl, page, pdf) {
-    if (!state.pdf || state.pdf !== pdf) return;
-    const image = $("bt-pdf-image");
-    const loading = $("bt-pdf-loading");
-    if (image) {
-      image.src = dataUrl;
-      image.alt = `Página ${page + 1} de ${pdf.pages}`;
-      image.hidden = false;
-    }
-    if (loading) loading.hidden = true;
-    updatePdfNav(page);
   }
 
   function goPdfPage(delta) {
     const pdf = state.pdf;
     if (!pdf) return;
-    const next = pdf.page + delta;
-    if (next < 0 || next >= pdf.pages) return;
-    renderPdfPage(next);
+    const step = pdf.twoPage ? (delta > 0 ? 2 : -2) : delta;
+    const next = pdf.page + step;
+    if (delta < 0 && pdf.page <= 0) return;
+    if (delta > 0 && pdf.page >= pdf.pages - 1) return;
+    renderPdfPage(Math.max(0, Math.min(pdf.pages - 1, next)));
   }
 
   function closeImageViewer() {
@@ -1812,9 +1955,8 @@
     if (["download", "files", "app"].includes(savedTab)) state.activeTab = savedTab;
     else state.activeTab = "files";
 
-    // Verificamos que el botón en el header y el menú estén listos tras el primer render
+    // Verificamos que el enlace en el menú y el almacenamiento estén listos tras el primer render
     setTimeout(() => {
-      injectHeaderButton();
       injectNavLink();
       renderStorage();
     }, 350);

@@ -2668,7 +2668,7 @@ draw();
  *
  * Para: Próximos desarrolladores y agentes de IA
  * Fecha de corte: 12 de Noviembre de 2026
- * Versión actual del ecosistema: BETA V8.0 (Web) - V2.2.12 Mobile (Android)
+ * Versión actual del ecosistema: BETA V8.1 (Web) - V2.2.13 Mobile (Android)
  * Autor y Creador Exclusivo: Liam Durán - Provincia TLXH (Instagram: @liaadurg3)
  * Sitio Web Público: https://ey-liam.github.io/bibliotech-scouts/
  * Repositorio Web: https://github.com/ey-liam/bibliotech-scouts (rama main)
@@ -2802,7 +2802,7 @@ draw();
  *
  * B) Repositorio App Android (ey-liam/bibliotech-scouts-app):
  * Envuelve el sitio web utilizando Capacitor 8 e inyecta una capa nativa:
- * - package.json: Versión 2.2.12 y versionLabel "V2.2.12 Mobile - Web V8.0 (12/11/2026)".
+ * - package.json: Versión 2.2.13 y versionLabel "V2.2.13 Mobile - Web V8.1 (12/11/2026)".
  * - scripts/sync-web.mjs: Clona o toma ../bibliotech-scouts como fuente hacia
  *   www/, copia index.html, styles.css, app.js, manifest.webmanifest, data/,
  *   img/, covers/ y BASE_ASSETS; parchea la leyenda del pie desde package.json;
@@ -2831,7 +2831,7 @@ draw();
  * - web-overlay/native.css: Estilos del botón flotante inferior izquierdo,
  *   modal de descargas, banner OTA y visores nativos.
  * - android/app/build.gradle: Configuración Android (applicationId
- *   mx.bibliotechscout.app, versionName 2.2.12, versionCode 21 y compilación
+ *   mx.bibliotechscout.app, versionName 2.2.13, versionCode 22 y compilación
  *   sobreescrita en tag vía APP_VERSION_NAME / APP_VERSION_CODE).
  * - android/app/src/main/AndroidManifest.xml: Permiso único
  *   android.permission.INTERNET (sin REQUEST_INSTALL_PACKAGES).

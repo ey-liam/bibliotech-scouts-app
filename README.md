@@ -8,8 +8,8 @@ nuevas versiones con descarga desde GitHub Releases.
 - Sitio: <https://ey-liam.github.io/bibliotech-scouts/>
 - App: este repositorio
 - Paquete Android: `mx.bibliotechscout.app`
-- Versión actual: `2.2.12` — `V2.2.12 Mobile - Web V8.0 (12/11/2026)`
-- Creador: Liam Durán - Provincia TLXH (Instagram: [@liaadurg3](https://www.instagram.com/liaadurg3/))
+- Versión actual: `2.2.13` — `V2.2.13 Mobile - Web V8.1 (12/11/2026)`
+- Creador: Liam Durán · Comunidad de Caminantes · Provincia Tláhuac-Xochimilco (Instagram: [@liaadurg3](https://www.instagram.com/liaadurg3/)) · `rdc.tlxh@gmail.com`
 - Sitio de referencia: `ey-liam/bibliotech-scouts`
 
 ## Capturas de pantalla y uso en teléfono
@@ -25,6 +25,12 @@ nuevas versiones con descarga desde GitHub Releases.
    - Consultar los PDFs, guías HTML autónomas, hojas Excel e imágenes ya guardados sin internet con los lectores integrados.
    - Explorar los **599 documentos oficiales accesibles** (de **751** totales en catálogo) filtrando por sección, **11 categorías y sus subcategorías**, con miniaturas de carátula y selección rápida en bloques de 25.
    - Entrar a **App y estado** para comprobar tus 5 bancos de preguntas sin conexión o buscar actualizaciones automáticas al instante.
+
+## Novedades de la Versión 2.2.13 (Nuevo Logo, Vistas Iniciales de 6 Archivos y Telemetría Automática Web V8.1)
+
+- **Nuevo Icono Oficial y Sincronización Web V8.1 (`sw.js v29`):** Integra el nuevo logotipo morado de flor de lis en iconos adaptativos Android, splash screen, cabecera y visor; corrige centrado de pestañas/botones y resume descripciones largas.
+- **Biblioteca y Catálogo Compactos al Inicio (`6` tarjetas):** Muestra 6 documentos inicialmente y expande todas las coincidencias automáticamente al escribir una búsqueda.
+- **Preguntas Recientes y Análisis Anónimo sin Banner en APK:** Dentro de la aplicación Android (`Capacitor`) las preferencias y análisis anónimos de uso/feedback se habilitan automáticamente en segundo plano sin mostrar el cuadro de cookies web, recordando preguntas recientes y reportando resúmenes anónimos de consultas o fallos.
 
 ## Novedades de la Versión 2.2.12 (Menú Intuitivo, Filtros de Azar y Textos Directos V8.0)
 

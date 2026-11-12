@@ -56,7 +56,7 @@ A diferencia de consultar la página web cuando requiere red constante, la **App
 
 ## 5. Instalación Segura y Aviso de Google Play Protect
 
-1. Descarga el archivo `bibliotech-scout-v2.2.16-release.apk` (o la versión más reciente) únicamente desde la sección **Releases** de este repositorio.
+1. Descarga el archivo `bibliotech-scout.apk` (de la versión `v2.2.16` o la más reciente) únicamente desde la sección **Releases** de este repositorio.
 2. En **Ajustes** de Android, habilita temporalmente *Instalar aplicaciones desconocidas* para tu navegador o gestor de archivos.
 3. **Aplicación segura y de código abierto:** Debido a que el APK se distribuye de forma directa y gratuita sin pasar por Google Play Store, Android puede mostrar inicialmente la ventana de revisión de **Google Play Protect**. Al pulsar **Analizar app**, Play Protect habitualmente verifica el paquete sin detectar riesgos ni mostrar alerta de inseguridad; si en algún dispositivo solicita confirmación adicional, selecciona *Más detalles → Instalar de todos modos*.
 4. La aplicación **no** solicita permisos invasivos ni `REQUEST_INSTALL_PACKAGES` para instalar paquetes externos; solo usa almacenamiento interno privado para tus documentos descargados y acceso de red para descargas/actualizaciones.

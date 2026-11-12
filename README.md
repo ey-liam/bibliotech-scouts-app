@@ -8,7 +8,7 @@ nuevas versiones con descarga desde GitHub Releases.
 - Sitio: <https://ey-liam.github.io/bibliotech-scouts/>
 - App: este repositorio
 - Paquete Android: `mx.bibliotechscout.app`
-- Versión actual: `2.2.14` — `V2.2.14 Mobile - Web V8.2 (12/11/2026)`
+- Versión actual: `2.2.15` — `V2.2.15 Mobile - Web V8.3 (12/11/2026)`
 - Creador: Liam Durán · Comunidad de Caminantes · Provincia Tláhuac-Xochimilco (Instagram: [@liaadurg3](https://www.instagram.com/liaadurg3/)) · `rdc.tlxh@gmail.com`
 - Sitio de referencia: `ey-liam/bibliotech-scouts`
 
@@ -25,6 +25,10 @@ nuevas versiones con descarga desde GitHub Releases.
    - Consultar los PDFs, guías HTML autónomas, hojas Excel e imágenes ya guardados sin internet con los lectores integrados.
    - Explorar los **599 documentos oficiales accesibles** (de **751** totales en catálogo) filtrando por sección, **11 categorías y sus subcategorías**, con miniaturas de carátula y selección rápida en bloques de 25.
    - Entrar a **App y estado** para comprobar tus 5 bancos de preguntas sin conexión o buscar actualizaciones automáticas al instante.
+
+## Novedades de la Versión 2.2.15 (Menú Secuencial, Acordeones Plegables, El Proyecto y Portada Poligonal Web V8.3)
+
+- **Sincronización Web V8.3 (`sw.js v31`):** Orden secuencial exacto de secciones y menú desplegable universal con los 12 apartados, contraste de Modo Noche corregido en *Ver más documentos de este estante*, tarjetas plegables cerradas por defecto en *Guía de Uso*, *Servicios y Trámites* y *Cambios en Esquemas*, sección *El Proyecto* ampliada, foto principal e imágenes con máscaras poligonales dinámicas sin letreros superpuestos y guía de descarga/instalación actualizada.
 
 ## Novedades de la Versión 2.2.14 (Telemetría Anónima Integral Web/App/iOS/Desktop V8.2)
 

@@ -94,7 +94,7 @@
         addListener: async () => ({ remove() {} }),
       },
       App: {
-        getInfo: async () => ({ version: "2.2.14", build: "23" }),
+        getInfo: async () => ({ version: "2.2.15", build: "24" }),
         addListener: async () => ({ remove() {} }),
         exitApp: () => {},
       },

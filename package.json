@@ -1,7 +1,7 @@
 {
   "name": "bibliotech-scout-app",
-  "version": "2.2.14",
-  "versionLabel": "V2.2.14 Mobile - Web V8.2 (12/11/2026)",
+  "version": "2.2.15",
+  "versionLabel": "V2.2.15 Mobile - Web V8.3 (12/11/2026)",
   "private": true,
   "description": "Aplicación Android de BiblioTech Scout: biblioteca scout offline con contenido actualizable.",
   "scripts": {

@@ -38,6 +38,7 @@
     "data/questions_bank.json",
     "data/knowledge_base.json",
     "data/chunks.json",
+    "data/spreadsheets.json",
     "data/faq_v3.json",
     "data/faq_v4.json",
   ];
@@ -1312,6 +1313,7 @@
     if (ext === "pdf") return openPdfReader(normalized, entry);
     if (IMAGE_EXTS.has(ext)) return openImageViewer(normalized, entry);
     if (ext === "html" || ext === "htm") return openHtmlViewer(normalized, entry);
+    if (ext === "xlsx") return openSpreadsheetViewer(normalized, entry);
     return openWithSystem(normalized, entry);
   }
 
@@ -1776,6 +1778,81 @@
       frame.srcdoc = "<p style='padding:24px;font-family:sans-serif;'>No se pudo abrir esta guía HTML offline.</p>";
     }
     return true;
+  }
+
+  function buildSpreadsheetHtml(doc, pkg, isDark) {
+    const esc = (v) =>
+      String(v == null ? "" : v)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    const payload = JSON.stringify(pkg.sheets || []).replace(/<\/script/gi, "<\\/script");
+    return `<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  body{margin:0;padding:12px;font-family:system-ui,-apple-system,sans-serif;background:${isDark ? "#0d0822" : "#f8fafc"};color:${isDark ? "#e2e8f0" : "#0f172a"};}
+  .tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+  .tab{padding:6px 12px;border-radius:10px;border:1px solid ${isDark ? "rgba(139,92,246,.45)" : "#cbd5e1"};background:${isDark ? "rgba(24,15,50,.94)" : "#fff"};color:${isDark ? "#f8fafc" : "#1e293b"};font-weight:700;font-size:12px;cursor:pointer;}
+  .tab.active{background:linear-gradient(135deg,#7928ca,#0284c7);color:#fff;border-color:transparent;}
+  .q{width:100%;box-sizing:border-box;padding:8px 10px;border-radius:10px;border:1px solid ${isDark ? "rgba(139,92,246,.45)" : "#cbd5e1"};background:${isDark ? "#140c2b" : "#fff"};color:${isDark ? "#fff" : "#0f172a"};font-size:13px;margin-bottom:10px;}
+  .wrap{overflow:auto;max-height:74vh;border:1px solid ${isDark ? "rgba(139,92,246,.4)" : "#cbd5e1"};border-radius:12px;background:${isDark ? "#0a0618" : "#fff"};}
+  table{width:100%;border-collapse:collapse;font-size:12px;}
+  th,td{border:1px solid ${isDark ? "rgba(139,92,246,.22)" : "#e2e8f0"};padding:6px 8px;text-align:left;vertical-align:top;max-width:240px;word-break:break-word;}
+  thead th{position:sticky;top:0;background:${isDark ? "#1c113d" : "#ede9fe"};color:${isDark ? "#c4b5fd" : "#4c1d95"};text-align:center;font-weight:800;}
+  tr.hdr td{background:${isDark ? "rgba(56,189,248,.14)" : "#f1f5f9"};font-weight:800;}
+  .num{background:${isDark ? "#140c2b" : "#f1f5f9"};color:#64748b;text-align:center;width:36px;font-weight:700;}
+  .note{font-size:11px;color:${isDark ? "#cbd5e1" : "#475569"};margin-top:8px;}
+</style></head><body>
+<div class="tabs" id="tabs"></div>
+<input type="search" id="q" class="q" placeholder="Filtrar texto dentro de la hoja..." />
+<div class="wrap" id="stage"></div>
+<div class="note" id="note"></div>
+<script>
+const sheets = ${payload};
+let active = 0;
+function col(i){let n=i+1,s="";while(n>0){let r=(n-1)%26;s=String.fromCharCode(65+r)+s;n=Math.floor((n-1)/26);}return s;}
+function esc(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function draw(){
+  const tabs=document.getElementById("tabs");
+  tabs.innerHTML=sheets.map((s,i)=>'<button class="tab '+(i===active?'active':'')+'" data-i="'+i+'">'+esc(s.name)+' ('+s.total_rows+')</button>').join("");
+  tabs.querySelectorAll("button").forEach(b=>b.onclick=()=>{active=+b.dataset.i;draw();});
+  const s=sheets[active]; if(!s)return;
+  const f=document.getElementById("q").value.trim().toLowerCase();
+  const rows=f?s.rows.filter((r,i)=>i===0||r.some(c=>String(c).toLowerCase().includes(f))):s.rows;
+  const cols=Math.max(s.total_cols||1,...rows.map(r=>r.length),1);
+  let th='<th>#</th>'+Array.from({length:cols},(_,i)=>'<th>'+col(i)+'</th>').join("");
+  let tb=rows.map((r,ri)=>'<tr class="'+(ri===0?'hdr':'')+'"><th class="num">'+(ri+1)+'</th>'+Array.from({length:cols},(_,ci)=>'<td>'+esc(r[ci]||"")+'</td>').join("")+'</tr>').join("");
+  document.getElementById("stage").innerHTML='<table><thead><tr>'+th+'</tr></thead><tbody>'+tb+'</tbody></table>';
+  document.getElementById("note").textContent=s.truncated?('Mostrando '+s.displayed_rows+' de '+s.total_rows+' filas. Pulsa "Abrir con otra app" para ver o editar el .xlsx completo.'):'Vista sin conexión de hoja de cálculo Excel.';
+}
+document.getElementById("q").oninput=draw;
+draw();
+</script></body></html>`;
+  }
+
+  async function openSpreadsheetViewer(doc, entry) {
+    try {
+      const res = await fetch("data/spreadsheets.json");
+      const db = res && res.ok ? await res.json() : {};
+      const pkg = db && db[doc.sha12];
+      if (!pkg || !pkg.sheets || !pkg.sheets.length) {
+        return openWithSystem(doc, entry);
+      }
+      closePdfReader();
+      closeImageViewer();
+      const path = `${DATA_DIR}/${doc.sha12}.${doc.ext}`;
+      state.html = { doc, entry, path };
+      const viewer = $("bt-html-viewer");
+      viewer.hidden = false;
+      document.documentElement.classList.add("bt-viewer-open");
+      $("bt-html-title").textContent = doc.title || "Hoja de cálculo Excel";
+      $("bt-html-meta").textContent = `Excel (.xlsx) · ${pkg.sheet_count || pkg.sheets.length} hojas${entry.size ? ` · ${fmtMB(entry.size)}` : ""}`;
+      const isDark = document.documentElement.getAttribute("data-camp-mode") === "true";
+      $("bt-html-frame").srcdoc = buildSpreadsheetHtml(doc, pkg, isDark);
+      return true;
+    } catch (_) {
+      return openWithSystem(doc, entry);
+    }
   }
 
   // ------------------------------------------------------------------
@@ -2484,7 +2561,7 @@
  *
  * Para: Próximos desarrolladores y agentes de IA
  * Fecha de corte: 11 de Noviembre de 2026
- * Versión actual del ecosistema: BETA V7.1 (Web) - V2.2.3 Mobile (Android)
+ * Versión actual del ecosistema: BETA V7.2 (Web) - V2.2.4 Mobile (Android)
  * Autor y Creador Exclusivo: Liam Durán - Provincia TLXH (Instagram: @liaadurg3)
  * Sitio Web Público: https://ey-liam.github.io/bibliotech-scouts/
  * Repositorio Web: https://github.com/ey-liam/bibliotech-scouts (rama main)
@@ -2618,7 +2695,7 @@
  *
  * B) Repositorio App Android (ey-liam/bibliotech-scouts-app):
  * Envuelve el sitio web utilizando Capacitor 8 e inyecta una capa nativa:
- * - package.json: Versión 2.2.3 y versionLabel "V2.2.3 Mobile - Web V7.1 (11/11/2026)".
+ * - package.json: Versión 2.2.4 y versionLabel "V2.2.4 Mobile - Web V7.2 (11/11/2026)".
  * - scripts/sync-web.mjs: Clona o toma ../bibliotech-scouts como fuente hacia
  *   www/, copia index.html, styles.css, app.js, manifest.webmanifest, data/,
  *   img/, covers/ y BASE_ASSETS; parchea la leyenda del pie desde package.json;
@@ -2647,7 +2724,7 @@
  * - web-overlay/native.css: Estilos del botón flotante inferior izquierdo,
  *   modal de descargas, banner OTA y visores nativos.
  * - android/app/build.gradle: Configuración Android (applicationId
- *   mx.bibliotechscout.app, versionName 2.2.3, versionCode 12 y compilación
+ *   mx.bibliotechscout.app, versionName 2.2.4, versionCode 13 y compilación
  *   sobreescrita en tag vía APP_VERSION_NAME / APP_VERSION_CODE).
  * - android/app/src/main/AndroidManifest.xml: Permiso único
  *   android.permission.INTERNET (sin REQUEST_INSTALL_PACKAGES).

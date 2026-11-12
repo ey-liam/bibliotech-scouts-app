@@ -8,7 +8,7 @@ nuevas versiones con descarga desde GitHub Releases.
 - Sitio: <https://ey-liam.github.io/bibliotech-scouts/>
 - App: este repositorio
 - Paquete Android: `mx.bibliotechscout.app`
-- Versión actual: `2.2.3` — `V2.2.3 Mobile - Web V7.1 (11/11/2026)`
+- Versión actual: `2.2.4` — `V2.2.4 Mobile - Web V7.2 (11/11/2026)`
 - Creador: Liam Durán - Provincia TLXH (Instagram: [@liaadurg3](https://www.instagram.com/liaadurg3/))
 - Sitio de referencia: `ey-liam/bibliotech-scouts`
 
@@ -20,19 +20,18 @@ nuevas versiones con descarga desde GitHub Releases.
 
 **Cómo usar la app:**
 1. En la parte inferior dispones del dock flotante con acceso rápido a **Inicio**, **Consultar**, **Biblioteca**, **Agentes**, **Guardados** y **Noche** (modo oscuro).
-2. Puedes buscar entre **12,264 preguntas y respuestas oficiales sin conexión** (incluidos proyectos SMART, PPV del Clan de Rovers, ciclo PER, Ejes Temáticos, las 18 Especialidades FES de Comunidad, 46 plantillas RECME/CNAMS, Help Desk SISAS/CONECTA, Reglamento 2023 y Manual del Uniforme junio 2026).
+2. Puedes buscar entre **13,494 preguntas y respuestas oficiales sin conexión** (incluidos proyectos SMART, PPV del Clan de Rovers, ciclo PER, Ejes Temáticos, las 18 Especialidades FES de Comunidad, 46 plantillas RECME/CNAMS, Help Desk SISAS/CONECTA, cobertura universal de qué es/para qué sirve/quién llena o es responsable de los 599 archivos, Reglamento 2023 y Manual del Uniforme junio 2026).
 3. El botón flotante **Descargas** (en la esquina inferior izquierda) y el acceso del menú abren **Mi biblioteca**, donde puedes:
    - Consultar los PDFs, guías HTML autónomas e imágenes ya guardados sin internet con los lectores integrados.
    - Explorar los **599 documentos oficiales accesibles** (de **751** totales en catálogo) filtrando por sección, **11 categorías y sus subcategorías**, o descargar los que necesites.
    - Entrar a **App y estado** para comprobar tus 5 bancos de preguntas sin conexión o buscar actualizaciones automáticas al instante.
 
-## Novedades de la Versión 2.2.3 (Acervo RECME/FES/Help Desk, Subcategorías y Lector HTML Offline)
+## Novedades de la Versión 2.2.4 (Acervo RECME/FES/Help Desk, Visor Excel Offline y 13,494 Preguntas)
 
-- **Acervo RECME, Especialidades FES y Help Desk Sin Conexión (12,264 Preguntas):** Incorpora **65 nuevos PDFs canónicos** (18 FES Comunidad, 46 plantillas P1–P10 de Diagnóstico/Evaluación/Mapas/FAES/Insignia Final Obsidiana y Jade/CNAMS y Formato de Proyecto v1.1), **32 guías HTML autónomas** (25 guías Help Desk SISAS/CONECTA con capturas embebidas, directorio de 11 departamentos, instructivos Genially *Masterchefsito* y *Primer Respondiente Junior*, y catálogos RECME) y **4 emblemas oficiales**, sumando **6,807 preguntas en `faq_v4.json`** (10 a 30 por cada PDF nuevo).
-- **Lector HTML Integrado Offline:** Los documentos HTML autónomos descargados en **Mi biblioteca** se abren directamente dentro de la app (`#bt-html-viewer`) sin depender de apps externas ni conexión.
-- **Filtro por 11 Categorías y Subcategorías en Mi Biblioteca:** Nuevo selector dinámico de **Categoría** y **Subcategoría** en *Explorar catálogo* replicando la estructura completa de la web.
+- **Acervo Completo Sin Conexión (13,494 Preguntas · 100 % Cobertura de 599 Archivos):** Incorpora **65 nuevos PDFs canónicos** (18 FES Comunidad, 46 plantillas P1–P10 de Diagnóstico/Evaluación/Mapas/FAES/Insignia Final Obsidiana y Jade/CNAMS y Formato de Proyecto v1.1), **32 guías HTML autónomas** (25 guías Help Desk SISAS/CONECTA con capturas embebidas, directorio de 11 departamentos, instructivos Genially *Masterchefsito* y *Primer Respondiente Junior*, y catálogos RECME) y **33 imágenes oficiales**, sumando **8,037 preguntas en `faq_v4.json`** (12 a 17 por cada PDF nuevo, más preguntas cotidianas básicas de qué es, para qué sirve y quién llena/emite cada documento).
+- **Lector Interactivo Excel (.xlsx) y Guías HTML Offline:** Integra visor offline de hojas de cálculo Excel (`.xlsx`) desde `data/spreadsheets.json` con pestañas por hoja y filtro en tiempo real, además de lector HTML autónomo sin conexión y las **49 subcategorías dinámicas** distribuidas en 11 categorías.
 - **Auto-actualización Web y de Contenido (OTA sin re-instalar APK):** Incorpora `OtaUpdaterPlugin` y `OtaWebViewClient` en Java para actualizar base de datos e interfaz web en segundo plano con verificación de integridad y reversión automática.
-- **Compatibilidad Total de Modo Oscuro y Estabilidad:** Modo oscuro limpio de alto contraste con sincronización completa de versiones y recursos empaquetados (504 portadas).
+- **Compatibilidad Total de Modo Oscuro y Estabilidad:** Modo oscuro limpio de alto contraste (incluyendo enlaces, tarjetas de respuesta, filtros de catálogo y visor modal) con sincronización completa de versiones y recursos empaquetados (`498` portadas PDF, `33` imágenes verificadas).
 
 ## Descargar la app
 

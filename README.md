@@ -8,7 +8,7 @@ nuevas versiones con descarga desde GitHub Releases.
 - Sitio: <https://ey-liam.github.io/bibliotech-scouts/>
 - App: este repositorio
 - Paquete Android: `mx.bibliotechscout.app`
-- Versión actual: `2.2.6` — `V2.2.6 Mobile - Web V7.4 (11/11/2026)`
+- Versión actual: `2.2.7` — `V2.2.7 Mobile - Web V7.5 (11/11/2026)`
 - Creador: Liam Durán - Provincia TLXH (Instagram: [@liaadurg3](https://www.instagram.com/liaadurg3/))
 - Sitio de referencia: `ey-liam/bibliotech-scouts`
 
@@ -26,8 +26,9 @@ nuevas versiones con descarga desde GitHub Releases.
    - Explorar los **599 documentos oficiales accesibles** (de **751** totales en catálogo) filtrando por sección, **11 categorías y sus subcategorías**, con miniaturas de carátula y selección rápida en bloques de 25.
    - Entrar a **App y estado** para comprobar tus 5 bancos de preguntas sin conexión o buscar actualizaciones automáticas al instante.
 
-## Novedades de la Versión 2.2.6 (Subcategorías Plegables, Ajuste Móvil Total y Web V7.4)
+## Novedades de la Versión 2.2.7 (Sincronización Web V7.5 e iOS Safari / Web App)
 
+- **Sincronización Web V7.5 (`sw.js v23`) y Compatibilidad Multiplataforma:** Hereda los ajustes iOS Safari / iPadOS (soporte `safe-area`, `100dvh` sin recorte en modales, prevención de auto-zoom en buscadores/filtros y pestaña iOS Web App dentro de `#app`) manteniendo el flujo nativo Android (`#app` oculto dentro de Capacitor).
 - **Subcategorías Plegables y Filtro en Catálogo y Biblioteca:** Sincroniza la pestaña desplegable **Subcategorías (N)** (oculta por defecto para evitar saturación) y el selector dedicado **Subcategoría** en el Catálogo, además de correcciones estrictas de contención `minmax(0, 1fr)` en móvil.
 - **Carátulas Reales en Todo el Catálogo y App (`599/599`) + Descripciones Depuradas:** Sincroniza las **599 carátulas JPG** (incluidos HTML, XLSX, DOCX, PPTX e imágenes), añade miniaturas en la lista de exploración y en *Mis descargas* con respaldo automático por formato, y limpia todas las descripciones genéricas.
 - **Exportación CSV Offline desde Excel y Selección Rápida de 25 Archivos:** El lector offline de hojas de cálculo `.xlsx` ahora incluye botón **Exportar CSV** (con BOM UTF-8 compatible con Excel en Android y navegador), y *Explorar catálogo* incorpora **Seleccionar bloque (25)** para descargar rápidamente subcategorías completas.

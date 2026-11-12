@@ -30,8 +30,17 @@ jobs:
       - name: Instalar dependencias
         run: npm ci
 
-      - name: Copiar el sitio a www/
-        run: npm run sync:web
+      - name: Validar sintaxis JS de overlay y scripts
+        run: |
+          node --check web-overlay/native-early.js
+          node --check web-overlay/native-bridge.js
+          node --check scripts/sync-web.mjs
+
+      - name: Copiar el sitio a www/ y verificar paquete limpio
+        run: |
+          npm run sync:web
+          test ! -f www/native-test.html
+          test ! -f www/native-mock.js
 
       - name: Sincronizar Capacitor
         run: npx cap sync android
@@ -86,15 +95,20 @@ jobs:
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
 
-      - name: Preparar APK para publicar
+      - name: Preparar APK y calcular huella SHA-256
         if: startsWith(github.ref, 'refs/tags/v')
-        run: cp android/app/build/outputs/apk/release/app-release.apk bibliotech-scout.apk
+        run: |
+          cp android/app/build/outputs/apk/release/app-release.apk bibliotech-scout.apk
+          sha256sum bibliotech-scout.apk > bibliotech-scout.apk.sha256
+          cat bibliotech-scout.apk.sha256
 
-      - name: Publicar release con el APK
+      - name: Publicar release con APK y SHA-256
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
           name: BiblioTech Scout ${{ github.ref_name }}
-          files: bibliotech-scout.apk
+          files: |
+            bibliotech-scout.apk
+            bibliotech-scout.apk.sha256
           generate_release_notes: true
           fail_on_unmatched_files: true

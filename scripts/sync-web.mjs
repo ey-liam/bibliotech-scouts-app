@@ -25,11 +25,6 @@ const BASE_ASSETS = [
   "assets/scouts/foros_extra_2.jpg",
   "assets/scouts/foros_evento_3.jpg",
   "assets/scouts/wosm_photo2.jpg",
-  "assets/scouts/agentes_cambio/AgentesDeCambioLogo.png",
-  "assets/scouts/agentes_cambio/Salud.png",
-  "assets/scouts/agentes_cambio/Habilidades.png",
-  "assets/scouts/agentes_cambio/Sustentabilidad.png",
-  "assets/scouts/agentes_cambio/Paz.png",
   "assets/scouts/agentes_cambio/LetreroCNRC.png",
   "assets/scouts/agentes_cambio/Logos.png",
 ];
@@ -149,8 +144,28 @@ async function patchHtmlFile() {
 }
 
 async function copyOverlay() {
+  let esbuild = null;
+  try {
+    esbuild = await import("esbuild");
+  } catch (_) {}
+
   for (const file of ["native-early.js", "native.css", "native-bridge.js"]) {
-    await cp(path.join(overlayDir, file), path.join(outDir, file));
+    const src = path.join(overlayDir, file);
+    const dest = path.join(outDir, file);
+    if (esbuild) {
+      const loader = file.endsWith(".css") ? "css" : "js";
+      const code = await readFile(src, "utf8");
+      const out = await esbuild.transform(code, {
+        loader,
+        minify: true,
+        charset: "utf8",
+        legalComments: "none",
+        ...(loader === "css" ? { target: ["chrome90"] } : {}),
+      });
+      await writeFile(dest, out.code, "utf8");
+    } else {
+      await cp(src, dest);
+    }
   }
 }
 

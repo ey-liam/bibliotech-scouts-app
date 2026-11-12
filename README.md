@@ -8,7 +8,7 @@ nuevas versiones con descarga desde GitHub Releases.
 - Sitio: <https://ey-liam.github.io/bibliotech-scouts/>
 - App: este repositorio
 - Paquete Android: `mx.bibliotechscout.app`
-- Versión actual: `2.2.5` — `V2.2.5 Mobile - Web V7.3 (11/11/2026)`
+- Versión actual: `2.2.6` — `V2.2.6 Mobile - Web V7.4 (11/11/2026)`
 - Creador: Liam Durán - Provincia TLXH (Instagram: [@liaadurg3](https://www.instagram.com/liaadurg3/))
 - Sitio de referencia: `ey-liam/bibliotech-scouts`
 
@@ -26,8 +26,9 @@ nuevas versiones con descarga desde GitHub Releases.
    - Explorar los **599 documentos oficiales accesibles** (de **751** totales en catálogo) filtrando por sección, **11 categorías y sus subcategorías**, con miniaturas de carátula y selección rápida en bloques de 25.
    - Entrar a **App y estado** para comprobar tus 5 bancos de preguntas sin conexión o buscar actualizaciones automáticas al instante.
 
-## Novedades de la Versión 2.2.5 (Carátulas 599/599, Exportación CSV Offline, Descargas en Bloque y 13,516 Preguntas)
+## Novedades de la Versión 2.2.6 (Subcategorías Plegables, Ajuste Móvil Total y Web V7.4)
 
+- **Subcategorías Plegables y Filtro en Catálogo y Biblioteca:** Sincroniza la pestaña desplegable **Subcategorías (N)** (oculta por defecto para evitar saturación) y el selector dedicado **Subcategoría** en el Catálogo, además de correcciones estrictas de contención `minmax(0, 1fr)` en móvil.
 - **Carátulas Reales en Todo el Catálogo y App (`599/599`) + Descripciones Depuradas:** Sincroniza las **599 carátulas JPG** (incluidos HTML, XLSX, DOCX, PPTX e imágenes), añade miniaturas en la lista de exploración y en *Mis descargas* con respaldo automático por formato, y limpia todas las descripciones genéricas.
 - **Exportación CSV Offline desde Excel y Selección Rápida de 25 Archivos:** El lector offline de hojas de cálculo `.xlsx` ahora incluye botón **Exportar CSV** (con BOM UTF-8 compatible con Excel en Android y navegador), y *Explorar catálogo* incorpora **Seleccionar bloque (25)** para descargar rápidamente subcategorías completas.
 - **Banco Documental `13,516` Preguntas (`8,059` en `faq_v4.json`):** Amplía respuestas fundamentales sobre origen e historia del escultismo, igualdad de género y diversidad (DEI 2024 / SCNEG / JSN 21.007), requisitos de membresía, Manual del Uniforme junio 2026, denuncias CONECTA, proyectos scout y especialidades FES (dejando explícito que Comunidad/Adultos están completos y Manada/Tropa/Clan siguen pendientes).

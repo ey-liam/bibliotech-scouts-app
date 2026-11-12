@@ -8,7 +8,7 @@ nuevas versiones con descarga desde GitHub Releases.
 - Sitio: <https://ey-liam.github.io/bibliotech-scouts/>
 - App: este repositorio
 - Paquete Android: `mx.bibliotechscout.app`
-- Versión actual: `2.2.10` — `V2.2.10 Mobile - Web V7.8 (12/11/2026)`
+- Versión actual: `2.2.11` — `V2.2.11 Mobile - Web V7.9 (12/11/2026)`
 - Creador: Liam Durán - Provincia TLXH (Instagram: [@liaadurg3](https://www.instagram.com/liaadurg3/))
 - Sitio de referencia: `ey-liam/bibliotech-scouts`
 
@@ -25,6 +25,11 @@ nuevas versiones con descarga desde GitHub Releases.
    - Consultar los PDFs, guías HTML autónomas, hojas Excel e imágenes ya guardados sin internet con los lectores integrados.
    - Explorar los **599 documentos oficiales accesibles** (de **751** totales en catálogo) filtrando por sección, **11 categorías y sus subcategorías**, con miniaturas de carátula y selección rápida en bloques de 25.
    - Entrar a **App y estado** para comprobar tus 5 bancos de preguntas sin conexión o buscar actualizaciones automáticas al instante.
+
+## Novedades de la Versión 2.2.11 (Portada Animada en Vertical y Optimización CSS/JS V7.9)
+
+- **Cinta Diagonal Vertical y Morfismo de Portada (`Web V7.9`, `sw.js v27`):** Corrige la cinta azul-violeta en pantallas verticales para que aparezca de forma nítida en móvil y APK mediante gradiente inline propio, y añade movimiento fluido de onda a la cinta junto con deformación orgánica continua al polígono del título.
+- **Limpieza y Código Reutilizable:** Retira fotos sueltas sobre *Servicios* y adornos redundantes, consolida 9 animaciones repetidas de flotación bajo `@keyframes btFloatBob`, unifica transiciones compartidas de botones/píldoras y centraliza la inclinación 3D en un solo manejador delegado.
 
 ## Novedades de la Versión 2.2.10 (Fondo Animado Unificado Visible en Modo Oscuro V7.8)
 

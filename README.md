@@ -8,7 +8,7 @@ nuevas versiones con descarga desde GitHub Releases.
 - Sitio: <https://ey-liam.github.io/bibliotech-scouts/>
 - App: este repositorio
 - Paquete Android: `mx.bibliotechscout.app`
-- Versión actual: `2.2.11` — `V2.2.11 Mobile - Web V7.9 (12/11/2026)`
+- Versión actual: `2.2.12` — `V2.2.12 Mobile - Web V8.0 (12/11/2026)`
 - Creador: Liam Durán - Provincia TLXH (Instagram: [@liaadurg3](https://www.instagram.com/liaadurg3/))
 - Sitio de referencia: `ey-liam/bibliotech-scouts`
 
@@ -25,6 +25,10 @@ nuevas versiones con descarga desde GitHub Releases.
    - Consultar los PDFs, guías HTML autónomas, hojas Excel e imágenes ya guardados sin internet con los lectores integrados.
    - Explorar los **599 documentos oficiales accesibles** (de **751** totales en catálogo) filtrando por sección, **11 categorías y sus subcategorías**, con miniaturas de carátula y selección rápida en bloques de 25.
    - Entrar a **App y estado** para comprobar tus 5 bancos de preguntas sin conexión o buscar actualizaciones automáticas al instante.
+
+## Novedades de la Versión 2.2.12 (Menú Intuitivo, Filtros de Azar y Textos Directos V8.0)
+
+- **Menú y Buscador Tipo App (`Web V8.0`, `sw.js v28`):** Menú móvil en cuadrícula de tarjetas limpias, barra superior abreviada y textos concisos en todas las secciones. El buscador incorpora botón desplegable **Sección** (filtro por Manada, Tropa, Comunidad, Clan, Adultos y WOSM), botón **Preguntas al azar**, botón **Recargar otras al azar**, pestañas temáticas en una sola fila deslizable y tarjetas de preguntas apiladas con respuesta instantánea.
 
 ## Novedades de la Versión 2.2.11 (Portada Animada en Vertical y Optimización CSS/JS V7.9)
 

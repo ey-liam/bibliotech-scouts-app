@@ -8,7 +8,7 @@ nuevas versiones con descarga desde GitHub Releases.
 - Sitio: <https://ey-liam.github.io/bibliotech-scouts/>
 - App: este repositorio
 - Paquete Android: `mx.bibliotechscout.app`
-- Versión actual: `2.2.9` — `V2.2.9 Mobile - Web V7.7 (12/11/2026)`
+- Versión actual: `2.2.10` — `V2.2.10 Mobile - Web V7.8 (12/11/2026)`
 - Creador: Liam Durán - Provincia TLXH (Instagram: [@liaadurg3](https://www.instagram.com/liaadurg3/))
 - Sitio de referencia: `ey-liam/bibliotech-scouts`
 
@@ -25,6 +25,10 @@ nuevas versiones con descarga desde GitHub Releases.
    - Consultar los PDFs, guías HTML autónomas, hojas Excel e imágenes ya guardados sin internet con los lectores integrados.
    - Explorar los **599 documentos oficiales accesibles** (de **751** totales en catálogo) filtrando por sección, **11 categorías y sus subcategorías**, con miniaturas de carátula y selección rápida en bloques de 25.
    - Entrar a **App y estado** para comprobar tus 5 bancos de preguntas sin conexión o buscar actualizaciones automáticas al instante.
+
+## Novedades de la Versión 2.2.10 (Fondo Animado Unificado Visible en Modo Oscuro V7.8)
+
+- **Visibilidad Total del Fondo Animado en Modo Oscuro (`Web V7.8`, `sw.js v26`):** Libera la capa opaca que cubría `.global-animated-bg` y `#btAmbientCanvas` al activar `data-camp-mode="true"`, mostrando de extremo a extremo la aurora cósmica oscura, los **6 rectángulos redondeados flotantes** y las partículas estelares detrás de todas las secciones translúcidas.
 
 ## Novedades de la Versión 2.2.9 (Fondo Animado Unificado Claro/Oscuro V7.7)
 

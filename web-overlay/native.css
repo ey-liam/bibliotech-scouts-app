@@ -436,7 +436,44 @@ html.bt-modal-open .bt-net-banner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.6rem;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.65rem;
+}
+
+.bt-head-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.bt-row-thumb-wrap {
+  position: relative;
+  flex: 0 0 auto;
+  width: 2.15rem;
+  height: 2.85rem;
+  border-radius: 7px;
+  overflow: hidden;
+  background: rgba(148, 163, 184, 0.16);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  display: grid;
+  place-items: center;
+}
+
+.bt-row-ext {
+  font-size: 0.56rem;
+  font-weight: 800;
+  color: #cbd5e1;
+  letter-spacing: 0.03em;
+}
+
+.bt-row-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .bt-count {
@@ -629,18 +666,29 @@ html.bt-modal-open .bt-net-banner {
 }
 
 .bt-saved-icon {
+  position: relative;
+  overflow: hidden;
   flex: 0 0 auto;
   width: 2.75rem;
-  height: 2.75rem;
+  height: 3.45rem;
   display: grid;
   place-items: center;
-  border-radius: 12px;
+  border-radius: 10px;
   background: #64748b;
   color: #ffffff;
   font-size: 0.62rem;
   font-weight: 900;
   letter-spacing: 0.04em;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.bt-saved-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .bt-ext-pdf {

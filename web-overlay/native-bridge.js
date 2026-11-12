@@ -395,7 +395,10 @@
             </div>
             <div class="bt-list-head">
               <p class="bt-count" id="bt-count"></p>
-              <button type="button" class="bt-link" id="bt-select-visible">Seleccionar visibles</button>
+              <div class="bt-head-links">
+                <button type="button" class="bt-link" id="bt-select-batch">Seleccionar bloque (25)</button>
+                <button type="button" class="bt-link" id="bt-select-visible">Seleccionar visibles</button>
+              </div>
             </div>
             <div class="bt-list" id="bt-list" role="list"></div>
           </section>
@@ -542,6 +545,7 @@
     });
     $("bt-download").addEventListener("click", downloadSelected);
     $("bt-delete").addEventListener("click", deleteSelected);
+    $("bt-select-batch").addEventListener("click", selectBatchVisible);
     $("bt-select-visible").addEventListener("click", toggleVisibleSelection);
     $("bt-delete-all").addEventListener("click", deleteAllSaved);
     $("bt-open-saved-notes").addEventListener("click", () => {
@@ -602,6 +606,7 @@
       if (!state.html) return;
       openWithSystem(state.html.doc, state.html.entry);
     });
+    window.addEventListener("message", handleViewerMessage);
 
     let touchStart = null;
     const stage = $("bt-pdf-stage");
@@ -875,6 +880,19 @@
         updateSelection();
       });
 
+      const thumbWrap = document.createElement("span");
+      thumbWrap.className = "bt-row-thumb-wrap";
+      const thumbExt = document.createElement("span");
+      thumbExt.className = "bt-row-ext";
+      thumbExt.textContent = String(doc.ext || "?").toUpperCase().slice(0, 4);
+      const thumbImg = document.createElement("img");
+      thumbImg.className = "bt-row-thumb";
+      thumbImg.src = `covers/${doc.sha12}.jpg`;
+      thumbImg.alt = "";
+      thumbImg.loading = "lazy";
+      thumbImg.addEventListener("error", () => thumbImg.remove());
+      thumbWrap.append(thumbExt, thumbImg);
+
       const main = document.createElement("span");
       main.className = "bt-row-main";
       const title = document.createElement("strong");
@@ -887,7 +905,7 @@
       tag.className = saved ? "bt-tag bt-tag-saved" : "bt-tag";
       tag.textContent = saved ? "Guardado" : doc.ext.toUpperCase();
 
-      row.append(check, main, tag);
+      row.append(check, thumbWrap, main, tag);
       fragment.appendChild(row);
     }
 
@@ -928,6 +946,22 @@
       selectVisible.textContent = allSelected ? "Quitar selección" : "Seleccionar visibles";
       selectVisible.disabled = docs.length === 0 || state.busy;
     }
+    const selectBatch = $("bt-select-batch");
+    if (selectBatch) {
+      selectBatch.disabled = docs.length === 0 || state.busy;
+    }
+  }
+
+  function selectBatchVisible() {
+    if (state.busy) return;
+    const docs = visibleDocs();
+    const pending = docs.filter((doc) => !state.offline[doc.sha12]);
+    const pool = pending.length ? pending : docs;
+    const batch = pool.slice(0, 25);
+    if (!batch.length) return;
+    batch.forEach((doc) => state.selected.add(doc.sha12));
+    renderList();
+    toast(`Seleccionados ${batch.length} documento${batch.length === 1 ? "" : "s"} del filtro actual.`);
   }
 
   function toggleVisibleSelection() {
@@ -989,7 +1023,19 @@
 
       const icon = document.createElement("div");
       icon.className = `bt-saved-icon bt-ext-${String(item.ext || "bin").toLowerCase()}`;
-      icon.textContent = String(item.ext || "?").toUpperCase().slice(0, 4);
+      const extLabel = document.createElement("span");
+      extLabel.className = "bt-saved-ext";
+      extLabel.textContent = String(item.ext || "?").toUpperCase().slice(0, 4);
+      icon.appendChild(extLabel);
+      if (item.sha12) {
+        const cover = document.createElement("img");
+        cover.className = "bt-saved-thumb";
+        cover.src = `covers/${item.sha12}.jpg`;
+        cover.alt = "";
+        cover.loading = "lazy";
+        cover.addEventListener("error", () => cover.remove());
+        icon.appendChild(cover);
+      }
 
       const info = document.createElement("div");
       info.className = "bt-saved-info";
@@ -1781,19 +1827,16 @@
   }
 
   function buildSpreadsheetHtml(doc, pkg, isDark) {
-    const esc = (v) =>
-      String(v == null ? "" : v)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
     const payload = JSON.stringify(pkg.sheets || []).replace(/<\/script/gi, "<\\/script");
+    const safeTitle = JSON.stringify(String(doc && doc.title ? doc.title : "hoja_scout").replace(/[^a-zA-Z0-9_-]+/g, "_").replace(/^_+|_+$/g, "") || "hoja_scout");
     return `<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
   body{margin:0;padding:12px;font-family:system-ui,-apple-system,sans-serif;background:${isDark ? "#0d0822" : "#f8fafc"};color:${isDark ? "#e2e8f0" : "#0f172a"};}
-  .tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+  .tabs-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
+  .tabs{display:flex;flex-wrap:wrap;gap:6px;}
   .tab{padding:6px 12px;border-radius:10px;border:1px solid ${isDark ? "rgba(139,92,246,.45)" : "#cbd5e1"};background:${isDark ? "rgba(24,15,50,.94)" : "#fff"};color:${isDark ? "#f8fafc" : "#1e293b"};font-weight:700;font-size:12px;cursor:pointer;}
   .tab.active{background:linear-gradient(135deg,#7928ca,#0284c7);color:#fff;border-color:transparent;}
+  .csv-btn{background:${isDark ? "rgba(16,185,129,.2)" : "#ecfdf5"};color:${isDark ? "#6ee7b7" : "#065f46"};border-color:${isDark ? "rgba(16,185,129,.45)" : "#a7f3d0"};}
   .q{width:100%;box-sizing:border-box;padding:8px 10px;border-radius:10px;border:1px solid ${isDark ? "rgba(139,92,246,.45)" : "#cbd5e1"};background:${isDark ? "#140c2b" : "#fff"};color:${isDark ? "#fff" : "#0f172a"};font-size:13px;margin-bottom:10px;}
   .wrap{overflow:auto;max-height:74vh;border:1px solid ${isDark ? "rgba(139,92,246,.4)" : "#cbd5e1"};border-radius:12px;background:${isDark ? "#0a0618" : "#fff"};}
   table{width:100%;border-collapse:collapse;font-size:12px;}
@@ -1803,12 +1846,16 @@
   .num{background:${isDark ? "#140c2b" : "#f1f5f9"};color:#64748b;text-align:center;width:36px;font-weight:700;}
   .note{font-size:11px;color:${isDark ? "#cbd5e1" : "#475569"};margin-top:8px;}
 </style></head><body>
-<div class="tabs" id="tabs"></div>
+<div class="tabs-bar">
+  <div class="tabs" id="tabs"></div>
+  <button type="button" class="tab csv-btn" id="csvExportBtn">Exportar CSV</button>
+</div>
 <input type="search" id="q" class="q" placeholder="Filtrar texto dentro de la hoja..." />
 <div class="wrap" id="stage"></div>
 <div class="note" id="note"></div>
 <script>
 const sheets = ${payload};
+const baseTitle = ${safeTitle};
 let active = 0;
 function col(i){let n=i+1,s="";while(n>0){let r=(n-1)%26;s=String.fromCharCode(65+r)+s;n=Math.floor((n-1)/26);}return s;}
 function esc(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
@@ -1826,8 +1873,68 @@ function draw(){
   document.getElementById("note").textContent=s.truncated?('Mostrando '+s.displayed_rows+' de '+s.total_rows+' filas. Pulsa "Abrir con otra app" para ver o editar el .xlsx completo.'):'Vista sin conexión de hoja de cálculo Excel.';
 }
 document.getElementById("q").oninput=draw;
+document.getElementById("csvExportBtn").onclick=()=>{
+  const s=sheets[active]; if(!s||!s.rows)return;
+  const csv="\\uFEFF"+s.rows.map(r=>r.map(v=>'"'+String(v??"").replace(/"/g,'""')+'"').join(",")).join("\\r\\n");
+  const sheetSlug=String(s.name||"hoja").replace(/[^a-zA-Z0-9_-]+/g,"_").replace(/^_+|_+$/g,"")||"hoja";
+  const filename=baseTitle+"_"+sheetSlug+".csv";
+  if(window.parent&&window.parent!==window){
+    window.parent.postMessage({type:"bt-export-csv",filename,csv},"*");
+  }
+};
 draw();
 </script></body></html>`;
+  }
+
+  async function handleViewerMessage(event) {
+    const frame = $("bt-html-frame");
+    if (!frame || event.source !== frame.contentWindow) return;
+    const data = event.data;
+    if (!data || data.type !== "bt-export-csv" || typeof data.csv !== "string") return;
+    const safeName =
+      String(data.filename || "hoja_scout.csv")
+        .replace(/[^a-zA-Z0-9._-]+/g, "_")
+        .replace(/^_+|_+$/g, "") || "hoja_scout.csv";
+    if (Filesystem) {
+      try {
+        const exportPath = `${DATA_DIR}/_exports/${safeName}`;
+        await Filesystem.writeFile({
+          path: exportPath,
+          data: data.csv,
+          directory: "DATA",
+          encoding: "utf8",
+          recursive: true,
+        });
+        toast(`CSV exportado: ${safeName}`);
+        if (FileOpener) {
+          const { uri } = await Filesystem.getUri({ path: exportPath, directory: "DATA" });
+          try {
+            await FileOpener.open({
+              filePath: uri,
+              contentType: "text/csv",
+              openWithDefault: true,
+            });
+          } catch (_) {}
+        }
+        return;
+      } catch (error) {
+        console.warn("No se pudo guardar CSV nativo", error);
+      }
+    }
+    try {
+      const blob = new Blob([data.csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = safeName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      toast(`CSV exportado: ${safeName}`);
+    } catch (_) {
+      toast("No se pudo exportar el CSV en este dispositivo.");
+    }
   }
 
   async function openSpreadsheetViewer(doc, entry) {
@@ -2561,7 +2668,7 @@ draw();
  *
  * Para: Próximos desarrolladores y agentes de IA
  * Fecha de corte: 11 de Noviembre de 2026
- * Versión actual del ecosistema: BETA V7.2 (Web) - V2.2.4 Mobile (Android)
+ * Versión actual del ecosistema: BETA V7.3 (Web) - V2.2.5 Mobile (Android)
  * Autor y Creador Exclusivo: Liam Durán - Provincia TLXH (Instagram: @liaadurg3)
  * Sitio Web Público: https://ey-liam.github.io/bibliotech-scouts/
  * Repositorio Web: https://github.com/ey-liam/bibliotech-scouts (rama main)
@@ -2695,7 +2802,7 @@ draw();
  *
  * B) Repositorio App Android (ey-liam/bibliotech-scouts-app):
  * Envuelve el sitio web utilizando Capacitor 8 e inyecta una capa nativa:
- * - package.json: Versión 2.2.4 y versionLabel "V2.2.4 Mobile - Web V7.2 (11/11/2026)".
+ * - package.json: Versión 2.2.5 y versionLabel "V2.2.5 Mobile - Web V7.3 (11/11/2026)".
  * - scripts/sync-web.mjs: Clona o toma ../bibliotech-scouts como fuente hacia
  *   www/, copia index.html, styles.css, app.js, manifest.webmanifest, data/,
  *   img/, covers/ y BASE_ASSETS; parchea la leyenda del pie desde package.json;
@@ -2724,7 +2831,7 @@ draw();
  * - web-overlay/native.css: Estilos del botón flotante inferior izquierdo,
  *   modal de descargas, banner OTA y visores nativos.
  * - android/app/build.gradle: Configuración Android (applicationId
- *   mx.bibliotechscout.app, versionName 2.2.4, versionCode 13 y compilación
+ *   mx.bibliotechscout.app, versionName 2.2.5, versionCode 14 y compilación
  *   sobreescrita en tag vía APP_VERSION_NAME / APP_VERSION_CODE).
  * - android/app/src/main/AndroidManifest.xml: Permiso único
  *   android.permission.INTERNET (sin REQUEST_INSTALL_PACKAGES).

@@ -8,7 +8,7 @@ nuevas versiones con descarga desde GitHub Releases.
 - Sitio: <https://ey-liam.github.io/bibliotech-scouts/>
 - App: este repositorio
 - Paquete Android: `mx.bibliotechscout.app`
-- Versión actual: `2.2.8` — `V2.2.8 Mobile - Web V7.6 (11/11/2026)`
+- Versión actual: `2.2.9` — `V2.2.9 Mobile - Web V7.7 (12/11/2026)`
 - Creador: Liam Durán - Provincia TLXH (Instagram: [@liaadurg3](https://www.instagram.com/liaadurg3/))
 - Sitio de referencia: `ey-liam/bibliotech-scouts`
 
@@ -25,6 +25,10 @@ nuevas versiones con descarga desde GitHub Releases.
    - Consultar los PDFs, guías HTML autónomas, hojas Excel e imágenes ya guardados sin internet con los lectores integrados.
    - Explorar los **599 documentos oficiales accesibles** (de **751** totales en catálogo) filtrando por sección, **11 categorías y sus subcategorías**, con miniaturas de carátula y selección rápida en bloques de 25.
    - Entrar a **App y estado** para comprobar tus 5 bancos de preguntas sin conexión o buscar actualizaciones automáticas al instante.
+
+## Novedades de la Versión 2.2.9 (Fondo Animado Unificado Claro/Oscuro V7.7)
+
+- **Fondo Animado Unificado y Consistencia Modo Claro / Modo Oscuro (`Web V7.7`, `sw.js v25`):** Sincroniza el sistema de fondo único (`.global-animated-bg` + partículas `#btAmbientCanvas`) sin capas encimadas, con **6 rectángulos redondeados flotantes** visibles en ambos temas. Todas las secciones usan superficies claras luminosas con texto oscuro legible en el modo predeterminado, y superficies cósmicas oscuras translúcidas con texto claro nítido al activar el Modo Noche (incluyendo Portada, Buscador, *Agentes de Cambio.MX*, descarga `#app` y pie de página).
 
 ## Novedades de la Versión 2.2.8 (Accesibilidad Web/App, Rendimiento y Sincronización V7.6)
 

@@ -2,7 +2,7 @@
 
 Aplicación oficial para **teléfonos y tablets Android** de **BiblioTech Scout**, diseñada para consultar manuales, reglamentos, progresiones, trámites y documentos oficiales del escultismo (ASMAC y World Scouting WOSM) incluso en campamentos y actividades sin acceso a internet.
 
-- **Versión actual:** `2.3.3` (`versionCode 29`) — `2.3.3 Mobile - Web 8.4.3 (12/11/2026)`
+- **Versión actual:** `2.3.4` (`versionCode 30`) — `2.3.4 Mobile - Web 8.4.4 (12/11/2026)`
 - **Creador:** Liam Durán · Comunidad de Caminantes · Provincia Tláhuac-Xochimilco · **Contacto:** `rdc.tlxh@gmail.com`
 - **Descarga oficial del APK:** [GitHub Releases (`bibliotech-scouts-app`)](https://github.com/ey-liam/bibliotech-scouts-app/releases/latest)
 
@@ -10,7 +10,7 @@ Aplicación oficial para **teléfonos y tablets Android** de **BiblioTech Scout*
 
 ## 1. Convención de Versionado de 3 Dígitos (`MAJOR.MINOR.PATCH`)
 
-Tanto el sitio web (`8.4.3`) como la aplicación Android (`2.3.3`) usan numeración semántica de tres dígitos:
+Tanto el sitio web (`8.4.4`) como la aplicación Android (`2.3.4`) usan numeración semántica de tres dígitos:
 
 - **Primer dígito (`X.0.0`):** Cambio mayor de arquitectura, plataforma o rediseño completo.
 - **Segundo dígito (`X.Y.0`):** Nuevas funciones relevantes dentro de la app, integraciones nativas o ampliaciones importantes del catálogo/preguntas.
@@ -56,7 +56,7 @@ A diferencia de consultar la página web cuando requiere red constante, la **App
 
 ## 5. Instalación Segura y Aviso de Google Play Protect
 
-1. Descarga el archivo `bibliotech-scout.apk` (de la versión `v2.3.3` o la más reciente) únicamente desde la sección **Releases** de este repositorio. Puedes comprobar su integridad verificando el archivo `bibliotech-scout.apk.sha256` incluido en el mismo Release (`sha256sum -c bibliotech-scout.apk.sha256` o `Get-FileHash bibliotech-scout.apk`).
+1. Descarga el archivo `bibliotech-scout.apk` (de la versión `v2.3.4` o la más reciente) únicamente desde la sección **Releases** de este repositorio. Puedes comprobar su integridad verificando el archivo `bibliotech-scout.apk.sha256` incluido en el mismo Release (`sha256sum -c bibliotech-scout.apk.sha256` o `Get-FileHash bibliotech-scout.apk`).
 2. En **Ajustes** de Android, habilita temporalmente *Instalar aplicaciones desconocidas* para tu navegador o gestor de archivos.
 3. **Aplicación segura y de código abierto:** Debido a que el APK se distribuye de forma directa y gratuita sin pasar por Google Play Store, Android puede mostrar inicialmente la ventana de revisión de **Google Play Protect**. Al pulsar **Analizar app**, Play Protect habitualmente verifica el paquete sin detectar riesgos ni mostrar alerta de inseguridad; si en algún dispositivo solicita confirmación adicional, selecciona *Más detalles → Instalar de todos modos*.
 4. La aplicación **no** solicita permisos invasivos ni `REQUEST_INSTALL_PACKAGES` para instalar paquetes externos; solo usa almacenamiento interno privado para tus documentos descargados y acceso de red para descargas/actualizaciones.
@@ -72,10 +72,11 @@ A diferencia de consultar la página web cuando requiere red constante, la **App
 
 ---
 
-## 7. Novedades de la Versión `2.3.3`
+## 7. Novedades de la Versión `2.3.4`
 
+- **Saneamiento oficial de infografías de Membresía Nacional ASMAC (Web `8.4.4`):** sincronización de los 7 registros del censo con títulos oficiales, nombres de archivo limpios y textos estadísticos detallados.
 - **Botón «Reportar error o bug» en el menú desplegable:** selector de dispositivo/plataforma, listado predeterminado de fallas comunes y descripción detallada con envío directo al Worker de Cloudflare + respaldo automático.
-- **Telemetría conectada al Worker de Cloudflare (`8.4.3` / `v2.3.3`) con respaldo automático:** envía el resumen de actividad y errores JS al Worker gratuito con respaldo automático a `FormSubmit`.
+- **Telemetría conectada al Worker de Cloudflare con respaldo automático:** envía el resumen de actividad y errores JS al Worker gratuito con respaldo automático a `FormSubmit`.
 - **Verificación de integridad `SHA-256` automática en Releases:** cada publicación compila y adjunta `bibliotech-scout.apk.sha256` junto al APK firmado.
-- **Optimización de compilación y bundle:** activado `minifyEnabled true` y `shrinkResources true` en Gradle Release con reglas ProGuard para Capacitor y plugins nativos; limpieza de PNGs duplicados y minificación `esbuild` tanto del sitio base (`Web 8.4.3`) como del overlay nativo (`native-bridge.js`, `native-early.js`, `native.css`).
+- **Optimización de compilación y bundle:** activado `minifyEnabled true` y `shrinkResources true` en Gradle Release con reglas ProGuard para Capacitor y plugins nativos; limpieza de PNGs duplicados y minificación `esbuild` tanto del sitio base (`Web 8.4.4`) como del overlay nativo (`native-bridge.js`, `native-early.js`, `native.css`).
 - **Validaciones CI en GitHub Actions:** verificación previa de sintaxis JS y comprobación automática de que `www/` no incluya archivos de prueba antes de empaquetar.

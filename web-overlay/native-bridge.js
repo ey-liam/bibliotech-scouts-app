@@ -2680,8 +2680,8 @@ draw();
  *
  * Para: Próximos desarrolladores y agentes de IA
  * Fecha de corte: 12 de Noviembre de 2026
- * Versión actual del ecosistema: BETA V8.3 (Web) - V2.2.15 Mobile (Android)
- * Autor y Creador Exclusivo: Liam Durán - Provincia TLXH (Instagram: @liaadurg3)
+ * Versión actual del ecosistema: BETA 8.3.1 (Web) - 2.2.16 Mobile (Android)
+ * Autor y Creador Exclusivo: Liam Durán - Provincia TLXH
  * Sitio Web Público: https://ey-liam.github.io/bibliotech-scouts/
  * Repositorio Web: https://github.com/ey-liam/bibliotech-scouts (rama main)
  * Repositorio App Android: https://github.com/ey-liam/bibliotech-scouts-app
@@ -2814,7 +2814,7 @@ draw();
  *
  * B) Repositorio App Android (ey-liam/bibliotech-scouts-app):
  * Envuelve el sitio web utilizando Capacitor 8 e inyecta una capa nativa:
- * - package.json: Versión 2.2.15 y versionLabel "V2.2.15 Mobile - Web V8.3 (12/11/2026)".
+ * - package.json: Versión 2.2.16 y versionLabel "2.2.16 Mobile - Web 8.3.1 (12/11/2026)".
  * - scripts/sync-web.mjs: Clona o toma ../bibliotech-scouts como fuente hacia
  *   www/, copia index.html, styles.css, app.js, manifest.webmanifest, data/,
  *   img/, covers/ y BASE_ASSETS; parchea la leyenda del pie desde package.json;
@@ -2843,7 +2843,7 @@ draw();
  * - web-overlay/native.css: Estilos del botón flotante inferior izquierdo,
  *   modal de descargas, banner OTA y visores nativos.
  * - android/app/build.gradle: Configuración Android (applicationId
- *   mx.bibliotechscout.app, versionName 2.2.15, versionCode 24 y compilación
+ *   mx.bibliotechscout.app, versionName 2.2.16, versionCode 25 y compilación
  *   sobreescrita en tag vía APP_VERSION_NAME / APP_VERSION_CODE).
  * - android/app/src/main/AndroidManifest.xml: Permiso único
  *   android.permission.INTERNET (sin REQUEST_INSTALL_PACKAGES).
@@ -2886,7 +2886,7 @@ draw();
  *     cian neón, 4 Ejes Temáticos (Salud y Bienestar, Habilidades para la Vida,
  *     Paz y Participación Comunitaria, Medio Ambiente y Sustentabilidad) ligados
  *     a los 4 pilares de la educación, chips conectados en data/faq_v3.json,
- *     enlaces a cnrc@scouts.org.mx, Instagram @RNC.MX e Instagram @liaadurg3.
+ *     enlaces a cnrc@scouts.org.mx e Instagram @RNC.MX.
  * - Reestructuración V7 y Mobile 2.2.x (Antigravity + OpenCode):
  *   - Inicio V7: tarjeta central inclinada rotate(-2deg), cinta diagonal
  *     .hero-band azul-morada, texto centrado «By Liam», 10 iconos SVG blancos

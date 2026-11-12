@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
-def appVersionName = System.getenv("APP_VERSION_NAME") ?: "2.2.15"
+def appVersionName = System.getenv("APP_VERSION_NAME") ?: "2.2.16"
 if (appVersionName.startsWith("v")) {
     appVersionName = appVersionName.substring(1)
 }
-def appVersionCode = (System.getenv("APP_VERSION_CODE") ?: "24").toInteger()
+def appVersionCode = (System.getenv("APP_VERSION_CODE") ?: "25").toInteger()
 def releaseKeystore = System.getenv("ANDROID_KEYSTORE_PATH")
 
 android {

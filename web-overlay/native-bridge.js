@@ -1161,6 +1161,12 @@
       savedAt: new Date().toISOString(),
     };
     await persistOfflineIndex();
+    if (typeof window.btTrackEvent === "function") {
+      window.btTrackEvent("doc_offline_apk", {
+        doc: doc.title || doc.sha12 || "",
+        ext: String(doc.ext || "").toLowerCase()
+      });
+    }
   }
 
   async function downloadSelected() {
@@ -1453,6 +1459,12 @@
     $("bt-pdf-page").textContent = "Abriendo…";
     $("bt-pdf-image").hidden = true;
     $("bt-pdf-image").removeAttribute("src");
+    if (typeof window.btTrackEvent === "function") {
+      window.btTrackEvent("pdf_nativo_apk", {
+        doc: (doc && doc.title) || "",
+        ext: (doc && doc.ext) || "pdf"
+      });
+    }
     const img2 = $("bt-pdf-image-2");
     if (img2) {
       img2.hidden = true;
@@ -2668,7 +2680,7 @@ draw();
  *
  * Para: Próximos desarrolladores y agentes de IA
  * Fecha de corte: 12 de Noviembre de 2026
- * Versión actual del ecosistema: BETA V8.1 (Web) - V2.2.13 Mobile (Android)
+ * Versión actual del ecosistema: BETA V8.2 (Web) - V2.2.14 Mobile (Android)
  * Autor y Creador Exclusivo: Liam Durán - Provincia TLXH (Instagram: @liaadurg3)
  * Sitio Web Público: https://ey-liam.github.io/bibliotech-scouts/
  * Repositorio Web: https://github.com/ey-liam/bibliotech-scouts (rama main)
@@ -2802,7 +2814,7 @@ draw();
  *
  * B) Repositorio App Android (ey-liam/bibliotech-scouts-app):
  * Envuelve el sitio web utilizando Capacitor 8 e inyecta una capa nativa:
- * - package.json: Versión 2.2.13 y versionLabel "V2.2.13 Mobile - Web V8.1 (12/11/2026)".
+ * - package.json: Versión 2.2.14 y versionLabel "V2.2.14 Mobile - Web V8.2 (12/11/2026)".
  * - scripts/sync-web.mjs: Clona o toma ../bibliotech-scouts como fuente hacia
  *   www/, copia index.html, styles.css, app.js, manifest.webmanifest, data/,
  *   img/, covers/ y BASE_ASSETS; parchea la leyenda del pie desde package.json;
@@ -2831,7 +2843,7 @@ draw();
  * - web-overlay/native.css: Estilos del botón flotante inferior izquierdo,
  *   modal de descargas, banner OTA y visores nativos.
  * - android/app/build.gradle: Configuración Android (applicationId
- *   mx.bibliotechscout.app, versionName 2.2.13, versionCode 22 y compilación
+ *   mx.bibliotechscout.app, versionName 2.2.14, versionCode 23 y compilación
  *   sobreescrita en tag vía APP_VERSION_NAME / APP_VERSION_CODE).
  * - android/app/src/main/AndroidManifest.xml: Permiso único
  *   android.permission.INTERNET (sin REQUEST_INSTALL_PACKAGES).

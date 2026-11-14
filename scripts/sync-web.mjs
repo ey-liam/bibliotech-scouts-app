@@ -113,10 +113,10 @@ function patchHtml(html) {
   // muestren siempre la misma versión.
   if (pkg.versionLabel) {
     out = out.replace(
-      /(<p class="footer-db-cutoff">\s*Base de datos: )([^<]+)(<\/p>)/i,
-      (match, start, body, end) => {
-        const cutoff = (body.match(/\d{2}\/\d{2}\/\d{4}/) || ["11/11/2026"])[0];
-        return `${start}${cutoff} · ${pkg.versionLabel}${end}`;
+      /(<p class="footer-db-cutoff">\s*Base de datos: )([^<]+)/i,
+      (match, start, body) => {
+        const cutoff = (body.match(/\d{2}\/\d{2}\/\d{4}/) || ["12/11/2026"])[0];
+        return `${start}${cutoff} · ${pkg.versionLabel} · `;
       }
     );
   }

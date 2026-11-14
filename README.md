@@ -2,7 +2,7 @@
 
 Aplicación oficial para **teléfonos y tablets Android** de **BiblioTech Scout**, diseñada para consultar manuales, reglamentos, progresiones, trámites y documentos oficiales del escultismo (ASMAC y World Scouting WOSM) incluso en campamentos y actividades sin acceso a internet.
 
-- **Versión actual:** `2.3.4` (`versionCode 30`) — `2.3.4 Mobile - Web 8.4.4 (12/11/2026)`
+- **Versión actual:** `2.3.5` (`versionCode 31`) — `2.3.5 Mobile - Web 8.4.5 (12/11/2026)`
 - **Creador:** Liam Durán · Comunidad de Caminantes · Provincia Tláhuac-Xochimilco · **Contacto:** `rdc.tlxh@gmail.com`
 - **Descarga oficial del APK:** [GitHub Releases (`bibliotech-scouts-app`)](https://github.com/ey-liam/bibliotech-scouts-app/releases/latest)
 
@@ -10,7 +10,7 @@ Aplicación oficial para **teléfonos y tablets Android** de **BiblioTech Scout*
 
 ## 1. Convención de Versionado de 3 Dígitos (`MAJOR.MINOR.PATCH`)
 
-Tanto el sitio web (`8.4.4`) como la aplicación Android (`2.3.4`) usan numeración semántica de tres dígitos:
+Tanto el sitio web (`8.4.5`) como la aplicación Android (`2.3.5`) usan numeración semántica de tres dígitos:
 
 - **Primer dígito (`X.0.0`):** Cambio mayor de arquitectura, plataforma o rediseño completo.
 - **Segundo dígito (`X.Y.0`):** Nuevas funciones relevantes dentro de la app, integraciones nativas o ampliaciones importantes del catálogo/preguntas.
@@ -32,7 +32,7 @@ La app adapta automáticamente sus superficies, tarjetas, tipografía y lector P
 
 | Apartado / Pantalla | Qué es y qué puedes hacer ahí | Captura |
 | :--- | :--- | :---: |
-| **Consultas Offline (`Buscador`)** | Pregunta cualquier duda scout o filtra por sección (*Manada*, *Tropa*, *Comunidad*, *Clan*, etc.) sobre las `13,516` preguntas y respuestas empaquetadas sin depender de datos móviles, con lectura en voz alta y citas documentales exactas. | ![Consulta offline en teléfono Android](docs/screenshots/app-consulta-movil.png) |
+| **Consultas Offline (`Buscador`)** | Pregunta cualquier duda scout o filtra por sección (*Manada*, *Tropa*, *Comunidad*, *Clan*, etc.) sobre las `13,520` preguntas y respuestas empaquetadas sin depender de datos móviles, con lectura en voz alta y citas documentales exactas. | ![Consulta offline en teléfono Android](docs/screenshots/app-consulta-movil.png) |
 | **Mi Biblioteca — Explorar Catálogo** | Abre el gestor nativo desde el menú móvil o el botón flotante para buscar entre los `599` documentos, filtrar por categoría/subcategoría/sección y descargar archivos individuales o en bloques de `25` para llevarlos sin conexión. | ![Gestor de descargas offline en teléfono](docs/screenshots/app-panel-descargas.png) |
 | **App y Estado (`OTA y Diagnóstico`)** | Verifica la versión instalada del APK, el commit web sincronizado, conectividad, cantidad de documentos guardados, actualización en segundo plano (`Actualizar web y contenido ahora`), revisión de APK nuevo y diagnóstico del banco offline. | ![Estado offline y verificación de datos en la app](docs/screenshots/app-estado-offline.png) |
 | **Vista Adaptada para Tablet Android** | Aprovecha pantallas medianas y grandes con diseño de catálogo amplio, barra superior completa y panel gestor lateral/modal cómodo para consulta grupal o de dirigentes. | ![BiblioTech Scout APK en Tablet Android](docs/screenshots/app-tablet.png) |
@@ -45,7 +45,7 @@ La app adapta automáticamente sus superficies, tarjetas, tipografía y lector P
 
 A diferencia de consultar la página web cuando requiere red constante, la **App Android (APK)** integra capacidades nativas específicas:
 
-1. **Banco de `13,516` preguntas 100% sin conexión (`data/` empaquetado):** El buscador completo (`5,356` base, `101` `faq_v3`, `8,059` `faq_v4`, `110` entradas de base de conocimiento y `7,470` fragmentos de lectura) y las `599` portadas JPG viven dentro del APK desde el primer arranque.
+1. **Banco de `13,520` preguntas 100% sin conexión (`data/` empaquetado):** El buscador completo (`5,360` base, `101` `faq_v3`, `8,059` `faq_v4`, `111` entradas de base de conocimiento y `7,470` fragmentos de lectura) y las `599` portadas JPG viven dentro del APK desde el primer arranque.
 2. **Descarga local persistente de hasta `599` documentos (`Mi biblioteca`):** Permite bajar PDFs, hojas Excel y documentos oficiales en almacenamiento interno mediante `@capacitor/filesystem`, seleccionando archivos uno por uno o en bloques de `25`.
 3. **Lector PDF nativo integrado (`PdfViewerPlugin.java`):** Renderiza páginas nítidas con Android `PdfRenderer`, zoom continuo (`40%` a `250%`), modo pliego en tablets, salto rápido de página e inversión visual en Modo Noche sin depender de apps externas.
 4. **Visor de hojas de cálculo Excel offline y exportación CSV:** Filtra tablas y exporta vistas directamente desde el almacenamiento interno de la app.

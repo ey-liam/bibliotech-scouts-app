@@ -2,7 +2,7 @@
 
 Aplicación oficial para **teléfonos y tablets Android** de **BiblioTech Scout**, diseñada para consultar manuales, reglamentos, progresiones, trámites y documentos oficiales del escultismo (ASMAC y World Scouting WOSM) incluso en campamentos y actividades sin acceso a internet.
 
-- **Versión actual:** `2.3.5` (`versionCode 31`) — `2.3.5 Mobile - Web 8.4.5 (12/11/2026)`
+- **Versión actual:** `3.0.0` (`versionCode 32`) — `3.0.0 Mobile - Web 9.0.0 (16/11/2026)`
 - **Creador:** Liam Durán · Comunidad de Caminantes · Provincia Tláhuac-Xochimilco · **Contacto:** `rdc.tlxh@gmail.com`
 - **Descarga oficial del APK:** [GitHub Releases (`bibliotech-scouts-app`)](https://github.com/ey-liam/bibliotech-scouts-app/releases/latest)
 
@@ -10,7 +10,7 @@ Aplicación oficial para **teléfonos y tablets Android** de **BiblioTech Scout*
 
 ## 1. Convención de Versionado de 3 Dígitos (`MAJOR.MINOR.PATCH`)
 
-Tanto el sitio web (`8.4.5`) como la aplicación Android (`2.3.5`) usan numeración semántica de tres dígitos:
+Tanto el sitio web (`9.0.0`) como la aplicación Android (`3.0.0`) usan numeración semántica de tres dígitos:
 
 - **Primer dígito (`X.0.0`):** Cambio mayor de arquitectura, plataforma o rediseño completo.
 - **Segundo dígito (`X.Y.0`):** Nuevas funciones relevantes dentro de la app, integraciones nativas o ampliaciones importantes del catálogo/preguntas.
@@ -37,7 +37,7 @@ La app adapta automáticamente sus superficies, tarjetas, tipografía y lector P
 | **App y Estado (`OTA y Diagnóstico`)** | Verifica la versión instalada del APK, el commit web sincronizado, conectividad, cantidad de documentos guardados, actualización en segundo plano (`Actualizar web y contenido ahora`), revisión de APK nuevo y diagnóstico del banco offline. | ![Estado offline y verificación de datos en la app](docs/screenshots/app-estado-offline.png) |
 | **Vista Adaptada para Tablet Android** | Aprovecha pantallas medianas y grandes con diseño de catálogo amplio, barra superior completa y panel gestor lateral/modal cómodo para consulta grupal o de dirigentes. | ![BiblioTech Scout APK en Tablet Android](docs/screenshots/app-tablet.png) |
 
-*(Dentro del contenido de la app también dispones de **Biblioteca completa**, **Guía de Uso** con acordeones por tema, **Agentes de Cambio.MX**, **Secciones Scouts**, **Servicios y Trámites**, **Cambios en Esquemas** y **El Proyecto**).*
+*(Dentro del contenido de la app también dispones de **Biblioteca completa**, **Guía de Uso** con acordeones por tema, **Agentes de Cambio.MX**, **Secciones Scouts**, **Servicios y Trámites**, **Cambios en Esquemas**, **La Fogata**, **Editor de Formatos (Próx.)** y **¿Qué es BiblioTech?**).*
 
 ---
 
@@ -72,11 +72,9 @@ A diferencia de consultar la página web cuando requiere red constante, la **App
 
 ---
 
-## 7. Novedades de la Versión `2.3.4`
+## 7. Novedades de la Versión `3.0.0` (Web `9.0.0`)
 
-- **Saneamiento oficial de infografías de Membresía Nacional ASMAC (Web `8.4.4`):** sincronización de los 7 registros del censo con títulos oficiales, nombres de archivo limpios y textos estadísticos detallados.
-- **Botón «Reportar error o bug» en el menú desplegable:** selector de dispositivo/plataforma, listado predeterminado de fallas comunes y descripción detallada con envío directo al Worker de Cloudflare + respaldo automático.
-- **Telemetría conectada al Worker de Cloudflare con respaldo automático:** envía el resumen de actividad y errores JS al Worker gratuito con respaldo automático a `FormSubmit`.
-- **Verificación de integridad `SHA-256` automática en Releases:** cada publicación compila y adjunta `bibliotech-scout.apk.sha256` junto al APK firmado.
-- **Optimización de compilación y bundle:** activado `minifyEnabled true` y `shrinkResources true` en Gradle Release con reglas ProGuard para Capacitor y plugins nativos; limpieza de PNGs duplicados y minificación `esbuild` tanto del sitio base (`Web 8.4.4`) como del overlay nativo (`native-bridge.js`, `native-early.js`, `native.css`).
-- **Validaciones CI en GitHub Actions:** verificación previa de sintaxis JS y comprobación automática de que `www/` no incluya archivos de prueba antes de empaquetar.
+- **Nuevo foro comunitario «La Fogata» (`#foro`):** disponible también dentro de la app con caché offline + cola de sincronización al reconectar, pestañas *Todos*, *Entre Jóvenes*, *Entre Scouters y Adultos* y *Mis Publicaciones y Guardados*, likes, edición, comentarios, registro obligatorio privado de seguridad con opción anónima pública y reporte de moderación.
+- **Editor de Formatos (Próximamente) + Bóveda Local (`#editor-formatos`):** guarda tus datos scouts localmente para adelantar el futuro autollenado de fichas y usarlos ya en La Fogata.
+- **Detector superior de versión nueva y cambios en archivos (`version.json`):** avisa al iniciar si salió un nuevo APK o si hay actualizaciones en la web sincronizada.
+- **Botón Reportar en el lector y cero emojis en toda la interfaz:** acceso directo a reporte de fallas desde el visor y limpieza visual completa sin emojis.

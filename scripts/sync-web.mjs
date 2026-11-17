@@ -76,10 +76,11 @@ async function copySite(source) {
   await rm(outDir, { recursive: true, force: true });
   await mkdir(outDir, { recursive: true });
 
-  const rootFiles = ["index.html", "styles.css", "app.js", "manifest.webmanifest"];
+  const rootFiles = ["index.html", "styles.css", "app.js", "manifest.webmanifest", "version.json"];
   for (const file of rootFiles) {
     const from = path.join(source, file);
     if (!existsSync(from)) {
+      if (file === "version.json") continue;
       throw new Error(`Falta ${file} en el sitio de origen (${source}).`);
     }
     await cp(from, path.join(outDir, file));

@@ -2,7 +2,7 @@
 
 Aplicación oficial para **teléfonos y tablets Android** de **BiblioTech Scout**, diseñada para consultar manuales, reglamentos, progresiones, trámites y documentos oficiales del escultismo (ASMAC y World Scouting WOSM) incluso en campamentos y actividades sin acceso a internet.
 
-- **Versión actual:** `3.1.0` (`versionCode 33`) — `3.1.0 Mobile - Web 9.1.0 (18/11/2026)`
+- **Versión actual:** `3.2.0` (`versionCode 34`) — `3.2.0 Mobile - Web 9.2.0 (18/11/2026)`
 - **Creador:** Liam Durán · Comunidad de Caminantes · Provincia Tláhuac-Xochimilco · **Contacto:** `rdc.tlxh@gmail.com`
 - **Descarga oficial del APK:** [GitHub Releases (`bibliotech-scouts-app`)](https://github.com/ey-liam/bibliotech-scouts-app/releases/latest)
 
@@ -10,7 +10,7 @@ Aplicación oficial para **teléfonos y tablets Android** de **BiblioTech Scout*
 
 ## 1. Convención de Versionado de 3 Dígitos (`MAJOR.MINOR.PATCH`)
 
-Tanto el sitio web (`9.1.0`) como la aplicación Android (`3.1.0`) usan numeración semántica de tres dígitos:
+Tanto el sitio web (`9.2.0`) como la aplicación Android (`3.2.0`) usan numeración semántica de tres dígitos:
 
 - **Primer dígito (`X.0.0`):** Cambio mayor de arquitectura, plataforma o rediseño completo.
 - **Segundo dígito (`X.Y.0`):** Nuevas funciones relevantes dentro de la app, integraciones nativas o ampliaciones importantes del catálogo/preguntas.
@@ -72,7 +72,12 @@ A diferencia de consultar la página web cuando requiere red constante, la **App
 
 ---
 
-## 7. Novedades de la Versión `3.1.0` (Web `9.1.0`)
+## 7. Novedades de la Versión `3.2.0` (Web `9.2.0`)
+- **Optimización móvil y arranque paralelo:** carga en paralelo en el inicio de Android, timeouts de red con `AbortController`, reducción de partículas 3D en segundo plano y render diferido en WebView.
+- **Cero botones encimados en móvil:** botón flotante `Descargas` elevado limpiamente por encima del dock inferior (izquierda) y oculto automáticamente al abrir modales o visores; `↑` a la derecha encima del dock; banner offline reposicionado sin solapamiento.
+- **Navegación nativa y sin duplicados:** botón físico/gesto Atrás de Android cierra modales web y regresa primero a Inicio antes de salir; dentro del APK se ocultan invitaciones redundantes a descargar el APK y el enlace `App / Modo Offline` abre directo el gestor de descargas sin conexión.
+
+### Base anterior (`3.1.0` / Web `9.1.0`)
 
 - **Arquitectura por 5 Espacios Dedicados:** *Inicio y Buscador*, *Biblioteca y Catálogo unificados*, *Guía Scout con sub-pestañas*, *La Fogata* y *Formatos*, con dock inferior móvil de 5 botones claros (*Inicio*, *Biblioteca*, *Fogata*, *Formatos*, *Guardados*).
 - **Lector PDF Nativo Android mejorado (`#bt-pdf-viewer`):**

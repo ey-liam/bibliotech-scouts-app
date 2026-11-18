@@ -87,6 +87,20 @@
   const $ = (id) => document.getElementById(id);
   const fmtMB = (bytes) => `${(bytes / 1024 / 1024).toFixed(bytes > 100 * 1024 * 1024 ? 0 : 1)} MB`;
 
+  function fetchWithTimeout(url, options, timeoutMs) {
+    const ms = typeof timeoutMs === "number" ? timeoutMs : 8000;
+    if (typeof AbortController !== "function" || ms <= 0) {
+      return fetch(url, options);
+    }
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => {
+      try {
+        ctrl.abort();
+      } catch (_) {}
+    }, ms);
+    return fetch(url, Object.assign({}, options || {}, { signal: ctrl.signal })).finally(() => clearTimeout(timer));
+  }
+
   function toast(text, long) {
     if (Toast) {
       Toast.show({ text, duration: long ? "long" : "short" }).catch(() => {});
@@ -2504,10 +2518,14 @@ draw();
       return;
     }
     try {
-      const res = await fetch(`https://api.github.com/repos/${APP_REPO}/releases/latest`, {
-        headers: { Accept: "application/vnd.github+json" },
-        cache: "no-store",
-      });
+      const res = await fetchWithTimeout(
+        `https://api.github.com/repos/${APP_REPO}/releases/latest`,
+        {
+          headers: { Accept: "application/vnd.github+json" },
+          cache: "no-store",
+        },
+        8000
+      );
       if (!res.ok) {
         if (!silent) {
           await Browser.open({ url: APP_RELEASES });
@@ -2588,6 +2606,25 @@ draw();
     document.addEventListener(
       "click",
       (event) => {
+        // En la App Android, el acceso a "App / Modo Offline" abre el gestor nativo de descargas
+        const offlineShortcut =
+          event.target.closest &&
+          event.target.closest('[data-bt-native-open-offline="1"], a[href="#app"]');
+        if (offlineShortcut) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          const header = document.querySelector(".main-header");
+          const navToggle = $("navToggle");
+          const navBackdrop = $("navBackdrop");
+          if (header && header.classList.contains("nav-open")) {
+            header.classList.remove("nav-open");
+            if (navToggle) navToggle.setAttribute("aria-expanded", "false");
+            if (navBackdrop) navBackdrop.hidden = true;
+          }
+          openModal("files");
+          return;
+        }
+
         const openBtn = event.target.closest && event.target.closest("[data-open-doc]");
         if (openBtn) {
           const docId = openBtn.getAttribute("data-open-doc");
@@ -2737,13 +2774,51 @@ draw();
     App.addListener("backButton", ({ canGoBack }) => {
       if (state.pdf) {
         closePdfReader();
-      } else if (state.image) {
+        return;
+      }
+      if (state.image) {
         closeImageViewer();
-      } else if (state.html) {
+        return;
+      }
+      if (state.html) {
         closeHtmlViewer();
-      } else if (state.modalOpen) {
+        return;
+      }
+      if (state.modalOpen) {
         closeModal();
-      } else if (canGoBack) {
+        return;
+      }
+      // Cerrar modales web antes de cambiar vista o salir
+      const openDocModal = document.getElementById("docModal");
+      if (openDocModal && !openDocModal.classList.contains("hidden")) {
+        const closeBtn = document.getElementById("closeDocModalBtn");
+        if (closeBtn) closeBtn.click();
+        return;
+      }
+      const openSaved = document.getElementById("savedPanel");
+      if (openSaved && !openSaved.classList.contains("hidden") && typeof window.closeSavedPanel === "function") {
+        window.closeSavedPanel();
+        return;
+      }
+      const webModalCloseSelectors = [
+        "#forumComposeModal:not(.hidden) #closeForumComposeBtn",
+        "#bugReportModal:not(.hidden) #closeBugReportModalBtn",
+        "#welcomeModal:not(.hidden) #closeWelcomeBtn",
+      ];
+      for (const sel of webModalCloseSelectors) {
+        const btn = document.querySelector(sel);
+        if (btn) {
+          btn.click();
+          return;
+        }
+      }
+      // Si el usuario está en otro espacio (Biblioteca, Guía, Fogata, Formatos), volver primero a Inicio
+      const activeView = document.documentElement.getAttribute("data-bt-active-view") || "inicio";
+      if (activeView !== "inicio" && typeof window.__btSwitchView === "function") {
+        window.__btSwitchView("inicio");
+        return;
+      }
+      if (canGoBack) {
         history.back();
       } else {
         App.exitApp();
@@ -2770,25 +2845,26 @@ draw();
   async function start() {
     document.documentElement.classList.add("bt-native");
     if (OtaUpdater && OtaUpdater.confirmBoot) {
-      OtaUpdater.confirmBoot().catch(() => {});
+      OtaUpdater.confirmBoot().catch((e) => console.warn("[BiblioTech Native] confirmBoot:", e));
     }
-    await ensureDataDirectory();
-    await clearOldContentCache();
-    await loadOfflineIndex();
+    // Arranque en paralelo para abrir más rápido en Android (sin waterfalls)
+    const [, , , savedTab] = await Promise.all([
+      ensureDataDirectory(),
+      clearOldContentCache(),
+      loadOfflineIndex(),
+      readPref("library_tab", ""),
+    ]);
+    state.activeTab = ["download", "files", "app"].includes(savedTab) ? savedTab : "files";
+
     buildUi();
     installLinkHandler();
     installBackButton();
-    loadCatalog().catch(() => {});
+    loadCatalog().catch((e) => console.warn("[BiblioTech Native] loadCatalog:", e));
 
-    const savedTab = await readPref("library_tab", "");
-    if (["download", "files", "app"].includes(savedTab)) state.activeTab = savedTab;
-    else state.activeTab = "files";
-
-    // Verificamos que el enlace en el menú y el almacenamiento estén listos tras el primer render
+    // Sincronizar almacenamiento en el botón flotante tras el primer render (sin duplicar enlace en el menú)
     setTimeout(() => {
-      injectNavLink();
       renderStorage();
-    }, 350);
+    }, 300);
 
     if (Network) {
       try {

@@ -443,10 +443,34 @@
         <button type="button" class="bt-viewer-icon" id="bt-pdf-close" aria-label="Cerrar lector">←</button>
         <div class="bt-viewer-title">
           <strong id="bt-pdf-title">Documento</strong>
-          <span id="bt-pdf-page">Página 1</span>
+          <button type="button" class="bt-pdf-page-btn" id="bt-pdf-page" title="Toca para ir a una página específica">Página 1</button>
         </div>
-        <button type="button" class="bt-viewer-icon" id="bt-pdf-external" aria-label="Abrir con otra app" title="Abrir con otra app">↗</button>
+        <div class="bt-viewer-head-actions">
+          <button type="button" class="bt-viewer-icon" id="bt-pdf-pin" aria-label="Guardar documento" title="Guardar en favoritos">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+          </button>
+          <button type="button" class="bt-viewer-icon" id="bt-pdf-note" aria-label="Notas del documento" title="Notas locales">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+          </button>
+          <button type="button" class="bt-viewer-icon bt-viewer-icon-report" id="bt-pdf-report" aria-label="Reportar error en este archivo" title="Reportar error">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+          </button>
+          <button type="button" class="bt-viewer-icon" id="bt-pdf-external" aria-label="Abrir con otra app" title="Abrir con otra app">↗</button>
+        </div>
       </header>
+      <div class="bt-pdf-drawer" id="bt-pdf-jump-drawer" hidden>
+        <label for="bt-pdf-jump-input">Ir a página:</label>
+        <input type="number" id="bt-pdf-jump-input" min="1" inputmode="numeric" placeholder="Ej. 12" />
+        <button type="button" class="bt-btn bt-primary bt-btn-sm" id="bt-pdf-jump-go">Ir</button>
+        <button type="button" class="bt-btn bt-secondary bt-btn-sm" id="bt-pdf-jump-cancel">Cerrar</button>
+      </div>
+      <div class="bt-pdf-drawer bt-pdf-note-drawer" id="bt-pdf-note-drawer" hidden>
+        <textarea id="bt-pdf-note-text" rows="3" placeholder="Escribe tus notas locales sobre este documento..."></textarea>
+        <div class="bt-pdf-note-actions">
+          <button type="button" class="bt-btn bt-primary bt-btn-sm" id="bt-pdf-note-save">Guardar nota</button>
+          <button type="button" class="bt-btn bt-secondary bt-btn-sm" id="bt-pdf-note-close">Cerrar</button>
+        </div>
+      </div>
       <div class="bt-viewer-stage" id="bt-pdf-stage">
         <div class="bt-viewer-loading" id="bt-pdf-loading">Cargando página…</div>
         <div class="bt-pdf-pages-wrap" id="bt-pdf-pages-wrap">
@@ -592,6 +616,115 @@
     $("bt-pdf-zoom-in").addEventListener("click", () => stepPdfZoom(0.25));
     $("bt-pdf-zoom").addEventListener("click", () => setPdfZoom(1, true));
     $("bt-pdf-layout-btn").addEventListener("click", togglePdfLayout);
+
+    // Ir a página #
+    $("bt-pdf-page").addEventListener("click", () => {
+      if (!state.pdf || !state.pdf.pages) return;
+      const jumpDrawer = $("bt-pdf-jump-drawer");
+      const noteDrawer = $("bt-pdf-note-drawer");
+      if (noteDrawer) noteDrawer.hidden = true;
+      if (!jumpDrawer) return;
+      const willShow = jumpDrawer.hidden;
+      jumpDrawer.hidden = !willShow;
+      if (willShow) {
+        const inp = $("bt-pdf-jump-input");
+        if (inp) {
+          inp.max = String(state.pdf.pages);
+          inp.value = String(state.pdf.page + 1);
+          inp.focus();
+          if (typeof inp.select === "function") inp.select();
+        }
+      }
+    });
+    $("bt-pdf-jump-go").addEventListener("click", () => {
+      if (!state.pdf || !state.pdf.pages) return;
+      const inp = $("bt-pdf-jump-input");
+      const num = parseInt((inp && inp.value) || "", 10);
+      if (!Number.isFinite(num) || num < 1 || num > state.pdf.pages) {
+        toast(`Escribe un número entre 1 y ${state.pdf.pages}`);
+        return;
+      }
+      $("bt-pdf-jump-drawer").hidden = true;
+      renderPdfPage(num - 1);
+    });
+    $("bt-pdf-jump-cancel").addEventListener("click", () => {
+      $("bt-pdf-jump-drawer").hidden = true;
+    });
+
+    // Guardar documento (sincronizado con bt_saved_docs)
+    $("bt-pdf-pin").addEventListener("click", () => {
+      if (!state.pdf || !state.pdf.doc || !state.pdf.doc.id) return;
+      const docId = state.pdf.doc.id;
+      let isSaved = false;
+      if (window.__btSavedBridge && typeof window.__btSavedBridge.toggleSavedPin === "function") {
+        isSaved = window.__btSavedBridge.toggleSavedPin(docId);
+      } else {
+        try {
+          const cur = JSON.parse(localStorage.getItem("bt_saved_docs") || "[]");
+          const set = new Set(Array.isArray(cur) ? cur : []);
+          if (set.has(docId)) { set.delete(docId); isSaved = false; }
+          else { set.add(docId); isSaved = true; }
+          localStorage.setItem("bt_saved_docs", JSON.stringify([...set]));
+        } catch (_) {}
+      }
+      $("bt-pdf-pin").classList.toggle("is-active", isSaved);
+      toast(isSaved ? "Documento guardado en favoritos" : "Quitado de guardados");
+    });
+
+    // Notas locales (sincronizadas con bt_note_<docId>)
+    $("bt-pdf-note").addEventListener("click", () => {
+      if (!state.pdf || !state.pdf.doc || !state.pdf.doc.id) return;
+      const noteDrawer = $("bt-pdf-note-drawer");
+      const jumpDrawer = $("bt-pdf-jump-drawer");
+      if (jumpDrawer) jumpDrawer.hidden = true;
+      if (!noteDrawer) return;
+      const willShow = noteDrawer.hidden;
+      noteDrawer.hidden = !willShow;
+      if (willShow) {
+        const ta = $("bt-pdf-note-text");
+        const docId = state.pdf.doc.id;
+        const currentNote = (window.__btSavedBridge && window.__btSavedBridge.getDocNote)
+          ? window.__btSavedBridge.getDocNote(docId)
+          : (localStorage.getItem("bt_note_" + docId) || "");
+        if (ta) {
+          ta.value = currentNote;
+          ta.focus();
+        }
+      }
+    });
+    $("bt-pdf-note-save").addEventListener("click", () => {
+      if (!state.pdf || !state.pdf.doc || !state.pdf.doc.id) return;
+      const docId = state.pdf.doc.id;
+      const val = ($("bt-pdf-note-text") && $("bt-pdf-note-text").value || "").trim();
+      if (window.__btSavedBridge && typeof window.__btSavedBridge.setDocNote === "function") {
+        window.__btSavedBridge.setDocNote(docId, val);
+      } else {
+        try {
+          if (val) localStorage.setItem("bt_note_" + docId, val);
+          else localStorage.removeItem("bt_note_" + docId);
+        } catch (_) {}
+      }
+      $("bt-pdf-note").classList.toggle("is-active", Boolean(val));
+      $("bt-pdf-note-drawer").hidden = true;
+      toast(val ? "Nota guardada en tu dispositivo" : "Nota borrada");
+    });
+    $("bt-pdf-note-close").addEventListener("click", () => {
+      $("bt-pdf-note-drawer").hidden = true;
+    });
+
+    // Reportar error en este PDF
+    $("bt-pdf-report").addEventListener("click", () => {
+      if (!state.pdf || !state.pdf.doc) return;
+      const doc = state.pdf.doc;
+      const label = doc.filename ? `${doc.title || doc.id} (${doc.filename})` : (doc.title || doc.id || "PDF");
+      closePdfReader();
+      setTimeout(() => {
+        if (typeof window.__btOpenBugReport === "function") {
+          window.__btOpenBugReport("Lector / Visor PDF o Excel", label, false);
+        }
+      }, 120);
+    });
+
     $("bt-pdf-external").addEventListener("click", () => {
       if (!state.pdf) return;
       openWithSystem(state.pdf.doc, state.pdf.entry);
@@ -631,6 +764,9 @@
         touchStart = null;
         if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
           goPdfPage(dx < 0 ? 1 : -1);
+        } else if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
+          const viewerEl = $("bt-pdf-viewer");
+          if (viewerEl) viewerEl.classList.toggle("is-immersive");
         }
       },
       { passive: true }
@@ -1454,6 +1590,21 @@
     };
     const viewer = $("bt-pdf-viewer");
     viewer.hidden = false;
+    viewer.classList.remove("is-immersive");
+    if ($("bt-pdf-jump-drawer")) $("bt-pdf-jump-drawer").hidden = true;
+    if ($("bt-pdf-note-drawer")) $("bt-pdf-note-drawer").hidden = true;
+    if ($("bt-pdf-pin") && doc && doc.id) {
+      const pins = (window.__btSavedBridge && window.__btSavedBridge.getSavedPins)
+        ? window.__btSavedBridge.getSavedPins()
+        : (() => { try { return JSON.parse(localStorage.getItem("bt_saved_docs") || "[]"); } catch (_) { return []; } })();
+      $("bt-pdf-pin").classList.toggle("is-active", Array.isArray(pins) && pins.includes(doc.id));
+    }
+    if ($("bt-pdf-note") && doc && doc.id) {
+      const note = (window.__btSavedBridge && window.__btSavedBridge.getDocNote)
+        ? window.__btSavedBridge.getDocNote(doc.id)
+        : (localStorage.getItem("bt_note_" + doc.id) || "");
+      $("bt-pdf-note").classList.toggle("is-active", Boolean(note));
+    }
     document.documentElement.classList.add("bt-viewer-open");
     $("bt-pdf-title").textContent = doc.title || "Documento";
     $("bt-pdf-page").textContent = "Abriendo…";

@@ -1552,3 +1552,107 @@ html[data-camp-mode="true"] .bt-pill-size,
 html[data-camp-mode="true"] .bt-pill-date {
   color: #cbd5e1 !important;
 }
+
+/* ==========================================================================
+   V3.1.0: VISOR PDF NATIVO MEJORADO (IR A PÁGINA, GUARDAR, NOTAS, REPORTAR, INMERSIVO)
+   ========================================================================== */
+.bt-viewer-head-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  flex-shrink: 0;
+}
+
+.bt-viewer-icon.is-active {
+  background: rgba(56, 189, 248, 0.26);
+  border-color: #38bdf8;
+  color: #7dd3fc;
+}
+
+.bt-viewer-icon-report {
+  border-color: rgba(248, 113, 113, 0.42);
+  color: #fecaca;
+}
+
+.bt-pdf-page-btn {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(148, 163, 184, 0.14);
+  color: #c7d2fe;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.bt-pdf-drawer {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.85rem;
+  background: rgba(15, 23, 42, 0.96);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  color: #e2e8f0;
+  font-size: 0.8rem;
+}
+
+.bt-pdf-drawer[hidden] {
+  display: none !important;
+}
+
+.bt-pdf-drawer input[type="number"] {
+  width: 5.2rem;
+  padding: 0.35rem 0.55rem;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(2, 6, 23, 0.85);
+  color: #ffffff;
+  font: inherit;
+  font-weight: 700;
+}
+
+.bt-pdf-note-drawer {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.bt-pdf-note-drawer textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 68px;
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  background: rgba(2, 6, 23, 0.85);
+  color: #f8fafc;
+  font: inherit;
+  font-size: 0.84rem;
+}
+
+.bt-pdf-note-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
+.bt-btn-sm {
+  min-height: 2rem;
+  padding: 0.32rem 0.75rem;
+  font-size: 0.78rem;
+}
+
+.bt-viewer.is-immersive .bt-viewer-head,
+.bt-viewer.is-immersive .bt-viewer-foot,
+.bt-viewer.is-immersive .bt-pdf-drawer {
+  display: none !important;
+}
+
+.bt-viewer.is-immersive .bt-pdf-image {
+  max-height: calc(100dvh - 16px);
+}

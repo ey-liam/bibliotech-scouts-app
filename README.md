@@ -2,7 +2,7 @@
 
 Aplicación oficial para **teléfonos y tablets Android** de **BiblioTech Scout**, diseñada para consultar manuales, reglamentos, progresiones, trámites y documentos oficiales del escultismo (ASMAC y World Scouting WOSM) incluso en campamentos y actividades sin acceso a internet.
 
-- **Versión actual:** `3.0.0` (`versionCode 32`) — `3.0.0 Mobile - Web 9.0.0 (16/11/2026)`
+- **Versión actual:** `3.1.0` (`versionCode 33`) — `3.1.0 Mobile - Web 9.1.0 (18/11/2026)`
 - **Creador:** Liam Durán · Comunidad de Caminantes · Provincia Tláhuac-Xochimilco · **Contacto:** `rdc.tlxh@gmail.com`
 - **Descarga oficial del APK:** [GitHub Releases (`bibliotech-scouts-app`)](https://github.com/ey-liam/bibliotech-scouts-app/releases/latest)
 
@@ -10,7 +10,7 @@ Aplicación oficial para **teléfonos y tablets Android** de **BiblioTech Scout*
 
 ## 1. Convención de Versionado de 3 Dígitos (`MAJOR.MINOR.PATCH`)
 
-Tanto el sitio web (`9.0.0`) como la aplicación Android (`3.0.0`) usan numeración semántica de tres dígitos:
+Tanto el sitio web (`9.1.0`) como la aplicación Android (`3.1.0`) usan numeración semántica de tres dígitos:
 
 - **Primer dígito (`X.0.0`):** Cambio mayor de arquitectura, plataforma o rediseño completo.
 - **Segundo dígito (`X.Y.0`):** Nuevas funciones relevantes dentro de la app, integraciones nativas o ampliaciones importantes del catálogo/preguntas.
@@ -72,9 +72,12 @@ A diferencia de consultar la página web cuando requiere red constante, la **App
 
 ---
 
-## 7. Novedades de la Versión `3.0.0` (Web `9.0.0`)
+## 7. Novedades de la Versión `3.1.0` (Web `9.1.0`)
 
-- **Nuevo foro comunitario «La Fogata» (`#foro`):** disponible también dentro de la app con caché offline + cola de sincronización al reconectar, pestañas *Todos*, *Entre Jóvenes*, *Entre Scouters y Adultos* y *Mis Publicaciones y Guardados*, likes, edición, comentarios, registro obligatorio privado de seguridad con opción anónima pública y reporte de moderación.
-- **Editor de Formatos (Próximamente) + Bóveda Local (`#editor-formatos`):** guarda tus datos scouts localmente para adelantar el futuro autollenado de fichas y usarlos ya en La Fogata.
-- **Detector superior de versión nueva y cambios en archivos (`version.json`):** avisa al iniciar si salió un nuevo APK o si hay actualizaciones en la web sincronizada.
-- **Botón Reportar en el lector y cero emojis en toda la interfaz:** acceso directo a reporte de fallas desde el visor y limpieza visual completa sin emojis.
+- **Arquitectura por 5 Espacios Dedicados:** *Inicio y Buscador*, *Biblioteca y Catálogo unificados*, *Guía Scout con sub-pestañas*, *La Fogata* y *Formatos*, con dock inferior móvil de 5 botones claros (*Inicio*, *Biblioteca*, *Fogata*, *Formatos*, *Guardados*).
+- **Lector PDF Nativo Android mejorado (`#bt-pdf-viewer`):**
+  - Salto directo **Ir a página `#`** al tocar el indicador de página.
+  - Botones integrados de **Guardar** y **Notas locales** sincronizados con tus guardados y notas del sitio.
+  - Botón **Reportar** directo desde el visor nativo.
+  - **Modo lectura limpia (inmersivo):** toca el centro de la página para ocultar/mostrar las barras y leer a pantalla completa.
+- **Lector Web compacto (`#docModal`):** cabecera de 1 fila con cajón `Info` plegable y barra de herramientas al pie en móvil.

@@ -407,6 +407,17 @@
                 <select id="bt-section"><option value="all">Todas las secciones</option></select>
               </label>
             </div>
+            <div class="bt-quick-packs" id="bt-quick-packs" role="group" aria-label="Paquetes rápidos de descarga por sección o necesidad">
+              <span class="bt-packs-label">Paquetes 1 clic:</span>
+              <button type="button" class="bt-pack-pill" data-bt-pack="campamento">Esenciales Campamento</button>
+              <button type="button" class="bt-pack-pill" data-bt-pack="centenario">Centenario (39)</button>
+              <button type="button" class="bt-pack-pill" data-bt-pack="manada">Manada</button>
+              <button type="button" class="bt-pack-pill" data-bt-pack="tropa">Tropa</button>
+              <button type="button" class="bt-pack-pill" data-bt-pack="caminantes">Caminantes</button>
+              <button type="button" class="bt-pack-pill" data-bt-pack="clan">Clan</button>
+              <button type="button" class="bt-pack-pill" data-bt-pack="adultos">Scouters y Adultos</button>
+              <button type="button" class="bt-pack-pill is-clear" data-bt-pack="clear">Limpiar</button>
+            </div>
             <div class="bt-list-head">
               <p class="bt-count" id="bt-count"></p>
               <div class="bt-head-links">
@@ -585,6 +596,45 @@
     $("bt-delete").addEventListener("click", deleteSelected);
     $("bt-select-batch").addEventListener("click", selectBatchVisible);
     $("bt-select-visible").addEventListener("click", toggleVisibleSelection);
+    $("bt-quick-packs").addEventListener("click", (event) => {
+      const pill = event.target.closest && event.target.closest("[data-bt-pack]");
+      if (!pill || state.busy) return;
+      const pack = pill.getAttribute("data-bt-pack");
+      if (pack === "clear") {
+        state.selected.clear();
+        renderList();
+        toast("Selección limpiada");
+        return;
+      }
+      const matchDoc = (doc) => {
+        const hay = `${doc.title || ""} ${doc.section || ""} ${doc.category || ""} ${doc.subcategory || ""}`.toLowerCase();
+        if (pack === "campamento") {
+          return /salud|jl304|salvo del peligro|riesgo|campismo|campamento|primeros auxilios|seguro scout|reglamento/i.test(hay);
+        }
+        if (pack === "centenario") {
+          return /centenario/i.test(doc.category || "") || /centenario/i.test(hay);
+        }
+        if (pack === "manada") return /manada|lobato/i.test(hay);
+        if (pack === "tropa") return /tropa|scout/i.test(doc.section || "");
+        if (pack === "caminantes") return /caminante|comunidad/i.test(hay);
+        if (pack === "clan") return /clan|rover/i.test(hay);
+        if (pack === "adultos") return /scouter|dirigente|adulto|consejo/i.test(hay);
+        return false;
+      };
+      let added = 0;
+      for (const doc of state.docs) {
+        if (!state.offline[doc.sha12] && matchDoc(doc)) {
+          state.selected.add(doc.sha12);
+          added += 1;
+        }
+      }
+      renderList();
+      toast(
+        added
+          ? `Paquete seleccionado: ${added} archivo${added === 1 ? "" : "s"} listo${added === 1 ? "" : "s"} para descargar`
+          : "Ya tienes descargados los archivos de este paquete"
+      );
+    });
     $("bt-delete-all").addEventListener("click", deleteAllSaved);
     $("bt-open-saved-notes").addEventListener("click", () => {
       closeModal();
@@ -2638,6 +2688,15 @@ draw();
             }
             openDoc(doc);
             return;
+          }
+          // Si aún no está descargado y abre el lector web, etiquetar el botón Descargar como "Guardar offline"
+          if (doc) {
+            setTimeout(() => {
+              const dlBtn = document.getElementById("modalDownloadBtn");
+              if (dlBtn) {
+                dlBtn.textContent = state.offline[doc.sha12] ? "Abrir offline" : "Guardar offline";
+              }
+            }, 60);
           }
         }
 

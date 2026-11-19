@@ -2,7 +2,7 @@
 
 Aplicación oficial para **teléfonos y tablets Android** de **BiblioTech Scout**, diseñada para consultar manuales, reglamentos, progresiones, trámites y documentos oficiales del escultismo (ASMAC y World Scouting WOSM) incluso en campamentos y actividades sin acceso a internet.
 
-- **Versión actual:** `3.2.0` (`versionCode 34`) — `3.2.0 Mobile - Web 9.2.0 (18/11/2026)`
+- **Versión actual:** `3.3.0` (`versionCode 35`) — `3.3.0 Mobile - Web 9.3.0 (18/11/2026)`
 - **Creador:** Liam Durán · Comunidad de Caminantes · Provincia Tláhuac-Xochimilco · **Contacto:** `rdc.tlxh@gmail.com`
 - **Descarga oficial del APK:** [GitHub Releases (`bibliotech-scouts-app`)](https://github.com/ey-liam/bibliotech-scouts-app/releases/latest)
 
@@ -10,7 +10,7 @@ Aplicación oficial para **teléfonos y tablets Android** de **BiblioTech Scout*
 
 ## 1. Convención de Versionado de 3 Dígitos (`MAJOR.MINOR.PATCH`)
 
-Tanto el sitio web (`9.2.0`) como la aplicación Android (`3.2.0`) usan numeración semántica de tres dígitos:
+Tanto el sitio web (`9.3.0`) como la aplicación Android (`3.3.0`) usan numeración semántica de tres dígitos:
 
 - **Primer dígito (`X.0.0`):** Cambio mayor de arquitectura, plataforma o rediseño completo.
 - **Segundo dígito (`X.Y.0`):** Nuevas funciones relevantes dentro de la app, integraciones nativas o ampliaciones importantes del catálogo/preguntas.
@@ -72,7 +72,12 @@ A diferencia de consultar la página web cuando requiere red constante, la **App
 
 ---
 
-## 7. Novedades de la Versión `3.2.0` (Web `9.2.0`)
+## 7. Novedades de la Versión `3.3.0` (Web `9.3.0`)
+- **Paquetes rápidos 1 clic en `Mi biblioteca -> Explorar catálogo`:** selección instantánea de *Esenciales Campamento*, *Centenario (39)*, *Manada*, *Tropa*, *Caminantes*, *Clan* y *Scouters y Adultos*.
+- **Guardado offline directo desde el lector:** botón *Guardar offline* dentro del lector cuando un documento aún no está descargado en el teléfono, conservando todos los assets en alta calidad original (75.9 MB).
+- **Editor Inteligente de Formatos y Modo oscuro automático:** integra todas las novedades de Web `9.3.0`.
+
+### Base anterior (`3.2.0` / Web `9.2.0`)
 - **Optimización móvil y arranque paralelo:** carga en paralelo en el inicio de Android, timeouts de red con `AbortController`, reducción de partículas 3D en segundo plano y render diferido en WebView.
 - **Cero botones encimados en móvil:** botón flotante `Descargas` elevado limpiamente por encima del dock inferior (izquierda) y oculto automáticamente al abrir modales o visores; `↑` a la derecha encima del dock; banner offline reposicionado sin solapamiento.
 - **Navegación nativa y sin duplicados:** botón físico/gesto Atrás de Android cierra modales web y regresa primero a Inicio antes de salir; dentro del APK se ocultan invitaciones redundantes a descargar el APK y el enlace `App / Modo Offline` abre directo el gestor de descargas sin conexión.

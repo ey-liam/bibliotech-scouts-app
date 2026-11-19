@@ -92,6 +92,54 @@ body.reader-open .bt-fab {
   }
 }
 
+/* Barra de paquetes rápidos 1 clic en Mi biblioteca -> Explorar catálogo */
+.bt-quick-packs {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  overflow-x: auto;
+  padding: 0.25rem 0 0.55rem;
+  margin-bottom: 0.35rem;
+  scrollbar-width: none;
+}
+
+.bt-quick-packs::-webkit-scrollbar {
+  display: none;
+}
+
+.bt-packs-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #a5b4fc;
+  white-space: nowrap;
+  margin-right: 0.15rem;
+}
+
+.bt-pack-pill {
+  flex: 0 0 auto;
+  padding: 0.34rem 0.72rem;
+  border-radius: 999px;
+  border: 1px solid rgba(139, 92, 246, 0.38);
+  background: rgba(30, 27, 75, 0.65);
+  color: #e2e8f0;
+  font-family: inherit;
+  font-size: 0.74rem;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.bt-pack-pill:active {
+  background: linear-gradient(135deg, #7c3aed, #0284c7);
+  color: #ffffff;
+}
+
+.bt-pack-pill.is-clear {
+  border-color: rgba(248, 113, 113, 0.4);
+  background: rgba(127, 29, 29, 0.35);
+  color: #fecaca;
+}
+
 .bt-fab:active {
   transform: scale(0.94);
 }

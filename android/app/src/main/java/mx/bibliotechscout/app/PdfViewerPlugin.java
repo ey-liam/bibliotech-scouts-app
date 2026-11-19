@@ -84,6 +84,12 @@ public class PdfViewerPlugin extends Plugin {
                     float scale = (float) targetWidth / (float) sourceWidth;
                     int width = Math.max(1, Math.round(sourceWidth * scale));
                     int height = Math.max(1, Math.round(sourceHeight * scale));
+                    int maxHeight = 3072;
+                    if (height > maxHeight) {
+                        float clampScale = (float) maxHeight / (float) height;
+                        height = maxHeight;
+                        width = Math.max(1, Math.round(width * clampScale));
+                    }
 
                     Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
                     bitmap.eraseColor(Color.WHITE);
@@ -102,7 +108,7 @@ public class PdfViewerPlugin extends Plugin {
                     result.put("dataUrl", "data:image/jpeg;base64," + base64);
                     call.resolve(result);
                 }
-            } catch (Exception error) {
+            } catch (Throwable error) {
                 call.reject("No se pudo mostrar la página: " + message(error));
             }
         });
@@ -176,7 +182,7 @@ public class PdfViewerPlugin extends Plugin {
         currentPath = null;
     }
 
-    private String message(Exception error) {
+    private String message(Throwable error) {
         return error.getMessage() != null ? error.getMessage() : "error desconocido";
     }
 }

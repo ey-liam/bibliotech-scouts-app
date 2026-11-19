@@ -23,10 +23,6 @@ const BASE_ASSETS = [
   "assets/scouts/logo_biblioteca_centenario.png",
   "assets/scouts/foto_secciones_nac.png",
   "assets/scouts/foros_extra_2.jpg",
-  "assets/scouts/foros_evento_3.jpg",
-  "assets/scouts/wosm_photo2.jpg",
-  "assets/scouts/agentes_cambio/LetreroCNRC.png",
-  "assets/scouts/agentes_cambio/Logos.png",
 ];
 
 const sibling = path.resolve(root, "..", "bibliotech-scouts");
@@ -116,7 +112,7 @@ function patchHtml(html) {
     out = out.replace(
       /(<p class="footer-db-cutoff">\s*Base de datos: )([^<]+)/i,
       (match, start, body) => {
-        const cutoff = (body.match(/\d{2}\/\d{2}\/\d{4}/) || ["12/11/2026"])[0];
+        const cutoff = (body.match(/\d{2}\/\d{2}\/\d{4}/) || ["19/11/2026"])[0];
         return `${start}${cutoff} · ${pkg.versionLabel} · `;
       }
     );

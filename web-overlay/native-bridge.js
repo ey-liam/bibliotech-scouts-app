@@ -2860,9 +2860,10 @@ draw();
         return;
       }
       const webModalCloseSelectors = [
-        "#forumComposeModal:not(.hidden) #closeForumComposeBtn",
-        "#bugReportModal:not(.hidden) #closeBugReportModalBtn",
-        "#welcomeModal:not(.hidden) #closeWelcomeBtn",
+        "#btSettingsModal:not(.hidden) #closeSettingsModalBtn",
+        "#forumComposerModal:not(.hidden) #closeForumComposerBtn",
+        "#bugReportModal:not(.hidden) #closeBugReportBtn",
+        "#welcomeModal:not(.hidden) #closeWelcomeModalBtn",
       ];
       for (const sel of webModalCloseSelectors) {
         const btn = document.querySelector(sel);
@@ -2916,6 +2917,13 @@ draw();
     state.activeTab = ["download", "files", "app"].includes(savedTab) ? savedTab : "files";
 
     buildUi();
+    window.__btNativeBridge = {
+      openModal,
+      closeModal,
+      updateContent,
+      checkAppUpdate,
+      verifyOfflineData,
+    };
     installLinkHandler();
     installBackButton();
     loadCatalog().catch((e) => console.warn("[BiblioTech Native] loadCatalog:", e));

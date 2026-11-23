@@ -1128,12 +1128,25 @@
 
   function renderNativeSettings() {
     const curVis = document.documentElement.dataset.btVisual === "full" ? "full" : "lite";
+    const curLang = document.documentElement.dataset.btLang === "en" ? "en" : "es";
+    const isEn = curLang === "en";
+
     const visBadge = $("bt-native-vis-badge");
-    if (visBadge) visBadge.textContent = curVis === "full" ? "Modo Estándar" : "Modo Lite";
+    if (visBadge) {
+      visBadge.textContent = curVis === "full" ? (isEn ? "Standard Mode" : "Modo Estándar") : (isEn ? "Lite Mode" : "Modo Lite");
+    }
     const btnLite = $("bt-native-vis-lite");
     const btnFull = $("bt-native-vis-full");
-    if (btnLite) btnLite.classList.toggle("is-active", curVis === "lite");
-    if (btnFull) btnFull.classList.toggle("is-active", curVis === "full");
+    if (btnLite) {
+      btnLite.classList.toggle("is-active", curVis === "lite");
+      const strong = btnLite.querySelector("strong");
+      if (strong) strong.textContent = isEn ? "Lite Mode" : "Modo Lite";
+    }
+    if (btnFull) {
+      btnFull.classList.toggle("is-active", curVis === "full");
+      const strong = btnFull.querySelector("strong");
+      if (strong) strong.textContent = isEn ? "Standard Mode" : "Modo Estándar";
+    }
 
     const darkChk = $("bt-native-dark-toggle");
     if (darkChk) darkChk.checked = document.documentElement.getAttribute("data-camp-mode") === "true";
@@ -1146,7 +1159,6 @@
     const contrastChk = $("bt-native-contrast-toggle");
     if (contrastChk) contrastChk.checked = document.documentElement.getAttribute("data-bt-contrast") === "high";
 
-    const curLang = document.documentElement.dataset.btLang === "en" ? "en" : "es";
     document.querySelectorAll("[data-bt-native-lang]").forEach((b) => {
       const act = b.getAttribute("data-bt-native-lang") === curLang;
       b.classList.toggle("bt-primary", act);
@@ -1154,11 +1166,31 @@
     });
 
     const curFont = document.documentElement.getAttribute("data-bt-font-scale") || "100";
+    const fontLabels = { "100": isEn ? "Normal" : "Normal", "115": isEn ? "Large" : "Grande", "130": "Extra" };
     document.querySelectorAll("[data-bt-native-font]").forEach((b) => {
-      const act = b.getAttribute("data-bt-native-font") === curFont;
+      const val = b.getAttribute("data-bt-native-font") || "100";
+      const act = val === curFont;
       b.classList.toggle("bt-primary", act);
       b.classList.toggle("bt-secondary", !act);
+      if (fontLabels[val]) b.textContent = fontLabels[val];
     });
+
+    const tabNames = isEn
+      ? { download: "Download", files: "My Files", settings: "Settings", app: "App" }
+      : { download: "Descargar", files: "Mis descargas", settings: "Ajustes", app: "App" };
+    Object.entries(tabNames).forEach(([k, txt]) => {
+      const tEl = $(`bt-tab-${k}`);
+      if (tEl) tEl.textContent = txt;
+    });
+
+    const notesBtn = $("bt-native-open-notes");
+    if (notesBtn) notesBtn.textContent = isEn ? "Saved & notes" : "Guardados y notas";
+    const goAfBtn = $("bt-native-go-autofill");
+    if (goAfBtn) goAfBtn.textContent = isEn ? "Edit autofill" : "Editar autollenado";
+    const clrAfBtn = $("bt-native-clear-autofill");
+    if (clrAfBtn) clrAfBtn.textContent = isEn ? "Clear autofill" : "Borrar autollenado";
+    const welBtn = $("bt-native-open-welcome");
+    if (welBtn) welBtn.textContent = isEn ? "Welcome (3 pgs) & QR" : "Bienvenida (3 págs) y QR";
 
     const afEl = $("bt-native-autofill-info");
     if (afEl) {
@@ -1166,8 +1198,8 @@
       try { prof = JSON.parse(localStorage.getItem("bt_autofill_profile_v1") || "{}") || {}; } catch (_) {}
       const filled = [prof.name, prof.section, prof.group, prof.province].filter(Boolean);
       afEl.textContent = filled.length
-        ? `Perfil local: ${filled.join(" · ")}`
-        : "Sin datos de autollenado guardados todavía.";
+        ? `${isEn ? "Local profile" : "Perfil local"}: ${filled.join(" · ")}`
+        : (isEn ? "No autofill data saved yet." : "Sin datos de autollenado guardados todavía.");
     }
   }
 

@@ -468,6 +468,17 @@
                 </div>
                 <div class="bt-native-row">
                   <div>
+                    <strong>Tamaño de letra</strong>
+                    <small>Amplía la lectura de respuestas y fichas.</small>
+                  </div>
+                  <div class="bt-native-seg">
+                    <button type="button" class="bt-btn bt-primary" data-bt-native-font="100">Normal</button>
+                    <button type="button" class="bt-btn bt-secondary" data-bt-native-font="115">Grande</button>
+                    <button type="button" class="bt-btn bt-secondary" data-bt-native-font="130">Extra</button>
+                  </div>
+                </div>
+                <div class="bt-native-row">
+                  <div>
                     <strong>Idioma</strong>
                     <small>Menús principales en Español o English.</small>
                   </div>
@@ -708,6 +719,18 @@
         }
         renderNativeSettings();
         toast(chosen === "en" ? "Interface set to English." : "Interfaz en Español.");
+      });
+    });
+    document.querySelectorAll("[data-bt-native-font]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const sc = btn.getAttribute("data-bt-native-font") || "100";
+        document.documentElement.setAttribute("data-bt-font-scale", sc);
+        try { localStorage.setItem("bt_font_scale_v1", sc); } catch (_) {}
+        document.querySelectorAll("[data-font-scale]").forEach((wBtn) => {
+          wBtn.classList.toggle("is-active", wBtn.getAttribute("data-font-scale") === sc);
+        });
+        renderNativeSettings();
+        toast(sc === "100" ? "Tamaño de letra Normal." : `Tamaño de letra al ${sc}%.`);
       });
     });
     $("bt-native-open-notes").addEventListener("click", () => {
@@ -1126,6 +1149,13 @@
     const curLang = document.documentElement.dataset.btLang === "en" ? "en" : "es";
     document.querySelectorAll("[data-bt-native-lang]").forEach((b) => {
       const act = b.getAttribute("data-bt-native-lang") === curLang;
+      b.classList.toggle("bt-primary", act);
+      b.classList.toggle("bt-secondary", !act);
+    });
+
+    const curFont = document.documentElement.getAttribute("data-bt-font-scale") || "100";
+    document.querySelectorAll("[data-bt-native-font]").forEach((b) => {
+      const act = b.getAttribute("data-bt-native-font") === curFont;
       b.classList.toggle("bt-primary", act);
       b.classList.toggle("bt-secondary", !act);
     });

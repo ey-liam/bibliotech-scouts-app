@@ -1449,9 +1449,16 @@ body.reader-open .bt-fab {
     font-size: 1.18rem;
   }
 
+  .bt-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.3rem;
+  }
+
   .bt-tab {
-    font-size: 0.74rem;
-    padding: 0.4rem 0.35rem;
+    font-size: 0.76rem;
+    min-height: 2.35rem;
+    padding: 0.42rem 0.5rem;
   }
 
   .bt-modal-foot {
@@ -1867,5 +1874,22 @@ html:not([data-camp-mode="true"]) .bt-native-vis-btn {
 }
 
 html:not([data-camp-mode="true"]) .bt-native-vis-btn.is-active {
+  background: linear-gradient(135deg, #6d28d9, #7c3aed);
+  border-color: #6d28d9;
   color: #ffffff;
+}
+
+.bt-native-seg {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+}
+
+.bt-native-seg .bt-btn {
+  padding: 0.38rem 0.62rem;
+  min-height: 2.1rem;
+  font-size: 0.78rem;
+  border-radius: 9px;
 }

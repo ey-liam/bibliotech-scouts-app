@@ -1723,3 +1723,149 @@ html[data-camp-mode="true"] .bt-pill-date {
 .bt-viewer.is-immersive .bt-pdf-image {
   max-height: calc(100dvh - 16px);
 }
+
+/* V3.9.1: Panel Ajustes y Avisos fusionados dentro del modal único Android */
+.bt-native-settings-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.bt-native-settings-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.bt-native-sec-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.bt-native-vis-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.bt-native-vis-btn {
+  appearance: none;
+  padding: 0.72rem 0.65rem;
+  border-radius: 12px;
+  border: 1.5px solid rgba(148, 163, 184, 0.35);
+  background: rgba(15, 23, 42, 0.35);
+  color: #e2e8f0;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.bt-native-vis-btn.is-active {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.92), rgba(79, 70, 229, 0.92));
+  border-color: #a78bfa;
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(109, 40, 217, 0.35);
+}
+
+.bt-native-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.bt-native-row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.bt-native-row strong {
+  display: block;
+  font-size: 0.85rem;
+}
+
+.bt-native-row small {
+  display: block;
+  font-size: 0.72rem;
+  opacity: 0.82;
+  margin-top: 2px;
+}
+
+.bt-native-row-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.bt-native-chk {
+  width: 20px;
+  height: 20px;
+  accent-color: #7c3aed;
+  cursor: pointer;
+}
+
+.bt-native-mini-note {
+  font-size: 0.78rem;
+  line-height: 1.4;
+  opacity: 0.88;
+}
+
+.bt-native-actions-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.bt-native-changelog-card {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.bt-native-changelog-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.bt-native-changelog-item {
+  padding-top: 0.45rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.bt-native-changelog-item:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.bt-native-changelog-item small {
+  opacity: 0.75;
+  margin-left: 0.35rem;
+}
+
+.bt-native-changelog-item ul {
+  margin: 0.25rem 0 0 1.05rem;
+  padding: 0;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  opacity: 0.9;
+}
+
+html:not([data-camp-mode="true"]) .bt-native-vis-btn {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: rgba(109, 40, 217, 0.22);
+}
+
+html:not([data-camp-mode="true"]) .bt-native-vis-btn.is-active {
+  color: #ffffff;
+}

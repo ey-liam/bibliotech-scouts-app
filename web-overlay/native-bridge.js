@@ -341,9 +341,9 @@
         <div class="bt-sheet-grip" aria-hidden="true"></div>
         <header class="bt-modal-head">
           <div class="bt-head-copy">
-            <span class="bt-eyebrow">BiblioTech Scout · Modo sin conexión</span>
-            <h2 id="bt-offline-title">Mi biblioteca</h2>
-            <p class="bt-sub">Documentos y lecturas oficiales disponibles en tu dispositivo sin necesidad de internet.</p>
+            <span class="bt-eyebrow">BiblioTech Scout · App Android</span>
+            <h2 id="bt-offline-title">Ajustes y Descargas</h2>
+            <p class="bt-sub">Descarga manuales sin conexión, ajusta apariencia y sonidos o actualiza la app.</p>
           </div>
           <button type="button" class="bt-close" id="bt-close-btn" data-bt-close="1" aria-label="Cerrar">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -353,15 +353,18 @@
           </button>
         </header>
 
-        <nav class="bt-tabs" role="tablist" aria-label="Secciones de Mi biblioteca">
+        <nav class="bt-tabs" role="tablist" aria-label="Secciones de Ajustes y Descargas">
           <button type="button" class="bt-tab is-active" id="bt-tab-files" role="tab" aria-selected="true" aria-controls="bt-panel-files">
             <span>Mis descargas</span><span class="bt-tab-badge" id="bt-tab-files-count">0</span>
           </button>
           <button type="button" class="bt-tab" id="bt-tab-download" role="tab" aria-selected="false" aria-controls="bt-panel-download" tabindex="-1">
-            <span>Explorar catálogo</span><span class="bt-tab-badge" id="bt-tab-download-count">0</span>
+            <span>Descargar archivos</span><span class="bt-tab-badge" id="bt-tab-download-count">0</span>
+          </button>
+          <button type="button" class="bt-tab" id="bt-tab-settings" role="tab" aria-selected="false" aria-controls="bt-panel-settings" tabindex="-1">
+            <span>Ajustes</span>
           </button>
           <button type="button" class="bt-tab" id="bt-tab-app" role="tab" aria-selected="false" aria-controls="bt-panel-app" tabindex="-1">
-            <span>App y estado</span>
+            <span>Actualizaciones</span>
           </button>
         </nav>
 
@@ -428,6 +431,68 @@
             <div class="bt-list" id="bt-list" role="list"></div>
           </section>
 
+          <section class="bt-panel" id="bt-panel-settings" role="tabpanel" aria-labelledby="bt-tab-settings" hidden>
+            <div class="bt-native-settings-wrap">
+              <div class="bt-app-card bt-native-settings-card">
+                <div class="bt-native-sec-head">
+                  <strong>Modo visual</strong>
+                  <span class="bt-tab-badge" id="bt-native-vis-badge">Modo Lite</span>
+                </div>
+                <div class="bt-native-vis-grid">
+                  <button type="button" class="bt-native-vis-btn" id="bt-native-vis-lite">Modo Lite</button>
+                  <button type="button" class="bt-native-vis-btn" id="bt-native-vis-full">Modo Estándar</button>
+                </div>
+              </div>
+
+              <div class="bt-app-card bt-native-settings-card">
+                <div class="bt-native-row">
+                  <label for="bt-native-dark-toggle"><strong>Modo oscuro</strong></label>
+                  <input type="checkbox" id="bt-native-dark-toggle" class="bt-native-chk" />
+                </div>
+                <div class="bt-native-row">
+                  <div>
+                    <label for="bt-native-sound-toggle"><strong>Efectos de sonido</strong></label>
+                    <small>Sonidos suaves al tocar botones y pasar páginas.</small>
+                  </div>
+                  <div class="bt-native-row-right">
+                    <button type="button" class="bt-btn bt-secondary bt-btn-sm" id="bt-native-sound-test">Probar</button>
+                    <input type="checkbox" id="bt-native-sound-toggle" class="bt-native-chk" />
+                  </div>
+                </div>
+                <div class="bt-native-row">
+                  <div>
+                    <label for="bt-native-contrast-toggle"><strong>Modo de Alto Contraste</strong></label>
+                    <small>Refuerza textos y bordes bajo sol o vista reducida.</small>
+                  </div>
+                  <input type="checkbox" id="bt-native-contrast-toggle" class="bt-native-chk" />
+                </div>
+                <div class="bt-native-row">
+                  <div>
+                    <strong>Idioma</strong>
+                    <small>Menús principales en Español o English.</small>
+                  </div>
+                  <div class="bt-native-row-right">
+                    <button type="button" class="bt-btn bt-secondary bt-btn-sm" data-bt-native-lang="es">ES</button>
+                    <button type="button" class="bt-btn bt-secondary bt-btn-sm" data-bt-native-lang="en">EN</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bt-app-card bt-native-settings-card">
+                <div class="bt-native-sec-head">
+                  <strong>Datos locales y guía</strong>
+                </div>
+                <div id="bt-native-autofill-info" class="bt-native-mini-note">Cargando datos...</div>
+                <div class="bt-native-actions-wrap">
+                  <button type="button" class="bt-btn bt-secondary bt-btn-sm" id="bt-native-open-notes">Guardados y notas</button>
+                  <button type="button" class="bt-btn bt-secondary bt-btn-sm" id="bt-native-go-autofill">Editar autollenado</button>
+                  <button type="button" class="bt-btn bt-secondary bt-btn-sm" id="bt-native-clear-autofill">Borrar autollenado</button>
+                  <button type="button" class="bt-btn bt-primary bt-btn-sm" id="bt-native-open-welcome">Bienvenida (3 págs) y QR</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
           <section class="bt-panel" id="bt-panel-app" role="tabpanel" aria-labelledby="bt-tab-app" hidden>
             <div class="bt-app-card">
               <div class="bt-app-row"><span>Versión de la app</span><strong id="bt-app-version">—</strong></div>
@@ -442,6 +507,10 @@
               <button type="button" class="bt-btn bt-secondary" id="bt-verify-offline">Verificar preguntas sin conexión</button>
             </div>
             <p class="bt-app-status" id="bt-app-status" role="status"></p>
+            <div class="bt-app-card bt-native-changelog-card">
+              <div class="bt-native-sec-head"><strong>Avisos de actualización</strong></div>
+              <div id="bt-native-changelog-list" class="bt-native-changelog-list"></div>
+            </div>
             <p class="bt-note">La app actualiza automáticamente el contenido y la interfaz web cuando tienes internet, conservando todos tus documentos descargados. Al pulsar «Buscar actualización de APK» se verifica si existe una nueva versión nativa para instalar desde el navegador.</p>
           </section>
         </div>
@@ -568,7 +637,116 @@
 
     $("bt-tab-download").addEventListener("click", () => setTab("download", true));
     $("bt-tab-files").addEventListener("click", () => setTab("files", true));
+    $("bt-tab-settings").addEventListener("click", () => setTab("settings", true));
     $("bt-tab-app").addEventListener("click", () => setTab("app", true));
+
+    $("bt-native-vis-lite").addEventListener("click", () => {
+      if (window.BiblioFeel && typeof window.BiblioFeel.setVisualMode === "function") {
+        window.BiblioFeel.setVisualMode("lite", true);
+      } else {
+        document.documentElement.dataset.btVisual = "lite";
+        document.documentElement.dataset.btPerf = "lite";
+        try { localStorage.setItem("bt_visual_mode_v1", "lite"); } catch (_) {}
+      }
+      renderNativeSettings();
+      toast("Modo Lite activado.");
+    });
+    $("bt-native-vis-full").addEventListener("click", () => {
+      if (window.BiblioFeel && typeof window.BiblioFeel.setVisualMode === "function") {
+        window.BiblioFeel.setVisualMode("full", true);
+      } else {
+        document.documentElement.dataset.btVisual = "full";
+        document.documentElement.dataset.btPerf = "standard";
+        try { localStorage.setItem("bt_visual_mode_v1", "full"); } catch (_) {}
+      }
+      renderNativeSettings();
+      toast("Modo Estándar activado.");
+    });
+    $("bt-native-dark-toggle").addEventListener("change", () => {
+      if (window.BiblioFeel && typeof window.BiblioFeel.toggleCampMode === "function") {
+        window.BiblioFeel.toggleCampMode();
+      } else {
+        const nextDark = document.documentElement.getAttribute("data-camp-mode") !== "true";
+        document.documentElement.setAttribute("data-camp-mode", String(nextDark));
+        try { localStorage.setItem("bt_camp_mode", String(nextDark)); } catch (_) {}
+      }
+      renderNativeSettings();
+    });
+    $("bt-native-sound-toggle").addEventListener("change", (ev) => {
+      const on = Boolean(ev.target.checked);
+      try { localStorage.setItem("bt_sound_enabled_v1", on ? "true" : "false"); } catch (_) {}
+      if (window.BtSoundEngine && typeof window.BtSoundEngine.setEnabled === "function") {
+        window.BtSoundEngine.setEnabled(on, true);
+        if (on) window.BtSoundEngine.play("success");
+      }
+      toast(on ? "Efectos de sonido activados." : "Efectos de sonido silenciados.");
+    });
+    $("bt-native-sound-test").addEventListener("click", () => {
+      try { localStorage.setItem("bt_sound_enabled_v1", "true"); } catch (_) {}
+      if (window.BtSoundEngine && typeof window.BtSoundEngine.setEnabled === "function") {
+        window.BtSoundEngine.setEnabled(true, true);
+        window.BtSoundEngine.play("success");
+      }
+      renderNativeSettings();
+    });
+    $("bt-native-contrast-toggle").addEventListener("change", (ev) => {
+      const on = Boolean(ev.target.checked);
+      document.documentElement.setAttribute("data-bt-contrast", on ? "high" : "normal");
+      try { localStorage.setItem("bt_high_contrast_v1", on ? "true" : "false"); } catch (_) {}
+      const webChk = document.getElementById("settingsContrastToggle");
+      if (webChk) webChk.checked = on;
+      toast(on ? "Modo de Alto Contraste activado." : "Alto Contraste desactivado.");
+    });
+    document.querySelectorAll("[data-bt-native-lang]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const chosen = btn.getAttribute("data-bt-native-lang") === "en" ? "en" : "es";
+        if (typeof window.applyUiLanguage === "function") {
+          window.applyUiLanguage(chosen, true);
+        } else {
+          document.documentElement.dataset.btLang = chosen;
+          try { localStorage.setItem("bt_ui_lang_v1", chosen); } catch (_) {}
+        }
+        renderNativeSettings();
+        toast(chosen === "en" ? "Interface set to English." : "Interfaz en Español.");
+      });
+    });
+    $("bt-native-open-notes").addEventListener("click", () => {
+      closeModal();
+      setTimeout(() => {
+        if (typeof window.openSavedPanel === "function") window.openSavedPanel();
+      }, 100);
+    });
+    $("bt-native-go-autofill").addEventListener("click", () => {
+      closeModal();
+      setTimeout(() => {
+        if (typeof window.__btSwitchView === "function") {
+          window.__btSwitchView("formatos", { scrollToId: "autofillProfileForm" });
+        }
+      }, 100);
+    });
+    $("bt-native-clear-autofill").addEventListener("click", () => {
+      try { localStorage.removeItem("bt_autofill_profile_v1"); } catch (_) {}
+      const form = document.getElementById("autofillProfileForm");
+      if (form) form.reset();
+      const badge = document.getElementById("autofillStatusBadge");
+      if (badge) {
+        badge.classList.remove("is-ready");
+        badge.textContent = "Sin datos guardados";
+      }
+      renderNativeSettings();
+      toast("Datos de autollenado borrados.");
+    });
+    $("bt-native-open-welcome").addEventListener("click", () => {
+      closeModal();
+      setTimeout(() => {
+        if (typeof window.__btOpenWelcomeModal === "function") {
+          window.__btOpenWelcomeModal(1);
+        } else {
+          const wb = document.getElementById("openWelcomeFooterBtn");
+          if (wb) wb.click();
+        }
+      }, 120);
+    });
 
     $("bt-search").addEventListener("input", (event) => {
       state.query = event.target.value.trim().toLowerCase();
@@ -890,31 +1068,84 @@
     const setupDockIntegration = () => {
       const dock = document.getElementById("unifiedBottomDock");
       const dockBtn = document.getElementById("dockBtnSaved") || document.getElementById("dockBtnMochila");
-      if (dock && dockBtn) {
+      const dockSettings = document.getElementById("dockBtnSettings");
+      if (dock) {
         document.body.classList.add("has-unified-dock");
-        if (!dockBtn.__btBound) {
-          dockBtn.__btBound = true;
-          dockBtn.addEventListener(
-            "click",
-            (e) => {
-              e.preventDefault();
-              e.stopImmediatePropagation();
-              openModal("files");
-            },
-            true
-          );
-        }
+        const fabEl = $("bt-offline-fab");
+        if (fabEl) fabEl.hidden = true;
+      }
+      if (dock && dockBtn && !dockBtn.__btBound) {
+        dockBtn.__btBound = true;
+        dockBtn.addEventListener(
+          "click",
+          (e) => {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            openModal("files");
+          },
+          true
+        );
+      }
+      if (dock && dockSettings && !dockSettings.__btNativeBound) {
+        dockSettings.__btNativeBound = true;
+        dockSettings.addEventListener(
+          "click",
+          (e) => {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            openModal("settings");
+          },
+          true
+        );
       }
     };
     setupDockIntegration();
     setTimeout(setupDockIntegration, 600);
   }
 
+  function renderNativeSettings() {
+    const curVis = document.documentElement.dataset.btVisual === "full" ? "full" : "lite";
+    const visBadge = $("bt-native-vis-badge");
+    if (visBadge) visBadge.textContent = curVis === "full" ? "Modo Estándar" : "Modo Lite";
+    const btnLite = $("bt-native-vis-lite");
+    const btnFull = $("bt-native-vis-full");
+    if (btnLite) btnLite.classList.toggle("is-active", curVis === "lite");
+    if (btnFull) btnFull.classList.toggle("is-active", curVis === "full");
+
+    const darkChk = $("bt-native-dark-toggle");
+    if (darkChk) darkChk.checked = document.documentElement.getAttribute("data-camp-mode") === "true";
+
+    const soundChk = $("bt-native-sound-toggle");
+    let soundOn = true;
+    try { soundOn = localStorage.getItem("bt_sound_enabled_v1") !== "false"; } catch (_) {}
+    if (soundChk) soundChk.checked = soundOn;
+
+    const contrastChk = $("bt-native-contrast-toggle");
+    if (contrastChk) contrastChk.checked = document.documentElement.getAttribute("data-bt-contrast") === "high";
+
+    const curLang = document.documentElement.dataset.btLang === "en" ? "en" : "es";
+    document.querySelectorAll("[data-bt-native-lang]").forEach((b) => {
+      const act = b.getAttribute("data-bt-native-lang") === curLang;
+      b.classList.toggle("bt-primary", act);
+      b.classList.toggle("bt-secondary", !act);
+    });
+
+    const afEl = $("bt-native-autofill-info");
+    if (afEl) {
+      let prof = {};
+      try { prof = JSON.parse(localStorage.getItem("bt_autofill_profile_v1") || "{}") || {}; } catch (_) {}
+      const filled = [prof.name, prof.section, prof.group, prof.province].filter(Boolean);
+      afEl.textContent = filled.length
+        ? `Perfil local: ${filled.join(" · ")}`
+        : "Sin datos de autollenado guardados todavía.";
+    }
+  }
+
   function setTab(tab, focusTab) {
-    if (!["download", "files", "app"].includes(tab)) tab = "files";
+    if (!["download", "files", "settings", "app"].includes(tab)) tab = "files";
     state.activeTab = tab;
     writePref("library_tab", tab);
-    for (const name of ["download", "files", "app"]) {
+    for (const name of ["download", "files", "settings", "app"]) {
       const button = $(`bt-tab-${name}`);
       const panel = $(`bt-panel-${name}`);
       const active = name === tab;
@@ -929,6 +1160,7 @@
     const foot = $("bt-download-foot");
     if (foot) foot.hidden = tab !== "download";
     if (tab === "files") renderSavedList();
+    if (tab === "settings") renderNativeSettings();
     if (tab === "app") renderAppInfo();
   }
 
@@ -2231,6 +2463,15 @@ draw();
     }
     const networkEl = $("bt-app-network");
     if (networkEl) networkEl.textContent = state.online ? "Con conexión" : "Sin conexión";
+    const clBox = $("bt-native-changelog-list");
+    if (clBox && Array.isArray(window.BT_RELEASE_NOTES)) {
+      clBox.innerHTML = window.BT_RELEASE_NOTES.map(
+        (rel) =>
+          `<div class="bt-native-changelog-item"><strong>${String(rel.version || "").replace(/</g, "&lt;")}</strong> <small>${String(rel.date || "").replace(/</g, "&lt;")}</small><ul>${(rel.items || [])
+            .map((it) => `<li>${String(it).replace(/</g, "&lt;")}</li>`)
+            .join("")}</ul></div>`
+      ).join("");
+    }
     renderStorage();
   }
 
@@ -2656,7 +2897,7 @@ draw();
     document.addEventListener(
       "click",
       (event) => {
-        // En la App Android, el acceso a "App / Modo Offline" abre el gestor nativo de descargas
+        // En la App Android, abrir "App / Modo Offline" lleva directo al centro unificado de descargas
         const offlineShortcut =
           event.target.closest &&
           event.target.closest('[data-bt-native-open-offline="1"], a[href="#app"]');
@@ -2671,7 +2912,19 @@ draw();
             if (navToggle) navToggle.setAttribute("aria-expanded", "false");
             if (navBackdrop) navBackdrop.hidden = true;
           }
-          openModal("files");
+          openModal("download");
+          return;
+        }
+
+        // En la App Android, cualquier botón de Ajustes abre la pestaña Ajustes fusionada aquí
+        const settingsShortcut =
+          event.target.closest &&
+          event.target.closest("[data-action-open-settings], #dockBtnSettings");
+        if (settingsShortcut) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          const tab = settingsShortcut.getAttribute("data-settings-initial-tab") === "version" ? "app" : "settings";
+          openModal(tab);
           return;
         }
 
@@ -2798,6 +3051,7 @@ draw();
     renderStorage();
     renderList();
     renderSavedList();
+    renderNativeSettings();
     renderAppInfo();
 
     if (state.catalog) {
@@ -2814,7 +3068,14 @@ draw();
     }
 
     setTimeout(() => {
-      const target = tab === "files" ? $("bt-saved-search") : tab === "app" ? $("bt-tab-app") : $("bt-search");
+      const target =
+        tab === "files"
+          ? $("bt-saved-search")
+          : tab === "settings"
+            ? $("bt-tab-settings")
+            : tab === "app"
+              ? $("bt-tab-app")
+              : $("bt-search");
       if (target) target.focus();
     }, 80);
   }
@@ -2914,7 +3175,7 @@ draw();
       loadOfflineIndex(),
       readPref("library_tab", ""),
     ]);
-    state.activeTab = ["download", "files", "app"].includes(savedTab) ? savedTab : "files";
+    state.activeTab = ["download", "files", "settings", "app"].includes(savedTab) ? savedTab : "files";
 
     buildUi();
     window.__btNativeBridge = {

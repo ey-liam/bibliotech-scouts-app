@@ -491,10 +491,13 @@
 
               <div class="bt-app-card bt-native-settings-card">
                 <div class="bt-native-sec-head">
-                  <strong>Datos locales y guía</strong>
+                  <strong>Datos locales, código y guía</strong>
+                  <code id="bt-native-device-uid" class="bt-tab-badge">BT-000000</code>
                 </div>
                 <div id="bt-native-autofill-info" class="bt-native-mini-note">Cargando datos...</div>
                 <div class="bt-native-actions-wrap">
+                  <button type="button" class="bt-btn bt-secondary bt-btn-sm" id="bt-native-copy-uid">Copiar mi código</button>
+                  <button type="button" class="bt-btn bt-secondary bt-btn-sm" id="bt-native-open-ejes">Los 4 Ejes PJOS</button>
                   <button type="button" class="bt-btn bt-secondary bt-btn-sm" id="bt-native-open-notes">Guardados y notas</button>
                   <button type="button" class="bt-btn bt-secondary bt-btn-sm" id="bt-native-go-autofill">Editar autollenado</button>
                   <button type="button" class="bt-btn bt-secondary bt-btn-sm" id="bt-native-clear-autofill">Borrar autollenado</button>
@@ -739,6 +742,29 @@
         if (typeof window.openSavedPanel === "function") window.openSavedPanel();
       }, 100);
     });
+    const copyUidBtn = $("bt-native-copy-uid");
+    if (copyUidBtn) {
+      copyUidBtn.addEventListener("click", async () => {
+        const uid = (typeof window.__btGetDeviceUid === "function" && window.__btGetDeviceUid()) || localStorage.getItem("bt_device_uid_v1") || "";
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(uid);
+          }
+        } catch (_) {}
+        toast(`Código copiado: ${uid}`);
+      });
+    }
+    const openEjesBtn = $("bt-native-open-ejes");
+    if (openEjesBtn) {
+      openEjesBtn.addEventListener("click", () => {
+        closeModal();
+        setTimeout(() => {
+          if (typeof window.__btSwitchView === "function") {
+            window.__btSwitchView("ejes");
+          }
+        }, 100);
+      });
+    }
     $("bt-native-go-autofill").addEventListener("click", () => {
       closeModal();
       setTimeout(() => {
@@ -1191,6 +1217,15 @@
     if (clrAfBtn) clrAfBtn.textContent = isEn ? "Clear autofill" : "Borrar autollenado";
     const welBtn = $("bt-native-open-welcome");
     if (welBtn) welBtn.textContent = isEn ? "Welcome (3 pgs) & QR" : "Bienvenida (3 págs) y QR";
+
+    const uidEl = $("bt-native-device-uid");
+    if (uidEl) {
+      const uid =
+        (typeof window.__btGetDeviceUid === "function" && window.__btGetDeviceUid()) ||
+        localStorage.getItem("bt_device_uid_v1") ||
+        "BT-LOCAL";
+      uidEl.textContent = uid;
+    }
 
     const afEl = $("bt-native-autofill-info");
     if (afEl) {
@@ -3231,12 +3266,26 @@ draw();
       OtaUpdater.confirmBoot().catch((e) => console.warn("[BiblioTech Native] confirmBoot:", e));
     }
     // Arranque en paralelo para abrir más rápido en Android (sin waterfalls)
-    const [, , , savedTab] = await Promise.all([
+    const [, , , savedTab, prefDeviceUid] = await Promise.all([
       ensureDataDirectory(),
       clearOldContentCache(),
       loadOfflineIndex(),
       readPref("library_tab", ""),
+      readPref("device_uid_v1", ""),
     ]);
+    try {
+      const validPref = String(prefDeviceUid || "").trim().toUpperCase();
+      if (/^BT-[A-Z0-9]{6,10}$/.test(validPref)) {
+        localStorage.setItem("bt_device_uid_v1", validPref);
+      } else {
+        const curWebUid =
+          (typeof window.__btGetDeviceUid === "function" && window.__btGetDeviceUid()) ||
+          String(localStorage.getItem("bt_device_uid_v1") || "").trim().toUpperCase();
+        if (/^BT-[A-Z0-9]{6,10}$/.test(curWebUid)) {
+          writePref("device_uid_v1", curWebUid);
+        }
+      }
+    } catch (_) {}
     state.activeTab = ["download", "files", "settings", "app"].includes(savedTab) ? savedTab : "files";
 
     buildUi();

@@ -2,7 +2,7 @@
 
 Aplicación oficial para **teléfonos y tablets Android** de **BiblioTech Scout**, diseñada para consultar manuales, reglamentos, progresiones, trámites y documentos oficiales del escultismo (ASMAC y World Scouting WOSM) incluso en campamentos y actividades sin acceso a internet.
 
-- **Versión actual:** `4.1.0` (`versionCode 51`) — `4.1.0 Mobile - Web 10.1.0 (25/11/2026)`
+- **Versión actual:** `4.2.0` (`versionCode 52`) — `4.2.0 Mobile - Web 10.2.0 (25/11/2026)`
 - **Creador:** Liam Durán · Comunidad de Caminantes · Provincia Tláhuac-Xochimilco · **Contacto:** `rdc.tlxh@gmail.com`
 - **Descarga oficial del APK:** [GitHub Releases (`bibliotech-scouts-app`)](https://github.com/ey-liam/bibliotech-scouts-app/releases/latest)
 
@@ -32,7 +32,7 @@ La app adapta automáticamente sus superficies, tarjetas, tipografía y lector P
 
 | Apartado / Pantalla | Qué es y qué puedes hacer ahí | Captura |
 | :--- | :--- | :---: |
-| **Consultas Offline (`Buscador`)** | Pregunta cualquier duda scout o filtra por sección (*Manada*, *Tropa*, *Comunidad*, *Clan*, etc.) sobre las `21,252` preguntas y respuestas empaquetadas sin depender de datos móviles, con lectura en voz alta, nomenclatura oficial y citas documentales cruzadas. | ![Consulta offline en teléfono Android](docs/screenshots/app-consulta-movil.png) |
+| **Consultas Offline (`Buscador`)** | Pregunta cualquier duda scout o filtra por sección (*Manada*, *Tropa*, *Comunidad*, *Clan*, etc.) sobre las `21,258` preguntas y respuestas empaquetadas sin depender de datos móviles, con lectura en voz alta, nomenclatura oficial y citas documentales cruzadas. | ![Consulta offline en teléfono Android](docs/screenshots/app-consulta-movil.png) |
 | **Mi Biblioteca — Explorar Catálogo** | Abre el gestor nativo desde el menú móvil o el botón flotante para buscar entre los `883` documentos oficiales, filtrar por categoría/subcategoría/sección y descargar archivos individuales o en bloques de `25` para llevarlos sin conexión. | ![Gestor de descargas offline en teléfono](docs/screenshots/app-panel-descargas.png) |
 | **App y Estado (`OTA y Diagnóstico`)** | Verifica la versión instalada del APK, el commit web sincronizado, conectividad, cantidad de documentos guardados, actualización en segundo plano (`Actualizar web y contenido ahora`), revisión de APK nuevo y diagnóstico del banco offline. | ![Estado offline y verificación de datos en la app](docs/screenshots/app-estado-offline.png) |
 | **Vista Adaptada para Tablet Android** | Aprovecha pantallas medianas y grandes con diseño de catálogo amplio, barra superior completa y panel gestor lateral/modal cómodo para consulta grupal o de dirigentes. | ![BiblioTech Scout APK en Tablet Android](docs/screenshots/app-tablet.png) |
